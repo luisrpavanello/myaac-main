@@ -2,7 +2,7 @@
 
 MyAAC e o Automatic Account Creator usado como site/painel web do servidor. Ele permite criar contas, personagens, gerenciar recursos web e integrar o site diretamente ao banco de dados do Canary.
 
-Neste workspace, o arquivo `config.local.php` ja esta preparado para ambiente local, apontando para o servidor Canary em `/Users/luispavanello/Dev/ProjectOT/canary/` e para o banco `canary_db`.
+Neste workspace, o arquivo `config.local.php` ja esta preparado para ambiente local, apontando para o servidor Canary em `/Users/luispavanello/Dev/ProjectOT/canary/` e para o banco `canary`.
 
 ## Estrutura Importante
 
@@ -46,8 +46,8 @@ $config['server_path'] = getenv('MYAAC_SERVER_PATH') ?: '/Users/luispavanello/De
 $config['site_url'] = getenv('MYAAC_SITE_URL') ?: 'http://localhost:8080/';
 $config['database_host'] = getenv('CANARY_DB_HOST') ?: (getenv('MYAAC_DB_HOST') ?: '127.0.0.1');
 $config['database_user'] = getenv('CANARY_DB_USER') ?: (getenv('MYAAC_DB_USER') ?: 'canary');
-$config['database_password'] = getenv('CANARY_DB_PASSWORD') ?: (getenv('MYAAC_DB_PASSWORD') ?: 'canary123');
-$config['database_name'] = getenv('CANARY_DB_NAME') ?: (getenv('MYAAC_DB_NAME') ?: 'canary_db');
+$config['database_password'] = getenv('CANARY_DB_PASSWORD') ?: (getenv('MYAAC_DB_PASSWORD') ?: 'canary');
+$config['database_name'] = getenv('CANARY_DB_NAME') ?: (getenv('MYAAC_DB_NAME') ?: 'canary');
 ```
 
 Voce pode alterar diretamente o arquivo ou usar variaveis de ambiente:
@@ -57,8 +57,8 @@ export MYAAC_SITE_URL="http://localhost:8080/"
 export MYAAC_SERVER_PATH="/Users/luispavanello/Dev/ProjectOT/canary/"
 export MYAAC_DB_HOST="127.0.0.1"
 export MYAAC_DB_USER="canary"
-export MYAAC_DB_PASSWORD="canary123"
-export MYAAC_DB_NAME="canary_db"
+export MYAAC_DB_PASSWORD="canary"
+export MYAAC_DB_NAME="canary"
 ```
 
 ## Como Iniciar em Desenvolvimento
@@ -117,7 +117,7 @@ Nao e necessario rodar build frontend para iniciar o site em PHP.
 
 Para funcionar corretamente:
 
-1. O banco `canary_db` deve existir.
+1. O banco `canary` deve existir.
 2. O `schema.sql` do Canary deve ter sido importado.
 3. `config.local.php` deve apontar para o mesmo banco.
 4. `server_path` deve apontar para a pasta do Canary.
