@@ -15,6 +15,7 @@ $show_form = true;
 $reg_password = $_POST['reg_password'] ?? '';
 $reg_password = encrypt(($config_salt_enabled ? $account_logged->getCustomField('salt') : '') . $reg_password);
 $can_update_info = $config['account_update_info_on_register'];
+$can_update_country = $can_update_info && $config['account_country'];
 $save = $_POST['registeraccountsave'] ?? null;
 
 if ($save == "1") {
@@ -24,9 +25,14 @@ if ($save == "1") {
             $new_rlname = isset($_POST['info_rlname']) ? htmlspecialchars(stripslashes($_POST['info_rlname'])) : NULL;
             $new_location = isset($_POST['info_location']) ? htmlspecialchars(stripslashes($_POST['info_location'])) : NULL;
             $new_phone = isset($_POST['info_phone']) ? htmlspecialchars(stripslashes($_POST['info_phone'])) : NULL;
-            $new_country = isset($_POST['info_country']) ? htmlspecialchars(stripslashes($_POST['info_country'])) : NULL;
-            if (!$new_rlname || !$new_location || !$new_phone || !$new_country) {
+            $new_country = $can_update_country && isset($_POST['info_country']) ? htmlspecialchars(stripslashes($_POST['info_country'])) : NULL;
+            if (!$new_rlname || !$new_location || !$new_phone || ($can_update_country && !$new_country)) {
                 $errors[] = 'All fields are required, please try again!';
+                $show_form = true;
+            }
+
+            if ($can_update_country && $new_country && !isset($config['countries'][$new_country])) {
+                $errors[] = 'Country is not correct.';
                 $show_form = true;
             }
         }
@@ -40,22 +46,21 @@ if ($save == "1") {
 
                 $resultInfo = ['log' => '', 'title' => '', 'desc' => ''];
                 if ($can_update_info) {
-                    if (!isset($config['countries'][$new_country]))
-                        $errors[] = 'Country is not correct.';
-
-                    if (empty($errors)) {
-                        //save data from form
-                        $account_logged->setCustomField("rlname", $new_rlname);
-                        $account_logged->setCustomField("location", $new_location);
+                    //save data from form
+                    $account_logged->setCustomField("rlname", $new_rlname);
+                    $account_logged->setCustomField("location", $new_location);
+                    if ($can_update_country) {
                         $account_logged->setCustomField("country", $new_country);
-                        $account_logged->setCustomField("phone", $new_phone);
-                        $resultInfo = [
-                            'log' => " and Updated your Real Name to <b>$new_rlname</b>, Location to <b>$new_location</b>, Phone to <b>$new_phone</b> and Country to <b>{$config['countries'][$new_country]}</b>",
-                            'title' => ' and Public Information Changed',
-                            'desc' => 'Your public information has been changed.<br/>',
-                        ];
-                        $show_form = false;
                     }
+                    $account_logged->setCustomField("phone", $new_phone);
+
+                    $country_log = $can_update_country ? " and Country to <b>{$config['countries'][$new_country]}</b>" : '';
+                    $resultInfo = [
+                        'log' => " and Updated your Real Name to <b>$new_rlname</b>, Location to <b>$new_location</b>, Phone to <b>$new_phone</b>{$country_log}",
+                        'title' => ' and Public Information Changed',
+                        'desc' => 'Your public information has been changed.<br/>',
+                    ];
+                    $show_form = false;
                 }
 
                 $account_logged->logAction("Generated recovery key{$resultInfo['log']}.");
@@ -106,5 +111,8 @@ if ($show_form) {
         'can_update_public_info' => $can_update_info,
         'countries' => $countries,
         'account_country' => $account_country ?? '',
+        'account_rlname' => $account_logged->getRLName(),
+        'account_location' => $account_logged->getLocation(),
+        'account_phone' => $account_logged->getCustomField("phone"),
     ]);
 }
