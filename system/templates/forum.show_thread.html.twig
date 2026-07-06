@@ -82,8 +82,8 @@
                                 <div class="PostCharacterText"><b>{{ post.player_link|raw }}</b><br>
                                   {% if post.outfit is defined %}
                                     <img
-                                      style="margin-left:{% if post.player.getLookType() in [75, 266, 302] %}-0px;margin-top:-0px;width:64px;height:64px;{% else %}-60px;margin-top:-60px;width:128px;height:128px;{% endif %}"
-                                      src="{{ post.outfit }}" alt="player outfit"/>
+                                      style="display:block; width:64px; height:64px; object-fit:contain; margin:4px auto;"
+                                      src="{{ post.outfit }}" alt=""/>
                                     <br/>
                                   {% endif %}
 
@@ -199,8 +199,6 @@ View threads.
 Replace code is ON. Smileys are ON. Images are OFF. Links are ON. "Thank You!" option is OFF.
 <br>
 Account muting option is ON.
-
-
 
 
 

@@ -43,7 +43,7 @@ $Charm_Expansion = isset($getCharm['charm_expansion']) && $getCharm['charm_expan
 /* GET CHARM CHARACTER END */
 
 /* OUTFIT CHARACTER */
-$outfit_url = "{$config['outfit_images_url']}?id={$character['looktype']}" . (!empty($character['lookaddons']) ? "&addons={$character['lookaddons']}" : '') . "&head={$character['lookhead']}&body={$character['lookbody']}&legs={$character['looklegs']}&feet={$character['lookfeet']}";
+$outfit_url = getVocationImage($character['vocation']);
 /* OUTFIT CHARACTER */
 
 /* EQUIPAMENT CHARACTER */
@@ -198,10 +198,7 @@ $End = date('Y-m-d H:i:s', strtotime($getAuction['date_end']));
                                                     </div>
                                                     <div class="AuctionBody">
                                                         <div class="AuctionBodyBlock AuctionDisplay AuctionOutfit"
-                                                             style="font-size: 10px; text-align: center;">
-                                                            Current outfit:
                                                             <img class="AuctionOutfitImage" src="<?= $outfit_url ?>">
-                                                        </div>
                                                         <div
                                                             class="AuctionBodyBlock AuctionDisplay AuctionItemsViewBox">
                                                             <?php foreach ([2, 1, 3, 6, 4, 5, 9, 7, 10] as $i) { ?>

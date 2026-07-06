@@ -10,7 +10,7 @@ foreach ($auctions as $auction) { /* LOOP AUCTIONS */
     /* GET INFO CHARACTER END */
 
     /* OUTFIT CHARACTER */
-    $outfit_url = "{$config['outfit_images_url']}?id={$character['looktype']}" . (!empty($character['lookaddons']) ? "&addons={$character['lookaddons']}" : '') . "&head={$character['lookhead']}&body={$character['lookbody']}&legs={$character['looklegs']}&feet={$character['lookfeet']}";
+    $outfit_url = getVocationImage($character['vocation']);
     /* OUTFIT CHARACTER */
 
     /* EQUIPAMENT CHARACTER */
@@ -294,4 +294,3 @@ foreach ($auctions as $auction) { /* LOOP AUCTIONS */
     <?php
 } /* LOOP END */
 ?>
-

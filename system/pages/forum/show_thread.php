@@ -50,14 +50,14 @@ foreach ($posts as &$post) {
         throw new RuntimeException('Forum error: Player not loaded.');
     }
 
-    if ($config['characters']['outfit']) {
-        $post['outfit'] = $config['outfit_images_url'] . '?id=' . $player->getLookType() . ($lookaddons ? '&addons=' . $player->getLookAddons() : '') . '&head=' . $player->getLookHead() . '&body=' . $player->getLookBody() . '&legs=' . $player->getLookLegs() . '&feet=' . $player->getLookFeet();
-    }
-
     $groupName = '';
     $group = $player->getGroup();
     if ($group->isLoaded()) {
         $groupName = $group->getName();
+    }
+
+    if ($config['characters']['outfit']) {
+        $post['outfit'] = getVocationImage($player->getVocation(), $groupName);
     }
 
     $post['group'] = $groupName;

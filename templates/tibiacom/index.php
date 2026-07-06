@@ -492,39 +492,12 @@ if (isset($config['boxes']))
                                                     class="InfoBarSmallElement">Download Client</span></a>
                                     </span>
 
-                                    <?php if (!empty($config['whatsapp_link'])) { ?>
-                                        <img class="InfoBarBigLogo" style="margin-left: 8px"
-                                             src="<?= $template_path; ?>/images/global/header/icon-whatsapp.png"
-                                             width="16">
-                                        <span class="InfoBarNumbers">
-                                            <a class="InfoBarLinks" href="<?= $config['whatsapp_link']; ?>" target="new"><span
-                                                        class="InfoBarSmallElement">Grupo Whatsapp</span></a>
-                                        </span>
-                                    <?php } ?>
                                     <?php if (!empty($config['discord_link'])) { ?>
                                         <img class="InfoBarBigLogo" style="margin-left: 8px"
                                              src="<?= $template_path; ?>/images/global/header/icon-discord.png">
                                         <span class="InfoBarNumbers">
                                             <a class="InfoBarLinks" href="<?= $config['discord_link']; ?>" target="new"><span
                                                         class="InfoBarSmallElement">Discord</span></a>
-                                        </span>
-                                    <?php } ?>
-                                    <?php if (!empty($config['instagram_link'])) { ?>
-                                        <img class="InfoBarBigLogo" style="margin-left: 8px"
-                                             src="<?= $template_path; ?>/images/global/header/icon-instagram.png"
-                                             width="16">
-                                        <span class="InfoBarNumbers">
-                                            <a class="InfoBarLinks" href="https://www.instagram.com/<?= $config['instagram_link']; ?>"
-                                               target="new"><span class="InfoBarSmallElement">Instagram</span></a>
-                                        </span>
-                                    <?php } ?>
-                                    <?php if (!empty($config['facebook_link'])) { ?>
-                                        <img class="InfoBarBigLogo" style="margin-left: 8px"
-                                             src="<?= $template_path; ?>/images/global/header/icon-facebook.png"
-                                             width="16">
-                                        <span class="InfoBarNumbers">
-                                            <a class="InfoBarLinks" href="https://www.facebook.com/<?= $config['facebook_link']; ?>"
-                                               target="new"><span class="InfoBarSmallElement">Facebook</span></a>
                                         </span>
                                     <?php } ?>
                                     <span style="float: right; margin-top: 1px; margin-right: 4px">

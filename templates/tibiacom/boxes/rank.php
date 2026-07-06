@@ -71,15 +71,8 @@
     <div class="rank_content">
         <?php
         $topPlayers = getTopPlayers(5);
-        $outfitPath = parse_url($config['outfit_images_url'], PHP_URL_PATH);
-        $outfitLocalPath = strpos($outfitPath, './') === 0 ? substr($outfitPath, 2) : ltrim($outfitPath, '/');
-        $outfitImagesAvailable = preg_match('#^https?://#', $config['outfit_images_url']) || file_exists(BASE . $outfitLocalPath);
         foreach($topPlayers as $player){
-            $outfit_url = 'templates/tibiacom/images/global/general/blank.gif';
-            if ($config['online_outfit'] && $outfitImagesAvailable){
-                $outfit_url = $config['outfit_images_url'] . '?id=' . $player['looktype'] . ( !empty( $player['lookaddons'] ) ? '&addons=' . $player['lookaddons'] : '' ) . '&head=' . $player['lookhead'] . '&body=' . $player['lookbody'] . '&legs=' . $player['looklegs'] . '&feet=' . $player['lookfeet'];
-            }
-            $player['outfit'] = $outfit_url;
+            $player['outfit'] = getVocationImage($player['vocation']);
             $player_voc = $config['vocations'][$player['vocation']];
         ?>
         <div class="rank_player">

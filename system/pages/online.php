@@ -83,12 +83,7 @@ foreach($playersOnline as $player){
 	}
 
 	$base_vocation = $player['vocation'] > $config['vocations_amount'] ? $player['vocation'] - $config['vocations_amount'] : $player['vocation'];
-	$vocation_images = array(
-		1 => 'images/sorcerer.png',
-		2 => 'images/druid.png',
-		3 => 'images/paladin.png',
-		4 => 'images/knight.png',
-	);
+	$vocation_image = getVocationImage($player['vocation']);
 
 	$players_data[] = array(
 		'name' => getPlayerLink($player['name']),
@@ -96,8 +91,8 @@ foreach($playersOnline as $player){
 		'level' => $player['level'],
 		'vocation' => $config['vocations'][$player['vocation']],
 		'country_image' => $config['account_country'] ? getFlagImage($player['country']) : null,
-		'outfit' => $config['online_outfit'] ? $config['outfit_images_url'] . '?id=' . $player['looktype'] . ($outfit_addons ? '&addons=' . $player['lookaddons'] : '') . '&head=' . $player['lookhead'] . '&body=' . $player['lookbody'] . '&legs=' . $player['looklegs'] . '&feet=' . $player['lookfeet'] : null,
-		'vocation_image' => $vocation_images[$base_vocation] ?? 'templates/tibiacom/images/global/general/blank.gif',
+		'outfit' => $config['online_outfit'] ? $vocation_image : null,
+		'vocation_image' => $vocation_image,
 	);
 
 	if($config['online_vocations']) {

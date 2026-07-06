@@ -17,7 +17,7 @@ if (empty($race)) {
 	$replaces = [];
 	$replaces['boosted_monster_name'] = $monsterquery['boostname'];
 	$replaces['boosted_monster_uri'] = str_replace(' ', '', strtolower($monsterquery['boostname']));
-	$replaces['boosted_monster_image'] = "{$config['outfit_images_url']}?id={$monstertype}&addons={$monsteraddons}&head={$monsterhead}&body={$monsterbody}&legs={$monsterlegs}&feet={$monsterfeet}&mount={$monstermount}";
+	$replaces['boosted_monster_image'] = getLibraryCreatureImage($monsterquery['boostname']);
 
 	echo $twig->render('library/library.html.twig', $replaces);
 

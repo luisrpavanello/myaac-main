@@ -370,7 +370,7 @@ if (!$rank_vocation = $_POST['profession'] ?? null) {
                                                 echo '
 			<tr style="height: 64px;"><td>' . ($offset + $i) . '.</td>';
                                                 if ($config['highscores_outfit'])
-                                                    echo '<td><img style="position:absolute;margin-top:' . (in_array($player['looktype'], array(75, 266, 302)) ? '-15px;margin-left:5px' : '-45px;margin-left:-25px') . ';" src="' . $config['outfit_images_url'] . '?id=' . $player['looktype'] . ($outfit_addons ? '&addons=' . $player['lookaddons'] : '') . '&head=' . $player['lookhead'] . '&body=' . $player['lookbody'] . '&legs=' . $player['looklegs'] . '&feet=' . $player['lookfeet'] . '" alt="" /></td>';
+                                                    echo '<td style="width:72px; text-align:center;"><img style="display:block; width:64px; height:64px; object-fit:contain; margin:0 auto;" src="' . getVocationImage($player['vocation']) . '" alt="" /></td>';
 
                                                 echo '
 			<td>

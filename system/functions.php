@@ -13,6 +13,109 @@ defined('MYAAC') or die('Direct access not allowed!');
 
 use Twig\Loader\ArrayLoader as Twig_ArrayLoader;
 
+function getVocationImage($vocation = null, $groupName = '', $groupId = null)
+{
+  global $config;
+
+  $group = strtolower(trim((string)$groupName));
+  if ($groupId !== null && (int)$groupId >= 4) {
+    if (strpos($group, 'god') !== false || strpos($group, 'admin') !== false || strpos($group, 'administrator') !== false) {
+      return 'images/gamemaster.gif';
+    }
+
+    if (strpos($group, 'gamemaster') !== false || strpos($group, 'game master') !== false || strpos($group, 'gm') !== false) {
+      return 'images/gamemaster.gif';
+    }
+  }
+
+  if (strpos($group, 'god') !== false || strpos($group, 'admin') !== false || strpos($group, 'administrator') !== false) {
+    return 'images/gamemaster.gif';
+  }
+
+  if (strpos($group, 'gamemaster') !== false || strpos($group, 'game master') !== false || strpos($group, 'gm') !== false) {
+    return 'images/gamemaster.gif';
+  }
+
+  $name = '';
+  if (is_numeric($vocation)) {
+    $vocationId = (int)$vocation;
+    if (isset($config['vocations'][$vocationId])) {
+      $name = strtolower($config['vocations'][$vocationId]);
+    } else {
+      $baseAmount = (int)($config['vocations_amount'] ?? 4);
+      $baseId = $baseAmount > 0 && $vocationId > $baseAmount ? (($vocationId - 1) % $baseAmount) + 1 : $vocationId;
+      $map = [
+        0 => 'rook',
+        1 => 'sorcerer',
+        2 => 'druid',
+        3 => 'paladin',
+        4 => 'knight',
+      ];
+      $name = $map[$baseId] ?? '';
+    }
+  } else {
+    $name = strtolower((string)$vocation);
+  }
+
+  if (strpos($name, 'admin') !== false || strpos($name, 'god') !== false) {
+    return 'images/adm.gif';
+  }
+  if (strpos($name, 'gamemaster') !== false || strpos($name, 'game master') !== false || preg_match('/\bgm\b/', $name)) {
+    return 'images/gamemaster.gif';
+  }
+  if (strpos($name, 'monk') !== false) {
+    return 'images/monk.gif';
+  }
+  if (strpos($name, 'knight') !== false) {
+    return 'images/knight.gif';
+  }
+  if (strpos($name, 'paladin') !== false) {
+    return 'images/paladin.gif';
+  }
+  if (strpos($name, 'druid') !== false) {
+    return 'images/druid.gif';
+  }
+  if (strpos($name, 'sorcerer') !== false) {
+    return 'images/sorcerer.gif';
+  }
+
+  return 'images/rook.gif';
+}
+
+function getLibraryCreatureImage($name, $fallback = 'demon')
+{
+  $normalize = static function ($value) {
+    $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string)$value);
+    return strtolower(preg_replace('/[^a-z0-9]/i', '', $value));
+  };
+
+  $name = trim((string)$name);
+  $candidates = [];
+  $exact = $normalize($name);
+  if ($exact !== '') {
+    $candidates[] = $exact;
+    $words = preg_split('/\s+/', $name);
+    for ($i = 1, $count = count($words); $i < $count; $i++) {
+      $candidate = $normalize(implode(' ', array_slice($words, $i)));
+      if ($candidate !== '') {
+        $candidates[] = $candidate;
+      }
+    }
+  }
+
+  foreach ($candidates as $candidate) {
+    $singular = preg_replace('/s$/', '', $candidate);
+    foreach (array_unique([$candidate, $singular]) as $sprite) {
+      $relativePath = 'images/library/' . $sprite . '.gif';
+      if (file_exists(BASE . $relativePath)) {
+        return $relativePath;
+      }
+    }
+  }
+
+  return 'images/library/' . $fallback . '.gif';
+}
+
 function message($message, $type, $return)
 {
   if (IS_CLI) {

@@ -145,24 +145,17 @@ if ($player->isLoaded() && !$player->isDeleted()) {
     $rows = 0;
     $hidden = $player->isHidden();
 
-    $base_vocation = $player->getVocation() > $config['vocations_amount'] ? $player->getVocation() - $config['vocations_amount'] : $player->getVocation();
-    $vocation_images = array(
-        1 => 'images/sorcerer.png',
-        2 => 'images/druid.png',
-        3 => 'images/paladin.png',
-        4 => 'images/knight.png',
-    );
-    $outfit_fallback = $vocation_images[$base_vocation] ?? 'templates/tibiacom/images/global/general/blank.gif';
+    $playerGroupName = '';
+    $playerGroupId = null;
+    $playerGroup = $player->getGroup();
+    if ($playerGroup->isLoaded()) {
+        $playerGroupName = $playerGroup->getName();
+        $playerGroupId = $playerGroup->getId();
+    }
+    $outfit_fallback = getVocationImage($player->getVocation(), $playerGroupName, $playerGroupId);
 
     if ($config['characters']['outfit']) {
         $outfit = $outfit_fallback;
-        $outfit_url = $config['outfit_images_url'] . '?id=' . $player->getLookType() . ($db->hasColumn('players', 'lookaddons') ? '&addons=' . $player->getLookAddons() : '') . '&head=' . $player->getLookHead() . '&body=' . $player->getLookBody() . '&legs=' . $player->getLookLegs() . '&feet=' . $player->getLookFeet();
-        $outfit_path = parse_url($config['outfit_images_url'], PHP_URL_PATH);
-        $outfit_local_path = BASE . '/' . ltrim(preg_replace('#^\./#', '', $outfit_path ?? ''), '/');
-
-        if (preg_match('#^https?://#', $config['outfit_images_url']) || file_exists($outfit_local_path)) {
-            $outfit = $outfit_url;
-        }
     }
 
     $flag = '';
