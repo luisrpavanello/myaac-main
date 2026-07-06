@@ -118,6 +118,7 @@ if (empty($uri) || isset($_REQUEST['template'])) {
             '/^gallery\/add\/?$/' => array('subtopic' => 'gallery', 'action' => 'add'),
             '/^gallery\/edit\/?$/' => array('subtopic' => 'gallery', 'action' => 'edit'),
             '/^gallery\/[0-9]+\/?$/' => array('subtopic' => 'gallery', 'image' => '$1'),
+            '/^houses\/view\/?$/' => array('subtopic' => 'houses', 'page' => 'view'),
             '/^gifts\/history\/?$/' => array('subtopic' => 'gifts', 'action' => 'show_history'),
             '/^guilds\/[A-Za-z0-9-_%+\']+$/' => array('subtopic' => 'guilds', 'action' => 'show', 'guild' => '$1'),
             '/^highscores\/[A-Za-z0-9-_]+\/[A-Za-z0-9-_]+\/[0-9]+\/?$/' => array('subtopic' => 'highscores', 'list' => '$1', 'vocation' => '$2', 'page' => '$3'),

@@ -1,4 +1,5 @@
-<form action="?subtopic=guilds&action=create&todo=save" method="post">
+<form action="?subtopic=guilds&action=create" method="post">
+<input type="hidden" name="todo" value="save">
 <div class="TableContainer">
 				<div class="CaptionContainer">
 						<div class="CaptionInnerContainer">
@@ -51,15 +52,13 @@
 			</td>
 			<td align="center" valign="top">
 				{{ include('buttons.submit.html.twig') }}
-</form>
 			</td>
 			<td align="center">
-				<form  action="?subtopic=guilds" method="post">
-					{{ include('buttons.back.html.twig') }}
-				</form>
+				<input type="button" class="BigButtonText" value="Back" onclick="window.location.href='?subtopic=guilds';" />
 			</td>
 			<td align="center">
 				<img src="{{ template_path }}/images/general/blank.gif" width="120" height="1" border="0"><br>
 			</td>
 		</tr>
 	</table>
+</form>

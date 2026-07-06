@@ -714,10 +714,14 @@ if (isset($config['boxes']))
                 $bossbody = $bossquery["lookbody"];
                 $bossaddons = $bossquery["lookaddons"];
                 $bossmount = $bossquery["lookmount"];
+                $outfitPath = parse_url($config['outfit_images_url'], PHP_URL_PATH);
+                $outfitLocalPath = strpos($outfitPath, './') === 0 ? substr($outfitPath, 2) : ltrim($outfitPath, '/');
+                $outfitImagesAvailable = preg_match('#^https?://#', $config['outfit_images_url']) || file_exists(BASE . $outfitLocalPath);
+                $outfitFallbackImage = $template_path . '/images/global/general/blank.gif';
                 ?>
                 <div id="RightArtwork">
                     <img id="Creature"
-                         src="<?= $config['outfit_images_url'] ?>?id=<?= $creaturetype; ?>&addons=<?= $creatureaddons; ?>&head=<?= $creaturehead; ?>&body=<?= $creaturebody; ?>&legs=<?= $creaturelegs; ?>&feet=<?= $creaturefeet; ?>&mount=<?= $creaturemount; ?>"
+                         src="<?= $outfitImagesAvailable ? $config['outfit_images_url'] . '?id=' . $creaturetype . '&addons=' . $creatureaddons . '&head=' . $creaturehead . '&body=' . $creaturebody . '&legs=' . $creaturelegs . '&feet=' . $creaturefeet . '&mount=' . $creaturemount : $outfitFallbackImage; ?>"
                          alt="Creature of the Day"
                          title="Today's boosted creature: <?= ucwords(strtolower(trim($creaturename))); ?>">
 
@@ -727,7 +731,7 @@ if (isset($config['boxes']))
                              title="Today's boosted boss: <?= ucwords(strtolower(trim($bossname))); ?>">
                     <?php else: ?>
                         <img id="Boss"
-                             src="<?= $config['outfit_images_url'] ?>?id=<?= $bosstype; ?>&addons=<?= $bossaddons; ?>&head=<?= $bosshead; ?>&body=<?= $bossbody; ?>&legs=<?= $bosslegs; ?>&feet=<?= $bossfeet; ?>&mount=<?= $bossmount; ?>"
+                             src="<?= $outfitImagesAvailable ? $config['outfit_images_url'] . '?id=' . $bosstype . '&addons=' . $bossaddons . '&head=' . $bosshead . '&body=' . $bossbody . '&legs=' . $bosslegs . '&feet=' . $bossfeet . '&mount=' . $bossmount : $outfitFallbackImage; ?>"
                              alt="Boss of the Day"
                              title="Today's boosted boss: <?= ucwords(strtolower(trim($bossname))); ?>">
                     <?php endif; ?>

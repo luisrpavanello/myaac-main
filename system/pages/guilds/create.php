@@ -45,12 +45,8 @@ if ($todo == 'save') {
         $guild_name = '';
     }
 
-    if (!Validator::characterName($name)) {
-        $guild_errors[] = 'Invalid character name format.';
-        $name = '';
-    }
-
     if (empty($guild_errors)) {
+        $name = trim((string) $name);
         $player = new OTS_Player();
         $player->find($name);
         if (!$player->isLoaded()) {
@@ -69,6 +65,14 @@ if ($todo == 'save') {
 
     if (empty($guild_errors) && $player->isDeleted()) {
         $guild_errors[] = "Character <b>$name</b> has been deleted.";
+    }
+
+    if (empty($guild_errors)) {
+        $ownerid = $db->hasColumn('guilds', 'owner_id') ? 'owner_id' : 'ownerid';
+        $ownerGuild = $db->query('SELECT `id`, `name` FROM `guilds` WHERE `' . $ownerid . '` = ' . (int) $player->getId() . ' LIMIT 1')->fetch();
+        if ($ownerGuild !== false && isset($ownerGuild['id'])) {
+            $guild_errors[] = 'Character <b>' . $name . '</b> already owns guild <b>' . $ownerGuild['name'] . '</b>.';
+        }
     }
 
     if (empty($guild_errors)) {
@@ -99,24 +103,68 @@ if (!empty($guild_errors)) {
 }
 
 if (isset($todo) && $todo == 'save') {
-    $new_guild = new OTS_Guild();
-    $new_guild->setCreationData(time());
-    $new_guild->setName($guild_name);
-    $new_guild->setOwner($player);
-    $new_guild->save();
-    $new_guild->setCustomField('description', 'New guild. Leader must edit this text :)');
-    //$new_guild->setCustomField('creationdata', time());
-    $ranks = $new_guild->getGuildRanksList();
-    $ranks->orderBy('level', POT::ORDER_DESC);
-    foreach ($ranks as $rank) {
-        if ($rank->getLevel() == 3) {
-            $player->setRank($rank);
+    try {
+        $db->exec('START TRANSACTION');
+
+        $ownerid = $db->hasColumn('guilds', 'owner_id') ? 'owner_id' : 'ownerid';
+        $creationdata = 'creationdata';
+        if ($db->hasColumn('guilds', 'creationdate')) {
+            $creationdata = 'creationdate';
+        } else if ($db->hasColumn('guilds', 'creation_time')) {
+            $creationdata = 'creation_time';
         }
+
+        $columns = array('name', $ownerid, $creationdata);
+        $values = array($db->quote($guild_name), (int) $player->getId(), time());
+
+        if ($db->hasColumn('guilds', 'description')) {
+            $columns[] = 'description';
+            $values[] = $db->quote('New guild. Leader must edit this text :)');
+        }
+
+        if ($db->hasColumn('guilds', 'logo_name')) {
+            $columns[] = 'logo_name';
+            $values[] = $db->quote('default.gif');
+        }
+
+        $db->exec('INSERT INTO `guilds` (`' . implode('`, `', $columns) . '`) VALUES (' . implode(', ', $values) . ')');
+        $guild_id = (int) $db->lastInsertId();
+
+        $leaderRank = $db->query('SELECT `id` FROM `guild_ranks` WHERE `guild_id` = ' . $guild_id . ' AND `level` = 3 ORDER BY `id` ASC LIMIT 1')->fetch();
+        if ($leaderRank === false || !isset($leaderRank['id'])) {
+            $db->exec('INSERT INTO `guild_ranks` (`name`, `level`, `guild_id`) VALUES (' . $db->quote('The Leader') . ', 3, ' . $guild_id . ')');
+            $leaderRank = array('id' => (int) $db->lastInsertId());
+            $db->exec('INSERT INTO `guild_ranks` (`name`, `level`, `guild_id`) VALUES (' . $db->quote('Vice-Leader') . ', 2, ' . $guild_id . ')');
+            $db->exec('INSERT INTO `guild_ranks` (`name`, `level`, `guild_id`) VALUES (' . $db->quote('Member') . ', 1, ' . $guild_id . ')');
+        }
+
+        if ($db->hasTable('guild_membership')) {
+            $db->exec(
+                'INSERT INTO `guild_membership` (`player_id`, `guild_id`, `rank_id`, `nick`) VALUES (' .
+                (int) $player->getId() . ', ' . $guild_id . ', ' . (int) $leaderRank['id'] . ', ' . $db->quote('') . ')' .
+                ' ON DUPLICATE KEY UPDATE `guild_id` = VALUES(`guild_id`), `rank_id` = VALUES(`rank_id`), `nick` = VALUES(`nick`)'
+            );
+        } else if ($db->hasTable('guild_members')) {
+            $db->exec(
+                'INSERT INTO `guild_members` (`player_id`, `rank_id`, `nick`) VALUES (' .
+                (int) $player->getId() . ', ' . (int) $leaderRank['id'] . ', ' . $db->quote('') . ')' .
+                ' ON DUPLICATE KEY UPDATE `rank_id` = VALUES(`rank_id`), `nick` = VALUES(`nick`)'
+            );
+        } else if ($db->hasColumn('players', 'rank_id')) {
+            $player->setRankId((int) $leaderRank['id'], $guild_id);
+        }
+
+        $db->exec('COMMIT');
+
+        $twig->display('guilds.create.success.html.twig', array(
+            'guild_name' => $guild_name,
+            'leader_name' => $player->getName()
+        ));
+    } catch (Exception $e) {
+        $db->exec('ROLLBACK');
+        error_log('Guild creation failed: ' . $e->getMessage());
+        $twig->display('error_box.html.twig', array('errors' => array('Could not create guild. Please try again or contact support.')));
     }
-    $twig->display('guilds.create.success.html.twig', array(
-        'guild_name' => $guild_name,
-        'leader_name' => $player->getName()
-    ));
 
     /*$db->exec('INSERT INTO `guild_ranks` (`id`, `guild_id`, `name`, `level`) VALUES (null, '.$new_guild->getId().', "the Leader", 3)');
     $db->exec('INSERT INTO `guild_ranks` (`id`, `guild_id`, `name`, `level`) VALUES (null, '.$new_guild->getId().', "a Vice-Leader", 2)');

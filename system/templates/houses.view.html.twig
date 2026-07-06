@@ -1,9 +1,25 @@
 <div class="TableContainer">
+    {% if messages is not empty %}
+        {% for message in messages %}
+            <table class="Table1" cellpadding="0" cellspacing="0" style="background-color: {{ config.lightborder }}; margin-bottom: 10px;">
+                <tr bgcolor="{{ config.darkborder }}">
+                    <td style="padding: 8px; color: green; font-weight: bold">{{ message }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    {% endif %}
+
     {% if errors is not empty %}
         {% for error in errors %}
-            <p class="error">{{ error }}</p>
+            <table class="Table1" cellpadding="0" cellspacing="0" style="background-color: {{ config.lightborder }}; margin-bottom: 10px;">
+                <tr bgcolor="{{ config.darkborder }}">
+                    <td style="padding: 8px; color: #8b0000; font-weight: bold">{{ error|default('The house bid could not be completed.') }}</td>
+                </tr>
+            </table>
         {% endfor %}
-    {% else %}
+    {% endif %}
+
+    {% if houseName is not empty %}
         <table class="Table1" cellpadding="0" cellspacing="0" style="background-color: {{ config.lightborder }}">
             <div class="CaptionContainer">
                 <div class="CaptionInnerContainer">
@@ -38,6 +54,18 @@
                                     {% else %}
                                     No one has bought this house yet.
                                     {% endif %}
+
+                                    {% if auctionEnabled and houseOwner == 0 and houseState == 0 %}
+                                        <br><br>
+                                        {% if currentBidder is not empty %}
+                                            Current highest bid: <b>{{ currentHighestBid }} gold</b> by <b>{{ currentBidder }}</b>.
+                                            {% if bidEndDate > 0 %}
+                                                Auction ends on <b>{{ bidEndDate|date("M d Y, H:i:s") }}</b>.
+                                            {% endif %}
+                                        {% else %}
+                                            There is no active bid for this house.
+                                        {% endif %}
+                                    {% endif %}
                                 </td>
                             </tr>
                         </table>
@@ -46,6 +74,74 @@
             </tr>
         </table>
     {% endif %}
-
 </div>
+
+{% if auctionEnabled and houseOwner == 0 and houseState == 0 %}
+    <br>
+    <div class="TableContainer">
+        <table class="Table1" cellpadding="0" cellspacing="0" style="background-color: {{ config.lightborder }}">
+            <div class="CaptionContainer">
+                <div class="CaptionInnerContainer">
+                    <span class="CaptionEdgeLeftTop" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+                    <span class="CaptionEdgeRightTop" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+                    <span class="CaptionBorderTop" style="background-image:url({{ template_path }}/images/content/table-headline-border.gif);"></span>
+                    <span class="CaptionVerticalLeft" style="background-image:url({{ template_path }}/images/content/box-frame-vertical.gif);"></span>
+                    <div class="Text">Bid House</div>
+                    <span class="CaptionVerticalRight" style="background-image:url({{ template_path }}/images/content/box-frame-vertical.gif);"></span>
+                    <span class="CaptionBorderBottom" style="background-image:url({{ template_path }}/images/content/table-headline-border.gif);"></span>
+                    <span class="CaptionEdgeLeftBottom" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+                    <span class="CaptionEdgeRightBottom" style="background-image:url({{ template_path }}/images/content/box-frame-edge.gif);"></span>
+                </div>
+            </div>
+
+            <tr>
+                <td>
+                    <div class="InnerTableContainer">
+                        {% if logged %}
+                            {% if accountCharacters is not empty %}
+                                <form action="{{ getLink('houses/view') }}" method="post">
+                                    <input type="hidden" name="house" value="{{ houseId }}">
+                                    <input type="hidden" name="action" value="bid_house">
+                                    <table border="0" cellpadding="4" cellspacing="1" width="100%">
+                                        <tr bgcolor="{{ config.darkborder }}">
+                                            <td class="LabelV" width="25%">Character:</td>
+                                            <td>
+                                                <select name="bidder">
+                                                    {% for character in accountCharacters %}
+                                                        <option value="{{ character.id }}"{% if selectedBidderId == character.id %} selected{% endif %}>
+                                                            {{ character.name }} ({{ character.balance }} gold{% if not character.can_bid_minimum %}, needs {{ character.required_balance }}{% endif %})
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="{{ config.lightborder }}">
+                                            <td class="LabelV">Bid:</td>
+                                            <td><input type="number" name="bid" min="{{ bidMinimum }}" value="{{ postedBidValue is not empty ? postedBidValue : bidMinimum }}"> gold</td>
+                                        </tr>
+                                        <tr bgcolor="{{ config.darkborder }}">
+                                            <td class="LabelV">Required:</td>
+                                            <td>At least {{ bidRequired }} gold in the selected character's bank for the minimum bid and rent.</td>
+                                        </tr>
+                                    </table>
+                                    <br>
+                                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                        <tr align="center">
+                                            <td>{{ include('buttons.submit.html.twig') }}</td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            {% else %}
+                                Your account has no characters available for bidding.
+                            {% endif %}
+                        {% else %}
+                            You need to login before bidding on this house.
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endif %}
+
 <br><br>
