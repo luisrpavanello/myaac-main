@@ -18,6 +18,14 @@ switch ($page) {
         $page = 'newsarchive';
         break;
 
+    case 'change-log':
+        $page = 'changelog';
+        break;
+
+    case 'downloads':
+        $page = 'downloadclient';
+        break;
+
     case 'whoisonline':
         $page = 'online';
         break;
@@ -31,7 +39,25 @@ switch ($page) {
         break;
 
     case 'killstatistics':
+    case 'last-kills':
         $page = 'lastkills';
+        break;
+
+    case 'monsters':
+        $page = 'creatures';
+        break;
+
+    case 'ots-info':
+    case 'server-info':
+        $page = 'serverinfo';
+        break;
+
+    case 'exp-table':
+        $page = 'experiencetable';
+        break;
+
+    case 'exp-stages':
+        $page = 'expstages';
         break;
 
     case 'buypoints':

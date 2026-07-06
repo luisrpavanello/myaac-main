@@ -328,8 +328,10 @@ img {
   position: absolute;
   height: 64px;
   width: 64px;
-  top: -136px;
-  left: -15px;
+  object-fit: contain;
+  object-position: center bottom;
+  top: -143px;
+  left: -12px;
   z-index: 15;
   cursor: pointer;
 }
@@ -338,8 +340,10 @@ img {
   position: absolute;
   height: 64px;
   width: 64px;
-  top: -136px;
-  left: 40px;
+  object-fit: contain;
+  object-position: center bottom;
+  top: -143px;
+  left: 38px;
   z-index: 15;
   cursor: pointer;
 }
@@ -347,9 +351,9 @@ img {
 #PedestalAndOnline {
   position: absolute;
   left: -15px;
-  top: -121px;
-  width: 161px;
-  height: 85px;
+  top: -128px;
+  width: 132px;
+  height: 111px;
 }
 #Pedestal {
   position: absolute;

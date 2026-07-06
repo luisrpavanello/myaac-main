@@ -692,51 +692,62 @@ if (isset($config['boxes']))
 
             <div id="ThemeboxesColumn">
                 <?php
-                $creaturequery = $db->query("SELECT `boostname`, `looktype`, `lookfeet` , `looklegs` , `lookhead` , `lookbody` , `lookaddons` , `lookmount`   FROM `boosted_creature`")->fetch();
-                $creaturename = $creaturequery["boostname"];
-                $creaturetype = $creaturequery["looktype"];
-                $creaturefeet = $creaturequery["lookfeet"];
-                $creaturelegs = $creaturequery["looklegs"];
-                $creaturehead = $creaturequery["lookhead"];
-                $creaturebody = $creaturequery["lookbody"];
-                $creatureaddons = $creaturequery["lookaddons"];
-                $creaturemount = $creaturequery["lookmount"];
-                ?>
+                if (!function_exists('tibiacomLibrarySpriteUrl')) {
+                    function tibiacomLibrarySpriteUrl($name, $fallback = 'demon')
+                    {
+                        $normalize = static function ($value) {
+                            $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string)$value);
+                            return strtolower(preg_replace('/[^a-z0-9]/i', '', $value));
+                        };
 
-                <?php
-                $bossquery = $db->query("SELECT `boostname`, `looktypeEx`, `looktype`, `lookfeet` , `looklegs` , `lookhead` , `lookbody` , `lookaddons` , `lookmount`   FROM `boosted_boss`")->fetch();
-                $bossname = $bossquery["boostname"];
-                $bosstypeEx = $bossquery["looktypeEx"];
-                $bosstype = $bossquery["looktype"];
-                $bossfeet = $bossquery["lookfeet"];
-                $bosslegs = $bossquery["looklegs"];
-                $bosshead = $bossquery["lookhead"];
-                $bossbody = $bossquery["lookbody"];
-                $bossaddons = $bossquery["lookaddons"];
-                $bossmount = $bossquery["lookmount"];
-                $outfitPath = parse_url($config['outfit_images_url'], PHP_URL_PATH);
-                $outfitLocalPath = strpos($outfitPath, './') === 0 ? substr($outfitPath, 2) : ltrim($outfitPath, '/');
-                $outfitImagesAvailable = preg_match('#^https?://#', $config['outfit_images_url']) || file_exists(BASE . $outfitLocalPath);
-                $outfitFallbackImage = $template_path . '/images/global/general/blank.gif';
+                        $name = trim((string)$name);
+                        $candidates = [];
+                        $exact = $normalize($name);
+                        if ($exact !== '') {
+                            $candidates[] = $exact;
+                            $words = preg_split('/\s+/', $name);
+                            for ($i = 1, $count = count($words); $i < $count; $i++) {
+                                $candidate = $normalize(implode(' ', array_slice($words, $i)));
+                                if ($candidate !== '') {
+                                    $candidates[] = $candidate;
+                                }
+                            }
+                        }
+
+                        foreach ($candidates as $candidate) {
+                            $singular = preg_replace('/s$/', '', $candidate);
+                            foreach (array_unique([$candidate, $singular]) as $sprite) {
+                                $relativePath = 'images/library/' . $sprite . '.gif';
+                                if (file_exists(BASE . $relativePath)) {
+                                    return $relativePath;
+                                }
+                            }
+                        }
+
+                        return 'images/library/' . $fallback . '.gif';
+                    }
+                }
+
+                $creaturequery = $db->query("SELECT `boostname` FROM `boosted_creature`")->fetch();
+                $creaturename = $creaturequery ? $creaturequery['boostname'] : 'Boosted Creature';
+                $creatureimage = tibiacomLibrarySpriteUrl($creaturename, 'dragon');
+
+                $bossquery = $db->query("SELECT `boostname` FROM `boosted_boss`")->fetch();
+                $bossname = $bossquery ? $bossquery['boostname'] : 'Boosted Boss';
+                $bossimage = tibiacomLibrarySpriteUrl($bossname, 'demon');
                 ?>
                 <div id="RightArtwork">
                     <img id="Creature"
-                         src="<?= $outfitImagesAvailable ? $config['outfit_images_url'] . '?id=' . $creaturetype . '&addons=' . $creatureaddons . '&head=' . $creaturehead . '&body=' . $creaturebody . '&legs=' . $creaturelegs . '&feet=' . $creaturefeet . '&mount=' . $creaturemount : $outfitFallbackImage; ?>"
+                         src="<?= $creatureimage; ?>"
                          alt="Creature of the Day"
-                         title="Today's boosted creature: <?= ucwords(strtolower(trim($creaturename))); ?>">
+                         title="Today's boosted creature: <?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
 
-                    <?php if ($bosstypeEx != 0): ?>
-                        <img id="Boss" src="<?= $config['item_images_url'] ?><?= $bosstypeEx; ?>.gif"
-                             alt="Boss of the Day"
-                             title="Today's boosted boss: <?= ucwords(strtolower(trim($bossname))); ?>">
-                    <?php else: ?>
-                        <img id="Boss"
-                             src="<?= $outfitImagesAvailable ? $config['outfit_images_url'] . '?id=' . $bosstype . '&addons=' . $bossaddons . '&head=' . $bosshead . '&body=' . $bossbody . '&legs=' . $bosslegs . '&feet=' . $bossfeet . '&mount=' . $bossmount : $outfitFallbackImage; ?>"
-                             alt="Boss of the Day"
-                             title="Today's boosted boss: <?= ucwords(strtolower(trim($bossname))); ?>">
-                    <?php endif; ?>
+                    <img id="Boss"
+                         src="<?= $bossimage; ?>"
+                         alt="Boss of the Day"
+                         title="Today's boosted boss: <?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
 
-                    <img id="PedestalAndOnline" src="<?= $template_path; ?>/images/header/pedestal.gif"
+                    <img id="PedestalAndOnline" src="<?= $template_path; ?>/images/header/pedestal-and-online.gif"
                          alt="Monster Pedestal and Players Online Box"/>
                 </div>
 

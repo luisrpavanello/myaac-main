@@ -4,6 +4,7 @@ $title = 'Download Client';
 
 
 $getpage_download = $_GET['step'] ?? '';
+$download_subtopic = $_GET['subtopic'] ?? PAGE;
 if (empty($getpage_download)) {
     ?>
     <div class="TableContainer">
@@ -93,7 +94,7 @@ if (empty($getpage_download)) {
     <?php
 }
 
-if ($_GET['subtopic'] == 'downloadclient' and $getpage_download == 'downloadagreement') {
+if ($download_subtopic == 'downloadclient' and $getpage_download == 'downloadagreement') {
     ?>
     <p>Before you can download the client program please read the Tibia Service Agreement and state if you agree to it
         by clicking on the appropriate button below.</p>
