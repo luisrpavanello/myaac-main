@@ -308,14 +308,14 @@
                     <table class="TableContent" width="100%" style="border:1px solid #faf0d7;">
                       <tbody>
                       <tr bgcolor="{{ getStyle(2) }}">
-                        <td align="center" style="border:0; width: 64px;">
+                        <td align="center" style="border:0; width: 70px;">
                           <b>Current outfit:</b>
                         </td>
-                        <td style="border:0;">
-                          <div style="width:64px; height:64px;">
+                        <td style="border:0; width: 96px; height: 120px; text-align:center; vertical-align:middle;">
+                          <div style="width:96px; height:112px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
                             <img
-                              style="margin-left:{% if player.getLookType() in [75, 266, 302] %}5px;margin-top:0;width:60px;height:60px;{% else %}-18px;margin-top:-28px;width:80px;height:80px;{% endif %}"
-                              src="{{ outfit }}" alt="player outfit"/>
+                              style="display:block; max-width:88px; max-height:104px; object-fit:contain;"
+                              src="{{ outfit }}" alt="" onerror="this.onerror=null; this.src='{{ outfit_fallback }}';"/>
                           </div>
                         </td>
                       </tr>

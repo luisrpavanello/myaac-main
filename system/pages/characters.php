@@ -145,8 +145,25 @@ if ($player->isLoaded() && !$player->isDeleted()) {
     $rows = 0;
     $hidden = $player->isHidden();
 
-    if ($config['characters']['outfit'])
-        $outfit = $config['outfit_images_url'] . '?id=' . $player->getLookType() . ($db->hasColumn('players', 'lookaddons') ? '&addons=' . $player->getLookAddons() : '') . '&head=' . $player->getLookHead() . '&body=' . $player->getLookBody() . '&legs=' . $player->getLookLegs() . '&feet=' . $player->getLookFeet();
+    $base_vocation = $player->getVocation() > $config['vocations_amount'] ? $player->getVocation() - $config['vocations_amount'] : $player->getVocation();
+    $vocation_images = array(
+        1 => 'images/sorcerer.png',
+        2 => 'images/druid.png',
+        3 => 'images/paladin.png',
+        4 => 'images/knight.png',
+    );
+    $outfit_fallback = $vocation_images[$base_vocation] ?? 'templates/tibiacom/images/global/general/blank.gif';
+
+    if ($config['characters']['outfit']) {
+        $outfit = $outfit_fallback;
+        $outfit_url = $config['outfit_images_url'] . '?id=' . $player->getLookType() . ($db->hasColumn('players', 'lookaddons') ? '&addons=' . $player->getLookAddons() : '') . '&head=' . $player->getLookHead() . '&body=' . $player->getLookBody() . '&legs=' . $player->getLookLegs() . '&feet=' . $player->getLookFeet();
+        $outfit_path = parse_url($config['outfit_images_url'], PHP_URL_PATH);
+        $outfit_local_path = BASE . '/' . ltrim(preg_replace('#^\./#', '', $outfit_path ?? ''), '/');
+
+        if (preg_match('#^https?://#', $config['outfit_images_url']) || file_exists($outfit_local_path)) {
+            $outfit = $outfit_url;
+        }
+    }
 
     $flag = '';
     if ($config['account_country']) {
@@ -450,15 +467,14 @@ WHERE killers.death_id = '" . $death['id'] . "' ORDER BY killers.final_hit DESC,
     {
         public static function getExpForLevel($lv)
         {
-            $lv--;
-            $lv = (string)$lv;
-            return bcdiv(bcadd(bcsub(bcmul(bcmul(bcmul("50", $lv), $lv), $lv), bcmul(bcmul("150", $lv), $lv)), bcmul("400", $lv)), "3", 0);
+            $lv = (int)$lv - 1;
+            return intdiv((50 * $lv * $lv * $lv) - (150 * $lv * $lv) + (400 * $lv), 3);
         }
     }
 
     $expCurrent = Functions::getExpForLevel($player->getLevel());
     $expNext = Functions::getExpForLevel($player->getLevel() + 1);
-    $expLeft = bcsub($expNext, $player->getExperience(), 0);
+    $expLeft = max(0, $expNext - (int)$player->getExperience());
     $expLeftPercent = max(0, min(100, ($player->getExperience() - $expCurrent) / ($expNext - $expCurrent) * 100));
     $expLeftPercent = number_format($expLeftPercent, '2', '.', '');
 
@@ -483,6 +499,7 @@ WHERE killers.death_id = '" . $death['id'] . "' ORDER BY killers.final_hit DESC,
 
     $twig->display('characters.html.twig', array(
         'outfit' => $outfit ?? null,
+        'outfit_fallback' => $outfit_fallback,
         'player' => $player,
         'achievementPoints' => $achievementPoints,
         'achievements' => $listAchievement,
