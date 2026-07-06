@@ -954,6 +954,18 @@ img {
   left: 5px;
 }
 
+.Content .TitleText {
+  color: #f0d1a4;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 19px;
+  font-weight: bold;
+  line-height: 24px;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  text-shadow: 1px 1px 1px #2b1207;
+  white-space: nowrap;
+}
+
 .Content .Border_2 {
   margin: 4px;
   padding: 0px;

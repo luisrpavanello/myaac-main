@@ -28,7 +28,12 @@ imagecolortransparent($image, imagecolorallocate($image, 0, 0, 0));
 
 // set text
 $font = getenv('GDFONTPATH') . DIRECTORY_SEPARATOR . 'martel.ttf';
-imagettftext($image, 18, 0, 4, 20, imagecolorallocate($image, 240, 209, 164), $font, $_GET['t']);
+$color = imagecolorallocate($image, 240, 209, 164);
+if (function_exists('imagettftext')) {
+    imagettftext($image, 18, 0, 4, 20, $color, $font, $_GET['t']);
+} else {
+    imagestring($image, 5, 4, 7, $_GET['t'], $color);
+}
 
 // header mime type
 header('Content-type: image/gif');

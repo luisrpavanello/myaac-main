@@ -320,8 +320,8 @@ if (isset($config['boxes']))
                     <img id="TibiaLogoArtworkTop"
                          src="<?= $template_path; ?>/images/header/<?= $config['logo_image']; ?>"
                          onClick="window.location = '<?= getLink('news') ?>';" alt="logoartwork"/>
-                    <img id="LogoLink" src="<?= $template_path; ?>/images/header/tibia-logo-artwork-string.gif"
-                         onClick="window.location = 'mailto:<?= $config['mail_address']; ?>';" alt="logoartwork"/>
+                    <!-- <img id="LogoLink" src="<?= $template_path; ?>/images/header/tibia-logo-artwork-string.gif"
+                         onClick="window.location = 'mailto:<?= $config['mail_address']; ?>';" alt="logoartwork"/> -->
                 </div>
 
                 <div id="Loginbox">
@@ -632,11 +632,27 @@ if (isset($config['boxes']))
                             <div class="BorderTitleText"
                                  style="background-image:url(<?= $template_path; ?>/images/content/title-background-green.gif);"></div>
                             <?php
-                            $headline = $template_path . '/images/header/headline-' . PAGE . '.gif';
-                            if (!file_exists($headline))
-                                $headline = $template_path . '/headline.php?t=' . ucfirst($title);
+                            $headline = null;
+                            $headline_candidates = array_unique(array_filter([
+                                defined('PAGE') ? PAGE : null,
+                                isset($page) ? $page : null,
+                                preg_replace('/[^a-z0-9]/', '', strtolower((string)$title)),
+                            ]));
+
+                            foreach ($headline_candidates as $candidate) {
+                                $candidate = strtolower($candidate);
+                                $headline_file = $template_path . '/images/header/headline-' . $candidate . '.gif';
+                                if (file_exists(BASE . $headline_file)) {
+                                    $headline = $headline_file;
+                                    break;
+                                }
+                            }
                             ?>
-                            <img class="Title" src="<?= $headline; ?>" alt="Contentbox headline"/>
+                            <?php if ($headline !== null): ?>
+                                <img class="Title" src="<?= $headline; ?>" alt="<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?>"/>
+                            <?php else: ?>
+                                <div class="Title TitleText"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></div>
+                            <?php endif; ?>
                             <div class="Border_2">
                                 <div class="Border_3">
                                     <?php $hooks->trigger(HOOK_TIBIACOM_BORDER_3); ?>
