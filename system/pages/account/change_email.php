@@ -19,8 +19,8 @@ if($email_new_time > 10) {
 
 if($email_new_time < 10) {
 	if(isset($_POST['changeemailsave']) && $_POST['changeemailsave'] == 1) {
-		$email_new = $_POST['new_email'];
-		$post_password = $_POST['password'];
+		$email_new = mb_strtolower(trim($_POST['new_email'] ?? ''));
+		$post_password = $_POST['password'] ?? '';
 
 		if(!Validator::email($email_new)) {
 			$errors[] = Validator::getLastError();
@@ -36,14 +36,36 @@ if($email_new_time < 10) {
 			}
 		}
 
+		if(empty($errors) && $config['account_mail_unique']) {
+			$account_id = $account_logged->getId();
+			$email_exists = $db->query('SELECT `id` FROM `accounts` WHERE `email` = ' . $db->quote($email_new) . ' AND `id` != ' . (int)$account_id . ' LIMIT 1')->fetch();
+			if($email_exists) {
+				$errors[] = 'This email address is already used by another account.';
+			}
+		}
+
 		if(empty($errors)) {
-			$email_new_time = time() + $config['account_mail_change'] * 24 * 3600;
-			$account_logged->setCustomField("email_new", $email_new);
-			$account_logged->setCustomField("email_new_time", $email_new_time);
-			$twig->display('success.html.twig', array(
-				'title' => 'New Email Address Requested',
-				'description' => 'You have requested to change your email address to <b>' . $email_new . '</b>. The actual change will take place after <b>' . date("j F Y, G:i:s", $email_new_time) . '</b>, during which you can cancel the request at any time.'
-			));
+			if((int)$config['account_mail_change'] <= 0) {
+				$account_logged->setCustomField("email_new", "");
+				$account_logged->setCustomField("email_new_time", 0);
+				$account_logged->setEMail($email_new);
+				$account_logged->save();
+				$account_logged->logAction('Account email changed to <b>' . $email_new . '</b>');
+
+				$twig->display('success.html.twig', array(
+					'title' => 'Email Address Changed',
+					'description' => 'Your email address has been changed to <b>' . $account_logged->getEMail() . '</b>.'
+				));
+			}
+			else {
+				$email_new_time = time() + $config['account_mail_change'] * 24 * 3600;
+				$account_logged->setCustomField("email_new", $email_new);
+				$account_logged->setCustomField("email_new_time", $email_new_time);
+				$twig->display('success.html.twig', array(
+					'title' => 'New Email Address Requested',
+					'description' => 'You have requested to change your email address to <b>' . $email_new . '</b>. The actual change will take place after <b>' . date("j F Y, G:i:s", $email_new_time) . '</b>, during which you can cancel the request at any time.'
+				));
+			}
 		}
 		else
 		{
@@ -66,18 +88,31 @@ if($email_new_time < 10) {
 }
 else
 {
-	if($email_new_time < time()) {
+	if($email_new_time < time() || (int)$config['account_mail_change'] <= 0) {
 		if (isset($_POST['changeemailsave']) && $_POST['changeemailsave'] == 1) {
-			$account_logged->setCustomField("email_new", "");
-			$account_logged->setCustomField("email_new_time", 0);
-			$account_logged->setEmail($email_new);
-			$account_logged->save();
-			$account_logged->logAction('Account email changed to <b>' . $email_new . '</b>');
+			if($config['account_mail_unique']) {
+				$account_id = $account_logged->getId();
+				$email_exists = $db->query('SELECT `id` FROM `accounts` WHERE `email` = ' . $db->quote($email_new) . ' AND `id` != ' . (int)$account_id . ' LIMIT 1')->fetch();
+				if($email_exists) {
+					$errors[] = 'This email address is already used by another account.';
+				}
+			}
 
-			$twig->display('success.html.twig', array(
-				'title' => 'Email Address Change Accepted',
-				'description' => 'You have accepted <b>' . $account_logged->getEmail() . '</b> as your new email adress.'
-			));
+			if(empty($errors)) {
+				$account_logged->setCustomField("email_new", "");
+				$account_logged->setCustomField("email_new_time", 0);
+				$account_logged->setEMail($email_new);
+				$account_logged->save();
+				$account_logged->logAction('Account email changed to <b>' . $email_new . '</b>');
+
+				$twig->display('success.html.twig', array(
+					'title' => 'Email Address Change Accepted',
+					'description' => 'You have accepted <b>' . $account_logged->getEMail() . '</b> as your new email adress.'
+				));
+			}
+			else {
+				$twig->display('error_box.html.twig', array('errors' => $errors));
+			}
 		}
 		else
 		{
