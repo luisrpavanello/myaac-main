@@ -46,8 +46,8 @@ if($config['online_outfit']) {
 	}
 }
 
+$vocs = array();
 if($config['online_vocations']) {
-	$vocs = array();
 	foreach($config['vocations'] as $id => $name) {
 		$vocs[$id] = 0;
 	}
@@ -82,38 +82,54 @@ foreach($playersOnline as $player){
 			$player['vocation'] += ($player['promotion'] * $config['vocations_amount']);
 	}
 
+	$base_vocation = $player['vocation'] > $config['vocations_amount'] ? $player['vocation'] - $config['vocations_amount'] : $player['vocation'];
+	$vocation_images = array(
+		1 => 'images/sorcerer.png',
+		2 => 'images/druid.png',
+		3 => 'images/paladin.png',
+		4 => 'images/knight.png',
+	);
+
 	$players_data[] = array(
 		'name' => getPlayerLink($player['name']),
 		'player' => $player,
 		'level' => $player['level'],
 		'vocation' => $config['vocations'][$player['vocation']],
 		'country_image' => $config['account_country'] ? getFlagImage($player['country']) : null,
-		'outfit' => $config['online_outfit'] ? $config['outfit_images_url'] . '?id=' . $player['looktype'] . ($outfit_addons ? '&addons=' . $player['lookaddons'] : '') . '&head=' . $player['lookhead'] . '&body=' . $player['lookbody'] . '&legs=' . $player['looklegs'] . '&feet=' . $player['lookfeet'] : null
+		'outfit' => $config['online_outfit'] ? $config['outfit_images_url'] . '?id=' . $player['looktype'] . ($outfit_addons ? '&addons=' . $player['lookaddons'] : '') . '&head=' . $player['lookhead'] . '&body=' . $player['lookbody'] . '&legs=' . $player['looklegs'] . '&feet=' . $player['lookfeet'] : null,
+		'vocation_image' => $vocation_images[$base_vocation] ?? 'templates/tibiacom/images/global/general/blank.gif',
 	);
 
 	if($config['online_vocations']) {
-		$vocs[($player['vocation'] > $config['vocations_amount'] ? $player['vocation'] - $config['vocations_amount'] : $player['vocation'])]++;
+		$vocs[$base_vocation]++;
 	}
 }
 
 $record = '';
 if($config['online_record']){
-	$timestamp = false;
+	$record_timestamp = null;
 	if($db->hasTable('server_record')) {
 		$query =
 			$db->query(
 				'SELECT `record`, `timestamp` FROM `server_record` WHERE `world_id` = ' . (int)$config['lua']['worldId'] .
 				' ORDER BY `record` DESC LIMIT 1');
-		$timestamp = true;
 	}else if($db->hasTable('server_config')) { // tfs 1.0
-		$query = $db->query('SELECT `timestamp`, `value` as `record` FROM `server_config` WHERE `config` = ' . $db->quote('players_record'));
+		$timestamp_field = $db->hasColumn('server_config', 'timestamp') ? '`timestamp`, ' : '';
+		$query = $db->query('SELECT ' . $timestamp_field . '`value` as `record` FROM `server_config` WHERE `config` = ' . $db->quote('players_record'));
 	}else{
 		$query = NULL;
 	}
 
 	if(isset($query) && $query->rowCount() > 0){
 		$result = $query->fetch();
-		$record = '' . $result['record'] . ' players<br><small>'.date('d/m/Y, H:i:s', strtotime($result['timestamp'])).'</small>';
+		if(isset($result['timestamp'])) {
+			$record_timestamp = is_numeric($result['timestamp']) ? (int)$result['timestamp'] : strtotime($result['timestamp']);
+		}
+
+		$record = '' . $result['record'] . ' players';
+		if(!empty($record_timestamp)) {
+			$record .= '<br><small>' . date('d/m/Y, H:i:s', $record_timestamp) . '</small>';
+		}
 	}
 }
 
