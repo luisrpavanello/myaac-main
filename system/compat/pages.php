@@ -64,6 +64,11 @@ switch ($page) {
         $page = 'points';
         break;
 
+    case 'premium':
+        $_GET['type'] = 'premium';
+        $page = 'donate';
+        break;
+
     case 'shopsystem':
         $page = 'gifts';
         break;

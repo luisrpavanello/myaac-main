@@ -95,7 +95,7 @@ class Visitors
 		}
 
 		global $db;
-		$db->exec('INSERT INTO ' . $db->tableName(TABLE_PREFIX . 'visitors') . ' (' . $db->fieldName('ip') . ' ,' . $db->fieldName('lastvisit') . ', ' . $db->fieldName('page') . ') VALUE (' . $db->quote($ip) . ', ' . time() . ', ' . $db->quote($page) . ')');
+		$db->exec('INSERT INTO ' . $db->tableName(TABLE_PREFIX . 'visitors') . ' (' . $db->fieldName('ip') . ' ,' . $db->fieldName('lastvisit') . ', ' . $db->fieldName('page') . ') VALUE (' . $db->quote($ip) . ', ' . time() . ', ' . $db->quote($page) . ') ON DUPLICATE KEY UPDATE ' . $db->fieldName('lastvisit') . ' = VALUES(' . $db->fieldName('lastvisit') . '), ' . $db->fieldName('page') . ' = VALUES(' . $db->fieldName('page') . ')');
 	}
 
 	public function getVisitors()

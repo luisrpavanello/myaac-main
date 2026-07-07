@@ -3,5 +3,6 @@ global $title;
 
 defined('MYAAC') or die('Direct access not allowed!');
 
-$title = 'Buy Points';
+$title = 'Payment Center';
+$_GET['type'] = $_GET['type'] ?? 'coins';
 require SYSTEM . 'pages/donate.php';

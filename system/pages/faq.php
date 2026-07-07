@@ -76,13 +76,6 @@ $faqs =
 		(!$canEdit ? ' WHERE `hidden` != 1' : '') .
 		' ORDER BY `ordering`;');
 
-if(!$faqs->rowCount())
-{
-	?>
-	There are no questions added yet.
-	<?php
-}
-
 $last = $faqs->rowCount();
 $twig->display('faq.html.twig', array(
 	'faqs' => $faqs,

@@ -115,7 +115,7 @@ if (count($donates) === 0) {
         echo '<td>' . htmlspecialchars($donate['id']) . '</td>';
         echo '<td>' . htmlspecialchars($reward) . '</td>';
         echo '<td>' . shopMoney($donate['value']) . '</td>';
-        echo '<td>' . generateLink(getLink('points'), 'Buy Points') . '</td>';
+        echo '<td>' . generateLink('?subtopic=donate&type=coins', 'Buy Coins') . '</td>';
         echo '</tr>';
     }
 }

@@ -1,68 +1,159 @@
-<table border="0" cellspacing="0" cellpadding="0" width="100%">
-	<tr class="white" bgcolor="{{ config.vdarkborder }}">
-		<td>
-			<b>FAQ</b>
-		</td>
-		<td align="right">
-			<a href="#" onclick="toggleAll(); return false;">Toggle all</a>
-		</td>
-		{% if canEdit %}
-		<td style="width: 300px">
-			Options
-		</td>
-		{% endif %}
-	</tr>
+<style>
+	.faq-panel {
+		border: 1px solid #7a5a35;
+		background: #f1e0c6;
+		box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
+		margin-bottom: 12px;
+	}
+
+	.faq-toolbar {
+		align-items: center;
+		background: #505050;
+		color: #fff;
+		display: flex;
+		justify-content: space-between;
+		padding: 8px 10px;
+	}
+
+	.faq-toolbar a {
+		color: #f0d1a4;
+		font-weight: bold;
+		text-decoration: none;
+	}
+
+	.faq-intro {
+		background: #d4c0a1;
+		color: #5a2800;
+		line-height: 1.45;
+		padding: 10px;
+	}
+
+	.faq-item {
+		border-top: 1px solid #c7ad87;
+	}
+
+	.faq-question {
+		align-items: center;
+		cursor: pointer;
+		display: flex;
+		font-weight: bold;
+		gap: 8px;
+		padding: 10px;
+	}
+
+	.faq-question:hover {
+		background: #e8d2ad;
+	}
+
+	.faq-marker {
+		background: #5f4d41;
+		color: #fff;
+		display: inline-block;
+		font-size: 12px;
+		height: 18px;
+		line-height: 18px;
+		text-align: center;
+		width: 18px;
+	}
+
+	.faq-answer {
+		background: #fff2d9;
+		border-top: 1px dotted #9f7d55;
+		color: #5a2800;
+		line-height: 1.5;
+		padding: 10px 12px 12px 36px;
+	}
+
+	.faq-answer a {
+		color: #004294;
+		font-weight: bold;
+	}
+
+	.faq-actions {
+		background: #d4c0a1;
+		border-top: 1px solid #c7ad87;
+		padding: 6px 10px 8px 36px;
+	}
+
+	.faq-actions a {
+		display: inline-block;
+		margin-right: 8px;
+		white-space: nowrap;
+	}
+</style>
+
+<div class="faq-panel">
+	<div class="faq-toolbar">
+		<strong>Frequently Asked Questions</strong>
+		<a href="#" onclick="toggleAll(); return false;">Toggle all</a>
+	</div>
+	<div class="faq-intro">
+		Find quick answers about accounts, the client, characters, houses, guilds, the shop and support.
+	</div>
+
 	{% set i = 0 %}
 	{% for faq in faqs %}
 		{% set i = i + 1 %}
-	<tr bgcolor="{{ getStyle(i) }}">
-		<td colspan="2" style="cursor: pointer;" onclick="toggleVisibility('faq_{{ i }}'); return false;">
-			<b>{{ faq.question|raw }}</b>
-
-			<div id="faq_{{ i }}" style="display: none;">{{ faq.answer|raw }}</div>
-		</td>
-		{% if canEdit %}
-			<td>
-				<a href="?subtopic=faq&action=edit&id={{ faq.id }}" title="Edit">
-					<img src="images/edit.png"/>Edit
-				</a>
-				<a id="delete" href="?subtopic=faq&action=delete&id={{ faq.id }}" onclick="return confirm('Are you sure?');" title="Delete">
-					<img src="images/del.png"/>Delete
-				</a>
-				<a href="?subtopic=faq&action=hide&id={{ faq.id }}" title="{% if faq.hidden != 1 %}Hide{% else %}Show{% endif %}">
-					<img src="images/{% if faq.hidden != 1 %}success{% else %}error{% endif %}.png"/>{% if faq.hidden != 1 %}Hide{% else %}Show{% endif %}
-				</a>
-                {% if i != 1 %}
-					<a href="?subtopic=faq&action=moveup&id={{ faq.id }}" title="Move up">
-						<img src="images/icons/arrow_up.gif"/>Move up
+		<div class="faq-item">
+			<div class="faq-question" onclick="toggleVisibility('faq_{{ i }}'); return false;">
+				<span class="faq-marker" id="faq_marker_{{ i }}">+</span>
+				<span>{{ faq.question }}</span>
+			</div>
+			<div id="faq_{{ i }}" class="faq-answer" style="display: none;">{{ faq.answer|raw }}</div>
+			{% if canEdit %}
+				<div class="faq-actions">
+					<a href="?subtopic=faq&action=edit&id={{ faq.id }}" title="Edit"><img src="images/edit.png"/> Edit</a>
+					<a id="delete" href="?subtopic=faq&action=delete&id={{ faq.id }}" onclick="return confirm('Are you sure?');" title="Delete"><img src="images/del.png"/> Delete</a>
+					<a href="?subtopic=faq&action=hide&id={{ faq.id }}" title="{% if faq.hidden != 1 %}Hide{% else %}Show{% endif %}">
+						<img src="images/{% if faq.hidden != 1 %}success{% else %}error{% endif %}.png"/> {% if faq.hidden != 1 %}Hide{% else %}Show{% endif %}
 					</a>
-                {% endif %}
-                {% if i != last %}
-					<a href="?subtopic=faq&action=movedown&id={{ faq.id }}" title="Move down">
-						<img src="images/icons/arrow_down.gif"/>Move down
-					</a>
-                {% endif %}
-			</td>
-		{% endif %}
-	</tr>
+					{% if i != 1 %}
+						<a href="?subtopic=faq&action=moveup&id={{ faq.id }}" title="Move up"><img src="images/icons/arrow_up.gif"/> Move up</a>
+					{% endif %}
+					{% if i != last %}
+						<a href="?subtopic=faq&action=movedown&id={{ faq.id }}" title="Move down"><img src="images/icons/arrow_down.gif"/> Move down</a>
+					{% endif %}
+				</div>
+			{% endif %}
+		</div>
+	{% else %}
+		<div class="faq-answer" style="display: block; padding-left: 12px;">
+			No questions have been added yet.
+		</div>
 	{% endfor %}
-</table>
+</div>
 
 <script type="text/javascript">
 	var expanded = false;
+	var faqCount = {{ i }};
+
+	function setFaqVisible(id, visible)
+	{
+		var answer = document.getElementById('faq_' + id);
+		var marker = document.getElementById('faq_marker_' + id);
+		if(answer) {
+			answer.style.display = visible ? '' : 'none';
+		}
+		if(marker) {
+			marker.innerHTML = visible ? '-' : '+';
+		}
+	}
 
 	function toggleVisibility(id)
 	{
-		var tmp = document.getElementById(id);
-		if(tmp)
-			tmp.style.display = tmp.style.display == 'none' ? '' : 'none';
+		var answer = document.getElementById(id);
+		if(!answer) {
+			return;
+		}
+
+		var number = id.replace('faq_', '');
+		setFaqVisible(number, answer.style.display == 'none');
 	}
 
 	function toggleAll()
 	{
-		for(i = 1; i < {{ i + 1 }}; i++)
-		{
-			document.getElementById('faq_' + i).style.display = expanded ? 'none' : '';
+		for(var i = 1; i <= faqCount; i++) {
+			setFaqVisible(i, !expanded);
 		}
 
 		expanded = !expanded;

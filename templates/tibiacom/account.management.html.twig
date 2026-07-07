@@ -74,11 +74,11 @@
                         {% endautoescape %}
                         </span>
                         <small><br>{{ account_expire_time[0] }} {% if account_expire_time[1] %}
-                            (<a href="?donate">donate now</a>) {% endif %}</small>
+                            (<a href="?subtopic=donate&type=premium">donate now</a>) {% endif %}</small>
                       </td>
                       <td>
                         {% if config.gifts_system %}
-                          <a href="?donate" target="blank">
+                          <a href="?subtopic=donate&type=coins" target="blank">
                             <div class="BigButton"
                                  style="background-image:url({{ template_path }}/images/global/buttons/sbutton_green.gif)">
                               <div onmouseover="MouseOverBigButton('GetCoinsButton');"
