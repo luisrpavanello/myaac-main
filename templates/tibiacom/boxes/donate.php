@@ -11,6 +11,7 @@
         font-weight: bold;
         color: #d5c3af;
         line-height: 65px;
+        font-size: 18px;
     }
     .donate_bottom{
         height: 30px;
@@ -58,13 +59,13 @@
     }
 </style>
 <div class="donate">
-    <div class="donate_header">Donate Here</div>
+    <div class="donate_header">Payment Center</div>
     <div class="donate_content">
         <div>
             <img src="templates/tibiacom/images/themeboxes/donate/donate.png">
         </div>
         <a href="<?php echo BASE_URL ?>?subtopic=donate&type=coins">
-            <button type="button" class="donate_button">Donate Now</button>
+            <button type="button" class="donate_button">Buy Coins</button>
         </a>
     </div>
     <div class="donate_bottom"></div>

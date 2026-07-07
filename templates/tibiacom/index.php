@@ -501,14 +501,6 @@ if (isset($config['boxes']))
                                         </span>
                                     <?php } ?>
                                     <span style="float: right; margin-top: 1px; margin-right: 4px">
-                                        <img class="InfoBarBigLogo" src="<?= $template_path; ?>/images/global/header/icon-players-online.png">
-                                        <span class="InfoBarNumbers">
-                                            <span class="InfoBarSmallElement">
-                                                <a class="InfoBarLinks" href="?online">
-                                                    <?= $status['online'] ? $status['players'] . ' Players Online' : 'Server Offline' ?>
-                                                </a>
-                                            </span>
-                                        </span>
                                         <?php if ($config['collapse_status']) { ?>
                                             <a data-bs-toggle="collapse" href="#statusbar" role="button" aria-expanded="false" aria-controls="statusbar">
                                                 <img src="<?= $template_path; ?>/images/global/content/top-to-back.gif" class="InfoBarBigLogo">
@@ -724,6 +716,17 @@ if (isset($config['boxes']))
                 $bossquery = $db->query("SELECT `boostname` FROM `boosted_boss`")->fetch();
                 $bossname = $bossquery ? $bossquery['boostname'] : 'Boosted Boss';
                 $bossimage = tibiacomLibrarySpriteUrl($bossname, 'demon');
+
+                $onlinePlayers = (int)($status['playersTotal'] ?? $status['players'] ?? 0);
+                if ($db->hasTable('players_online')) {
+                    $onlineQuery = $db->query('SELECT COUNT(`player_id`) AS `playersOnline` FROM `players_online`;')->fetch();
+                    $onlinePlayers = (int)($onlineQuery['playersOnline'] ?? $onlinePlayers);
+                } elseif ($db->hasColumn('players', 'online')) {
+                    $onlineQuery = $db->query('SELECT COUNT(`id`) AS `playersOnline` FROM `players` WHERE `online` > 0;')->fetch();
+                    $onlinePlayers = (int)($onlineQuery['playersOnline'] ?? $onlinePlayers);
+                }
+
+                $playersOnlineLabel = $onlinePlayers === 1 ? '1 Player Online' : $onlinePlayers . ' Players Online';
                 ?>
                 <div id="RightArtwork">
                     <img id="Creature"
@@ -738,6 +741,7 @@ if (isset($config['boxes']))
 
                     <img id="PedestalAndOnline" src="<?= $template_path; ?>/images/header/pedestal-and-online.gif"
                          alt="Monster Pedestal and Players Online Box"/>
+                    <a id="PlayersOnline" href="?online"><?= htmlspecialchars($playersOnlineLabel, ENT_QUOTES, 'UTF-8'); ?></a>
                 </div>
 
                 <div id="Themeboxes">

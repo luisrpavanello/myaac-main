@@ -115,23 +115,23 @@ function updateStatus()
     $status['players'] = $serverStatus->getOnlinePlayers(); // counts all players logged in-game, or only connected clients (if enabled on server side)
     $status['playersMax'] = $serverStatus->getMaxPlayers();
 
-    // for status afk thing
-    if ($config['online_afk']) {
-      // get amount of players that are currently logged in-game, including disconnected clients (exited)
-      if ($db->hasTable('players_online')) {
-        // tfs 1.x
-        $query = $db->query('SELECT COUNT(`player_id`) AS `playersTotal` FROM `players_online`;');
-      } else {
-        $query = $db->query(
-          'SELECT COUNT(`id`) AS `playersTotal` FROM `players` WHERE `online` > 0'
-        );
-      }
+    // Canary keeps the reliable in-game online list in players_online.
+    $status['playersTotal'] = 0;
+    if ($db->hasTable('players_online')) {
+      $query = $db->query('SELECT COUNT(`player_id`) AS `playersTotal` FROM `players_online`;');
+    } elseif ($db->hasColumn('players', 'online')) {
+      $query = $db->query('SELECT COUNT(`id`) AS `playersTotal` FROM `players` WHERE `online` > 0');
+    } else {
+      $query = false;
+    }
 
-      $status['playersTotal'] = 0;
-      if ($query->rowCount() > 0) {
-        $query = $query->fetch();
-        $status['playersTotal'] = $query['playersTotal'];
-      }
+    if ($query && $query->rowCount() > 0) {
+      $query = $query->fetch();
+      $status['playersTotal'] = (int)$query['playersTotal'];
+    }
+
+    if ($status['playersTotal'] > 0 || (int)$status['players'] === 0) {
+      $status['players'] = $status['playersTotal'];
     }
 
     $uptime = $status['uptime'] = $serverStatus->getUptime();
