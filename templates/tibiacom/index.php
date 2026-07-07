@@ -726,7 +726,7 @@ if (isset($config['boxes']))
                     $onlinePlayers = (int)($onlineQuery['playersOnline'] ?? $onlinePlayers);
                 }
 
-                $playersOnlineLabel = $onlinePlayers === 1 ? '1 Player Online' : $onlinePlayers . ' Players Online';
+                $playersOnlineLabel = $onlinePlayers === 1 ? '1 Players On' : $onlinePlayers . ' Players Online';
                 ?>
                 <div id="RightArtwork">
                     <img id="Creature"
