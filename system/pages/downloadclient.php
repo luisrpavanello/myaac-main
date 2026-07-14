@@ -74,7 +74,7 @@ if (empty($getpage_download)) {
                                             <tr>
                                                 <td>The software and any related documentation is provided "as is"
                                                     without warranty of any kind. The entire risk arising out of use of
-                                                    the software remains with you. In no event shall CipSoft GmbH be
+                                                    the software remains with you. In no event shall MythSoft GmbH be
                                                     liable for any damages to your computer or loss of data.
                                                 </td>
                                             </tr>
@@ -125,7 +125,7 @@ if ($download_subtopic == 'downloadclient' and $getpage_download == 'downloadagr
             <tbody>
             <tr>
                 <td>
-                    <div class="InnerTableContainer"><p>This agreement describes the terms on which CipSoft GmbH offers
+                    <div class="InnerTableContainer"><p>This agreement describes the terms on which MythSoft offers
                             you access to an account for being able to play the online role playing game "Tibia". By
                             creating an account or downloading the client software you accept the terms and conditions
                             below and state that you are of full legal age in your country or have the permission of
@@ -143,7 +143,7 @@ if ($download_subtopic == 'downloadclient' and $getpage_download == 'downloadagr
                         <p>While you are playing "Tibia", you must abide by some rules ("Tibia Rules") that are stated
                             on this homepage. If you break any of these rules, your account may be removed and all other
                             services terminated immediately.</p>
-                        <p>CipSoft GmbH is neither willing nor required to take part in out-of-court dispute
+                        <p>MythSoft is neither willing nor required to take part in out-of-court dispute
                             resolution.</p>
                         <p>By creating an account or downloading the client software, you also accept the terms and
                             conditions stated in the BattlEye End-User Licence Agreement.</p>

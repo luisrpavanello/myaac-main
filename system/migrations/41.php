@@ -1,11 +1,11 @@
 <?php
 
-// Seed a useful default FAQ for local OTServBR-Global/MyAAC installs.
+// Seed a useful default FAQ for local Numenor/MyAAC installs.
 if($db->hasTable(TABLE_PREFIX . 'faq')) {
 	$faqs = [
 		[
 			'question' => 'What is this website?',
-			'answer' => 'This is the local OTServBR-Global website. You can create an account, manage characters, check highscores, houses, guilds, forum, shop and server information here.',
+			'answer' => 'This is the local Numenor website. You can create an account, manage characters, check highscores, houses, guilds, forum, shop and server information here.',
 		],
 		[
 			'question' => 'How do I create my account?',
