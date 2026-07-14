@@ -36,8 +36,10 @@ function stripeEnsureTransactionsTable()
         `checkout_session_id` VARCHAR(255) NOT NULL,
         `payment_intent_id` VARCHAR(255) DEFAULT NULL,
         `account_id` INT(11) UNSIGNED NOT NULL,
+        `product_type` VARCHAR(20) NOT NULL DEFAULT 'coins',
         `package_key` VARCHAR(80) NOT NULL,
         `coins` INT(11) NOT NULL,
+        `premium_days` INT(11) NOT NULL DEFAULT 0,
         `amount_total` INT(11) NOT NULL,
         `currency` VARCHAR(10) NOT NULL,
         `coin_field` VARCHAR(40) NOT NULL,
@@ -49,6 +51,26 @@ function stripeEnsureTransactionsTable()
         KEY `account_id` (`account_id`),
         KEY `status` (`status`)
     ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;");
+}
+
+function stripeColumnExists($table, $column)
+{
+    global $db;
+
+    return (bool)$db->query('SHOW COLUMNS FROM `' . $table . '` LIKE ' . $db->quote($column))->fetch();
+}
+
+function stripeEnsureTransactionColumns()
+{
+    global $db;
+
+    if (!stripeColumnExists('myaac_stripe_transactions', 'product_type')) {
+        $db->query("ALTER TABLE `myaac_stripe_transactions` ADD COLUMN `product_type` VARCHAR(20) NOT NULL DEFAULT 'coins' AFTER `account_id`");
+    }
+
+    if (!stripeColumnExists('myaac_stripe_transactions', 'premium_days')) {
+        $db->query("ALTER TABLE `myaac_stripe_transactions` ADD COLUMN `premium_days` INT(11) NOT NULL DEFAULT 0 AFTER `coins`");
+    }
 }
 
 function stripeVerifySignature($payload, $signatureHeader, $endpointSecret)
@@ -109,6 +131,24 @@ function stripeInsertStoreHistory($accountId, $coins, $coinField)
     }
 }
 
+function stripeDeliverPremium($accountId, $days)
+{
+    global $db;
+
+    $days = (int)$days;
+    $accountId = (int)$accountId;
+    $seconds = $days * 86400;
+    $now = time();
+
+    $db->exec(
+        'UPDATE `accounts` SET ' .
+        '`premdays` = `premdays` + ' . $days . ', ' .
+        '`premdays_purchased` = `premdays_purchased` + ' . $days . ', ' .
+        '`lastday` = IF(`lastday` > ' . $now . ', `lastday` + ' . $seconds . ', ' . ($now + $seconds) . ') ' .
+        'WHERE `id` = ' . $accountId
+    );
+}
+
 $stripeConfig = $config['stripe'] ?? [];
 if (empty($stripeConfig['enabled'])) {
     stripeRespond(404, 'Stripe is disabled.');
@@ -143,6 +183,7 @@ if ($sessionId === '') {
 }
 
 stripeEnsureTransactionsTable();
+stripeEnsureTransactionColumns();
 
 $transaction = $db->query(
     'SELECT * FROM `myaac_stripe_transactions` WHERE `checkout_session_id` = ' . $db->quote($sessionId) . ' LIMIT 1'
@@ -162,24 +203,43 @@ if ($amountTotal !== (int)$transaction['amount_total'] || $currency !== strtolow
     stripeRespond(400, 'Amount mismatch.');
 }
 
+$accountId = (int)$transaction['account_id'];
+$productType = $transaction['product_type'] ?? 'coins';
+$coins = (int)$transaction['coins'];
+$premiumDays = (int)($transaction['premium_days'] ?? 0);
 $coinField = $transaction['coin_field'];
-if (!in_array($coinField, ['coins', 'coins_transferable'], true)) {
+$paymentIntent = $session['payment_intent'] ?? null;
+
+if ($productType === 'coins' && !in_array($coinField, ['coins', 'coins_transferable'], true)) {
     stripeRespond(400, 'Invalid coin field.');
 }
 
-$accountId = (int)$transaction['account_id'];
-$coins = (int)$transaction['coins'];
-$paymentIntent = $session['payment_intent'] ?? null;
+if (!in_array($productType, ['coins', 'premium'], true)) {
+    stripeRespond(400, 'Invalid product type.');
+}
+
+if ($productType === 'coins' && $coins <= 0) {
+    stripeRespond(400, 'Invalid coins amount.');
+}
+
+if ($productType === 'premium' && $premiumDays <= 0) {
+    stripeRespond(400, 'Invalid premium days.');
+}
 
 $db->beginTransaction();
 try {
-    $db->exec('UPDATE `accounts` SET `' . $coinField . '` = `' . $coinField . '` + ' . $coins . ' WHERE `id` = ' . $accountId);
+    if ($productType === 'premium') {
+        stripeDeliverPremium($accountId, $premiumDays);
+    } else {
+        $db->exec('UPDATE `accounts` SET `' . $coinField . '` = `' . $coinField . '` + ' . $coins . ' WHERE `id` = ' . $accountId);
+        stripeInsertStoreHistory($accountId, $coins, $coinField);
+    }
+
     $db->exec(
         'UPDATE `myaac_stripe_transactions` SET `payment_intent_id` = ' . $db->quote($paymentIntent) .
         ', `status` = ' . $db->quote('paid') .
         ', `delivered_at` = NOW() WHERE `checkout_session_id` = ' . $db->quote($sessionId)
     );
-    stripeInsertStoreHistory($accountId, $coins, $coinField);
     $db->commit();
 } catch (Exception $e) {
     $db->rollBack();

@@ -13,7 +13,6 @@
   .payment-method { background: #d4c0a1; border: 1px solid #7a5a3a; padding: 12px; }
   .payment-method h3 { margin: 0 0 8px; font-size: 18px; }
   .payment-button { display: inline-block; background: #0f4d3f; color: #fff !important; border: 1px solid #092f26; padding: 8px 12px; font-weight: bold; text-decoration: none; margin-top: 6px; }
-  .payment-button.disabled { background: #76675a; cursor: default; }
   .wallet-table code { word-break: break-all; white-space: normal; }
   .payment-message { padding: 10px; margin-bottom: 12px; border: 1px solid #7a5a3a; font-weight: bold; }
   .payment-message.success { background: #d7ead2; color: #1f5d23; }
@@ -24,7 +23,7 @@
 <div class="payment-center">
   <div class="payment-hero">
     <h2>Payment Center</h2>
-    <div>Buy coins or Premium Account time using international cards, PayPal, crypto, or manual transfer review.</div>
+    <div>Buy coins or Premium Account time using international cards, crypto, or manual transfer review.</div>
   </div>
 
   {% if message %}
@@ -95,12 +94,13 @@
             <div class="payment-methods">
               <div class="payment-method">
                 <h3>Credit / Debit Card</h3>
-                <div>Pay securely with Stripe Checkout. Test mode is configured for coin packages.</div>
-                {% if selected_type == 'coins' and packages|length > 0 %}
-                  <form method="post" action="?subtopic=donate&type=coins">
+                <div>Pay securely with Stripe Checkout.</div>
+                {% if packages|length > 0 %}
+                  <form method="post" action="?subtopic=donate&type={{ selected_type }}">
                     <input type="hidden" name="payment_action" value="stripe_checkout">
+                    <input type="hidden" name="product_type" value="{{ selected_type }}">
                     <select name="package_key">
-                      {% for package in coins_packages %}
+                      {% for package in packages %}
                         <option value="{{ package.key }}">{{ package.label }} - {{ payment.currency }} {{ package.price|number_format(2, '.', ',') }}</option>
                       {% endfor %}
                     </select>
@@ -108,16 +108,7 @@
                     <input class="payment-button" type="submit" value="Open Stripe Checkout">
                   </form>
                 {% else %}
-                  <span class="payment-button disabled">Select coin packages</span>
-                {% endif %}
-              </div>
-              <div class="payment-method">
-                <h3>PayPal</h3>
-                <div>Good fallback for players who prefer PayPal balance or local card routing.</div>
-                {% if payment.paypal_checkout_url %}
-                  <a class="payment-button" href="{{ payment.paypal_checkout_url }}" target="_blank" rel="noopener">Open PayPal Checkout</a>
-                {% else %}
-                  <span class="payment-button disabled">PayPal not configured</span>
+                  <span>No packages configured.</span>
                 {% endif %}
               </div>
               <div class="payment-method">
@@ -131,7 +122,7 @@
                 {% if payment.bank_transfer_enabled %}
                   <a class="payment-button" href="#manual-confirmation">Send Receipt</a>
                 {% else %}
-                  <span class="payment-button disabled">Manual approval only</span>
+                  <span>Manual approval only</span>
                 {% endif %}
               </div>
             </div>
