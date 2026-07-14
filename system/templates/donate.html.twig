@@ -10,8 +10,10 @@
   .payment-package strong { display: block; font-size: 17px; margin-bottom: 5px; }
   .payment-price { font-size: 20px; font-weight: bold; margin-top: 8px; }
   .payment-methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-bottom: 14px; }
-  .payment-method { background: #d4c0a1; border: 1px solid #7a5a3a; padding: 12px; }
+  .payment-method { background: #d4c0a1; border: 1px solid #7a5a3a; padding: 12px; min-width: 0; }
   .payment-method h3 { margin: 0 0 8px; font-size: 18px; }
+  .payment-method form { max-width: 100%; }
+  .payment-method select { box-sizing: border-box; display: block; width: 100%; max-width: 100%; margin-top: 6px; }
   .payment-button { display: inline-block; background: #0f4d3f; color: #fff !important; border: 1px solid #092f26; padding: 8px 12px; font-weight: bold; text-decoration: none; margin-top: 6px; }
   .wallet-table code { word-break: break-all; white-space: normal; }
   .payment-message { padding: 10px; margin-bottom: 12px; border: 1px solid #7a5a3a; font-weight: bold; }
@@ -23,7 +25,7 @@
 <div class="payment-center">
   <div class="payment-hero">
     <h2>Payment Center</h2>
-    <div>Buy coins or Premium Account time using international cards, crypto, or manual transfer review.</div>
+    <div>Buy coins or Premium time using international cards, crypto, or manual transfer review.</div>
   </div>
 
   {% if message %}
@@ -32,7 +34,7 @@
 
   <div class="payment-tabs">
     <a class="{% if selected_type == 'coins' %}active{% endif %}" href="?subtopic=donate&type=coins">Coins</a>
-    <a class="{% if selected_type == 'premium' %}active{% endif %}" href="?subtopic=donate&type=premium">Premium Account</a>
+    <a class="{% if selected_type == 'premium' %}active{% endif %}" href="?subtopic=donate&type=premium">Premium</a>
   </div>
 
   {% set packages = selected_type == 'premium' ? premium_packages : coins_packages %}
@@ -174,7 +176,7 @@
         <td>
           <select name="product_type" onchange="window.location='?subtopic=donate&type=' + this.value + '#manual-confirmation'">
             <option value="coins"{% if selected_type == 'coins' %} selected{% endif %}>Coins</option>
-            <option value="premium"{% if selected_type == 'premium' %} selected{% endif %}>Premium Account</option>
+            <option value="premium"{% if selected_type == 'premium' %} selected{% endif %}>Premium</option>
           </select>
         </td>
       </tr>

@@ -15,8 +15,8 @@ $defaults = [
     'bank_transfer_instructions' => 'Contact support before sending a bank transfer.',
     'coins_packages' => $config['pagSeguro']['donates'] ?? [],
     'premium_packages' => [
-        'premium_30' => ['label' => '30 Days Premium Account', 'days' => 30, 'price' => 9.99],
-        'premium_90' => ['label' => '90 Days Premium Account', 'days' => 90, 'price' => 24.99],
+        'premium_30' => ['label' => '30 Days Premium', 'days' => 30, 'price' => 9.99],
+        'premium_90' => ['label' => '90 Days Premium', 'days' => 90, 'price' => 24.99],
     ],
     'crypto_wallets' => [],
 ];
@@ -153,7 +153,7 @@ function paymentCenterNormalizePremiumPackage($key, $package)
     return [
         'key' => $key,
         'type' => 'premium',
-        'label' => $package['label'] ?? ($days . ' Days Premium Account'),
+        'label' => $package['label'] ?? ($days . ' Days Premium'),
         'reward' => $days . ' premium days',
         'days' => $days,
         'price' => (float)($package['price'] ?? 0),
