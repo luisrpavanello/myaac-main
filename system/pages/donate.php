@@ -36,6 +36,9 @@ function paymentCenterEnsureTable()
     global $db;
 
     if (paymentCenterTableExists('myaac_payment_requests')) {
+        if (!paymentCenterTableExists('myaac_stripe_transactions')) {
+            paymentCenterEnsureStripeTable();
+        }
         return;
     }
 
@@ -61,6 +64,36 @@ function paymentCenterEnsureTable()
         KEY `status` (`status`),
         KEY `product_type` (`product_type`)
     ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;");
+
+    paymentCenterEnsureStripeTable();
+}
+
+function paymentCenterEnsureStripeTable()
+{
+    global $db;
+
+    if (paymentCenterTableExists('myaac_stripe_transactions')) {
+        return;
+    }
+
+    $db->query("CREATE TABLE `myaac_stripe_transactions` (
+        `id` INT(11) NOT NULL AUTO_INCREMENT,
+        `checkout_session_id` VARCHAR(255) NOT NULL,
+        `payment_intent_id` VARCHAR(255) DEFAULT NULL,
+        `account_id` INT(11) UNSIGNED NOT NULL,
+        `package_key` VARCHAR(80) NOT NULL,
+        `coins` INT(11) NOT NULL,
+        `amount_total` INT(11) NOT NULL,
+        `currency` VARCHAR(10) NOT NULL,
+        `coin_field` VARCHAR(40) NOT NULL,
+        `status` VARCHAR(40) NOT NULL DEFAULT 'created',
+        `created_at` DATETIME NOT NULL,
+        `delivered_at` DATETIME DEFAULT NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `checkout_session_id` (`checkout_session_id`),
+        KEY `account_id` (`account_id`),
+        KEY `status` (`status`)
+    ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;");
 }
 
 function paymentCenterFindPackage($packages, $key)
@@ -85,6 +118,8 @@ function paymentCenterNormalizeCoinPackage($key, $package)
         'type' => 'coins',
         'label' => $package['label'] ?? (($coins + $bonus) . ' Coins'),
         'reward' => $coins . ' Coins' . ($bonus > 0 ? ' +' . $bonus . ' bonus' : ''),
+        'coins' => $coins,
+        'bonus' => $bonus,
         'price' => $price,
     ];
 }
@@ -100,6 +135,48 @@ function paymentCenterNormalizePremiumPackage($key, $package)
         'reward' => $days . ' premium days',
         'price' => (float)($package['price'] ?? 0),
     ];
+}
+
+function paymentCenterStripeEnabled($stripeConfig)
+{
+    return !empty($stripeConfig['enabled'])
+        && !empty($stripeConfig['secret_key'])
+        && strpos($stripeConfig['secret_key'], 'PASTE_YOUR') === false;
+}
+
+function paymentCenterStripeRequest($endpoint, $params)
+{
+    global $config;
+
+    $secretKey = $config['stripe']['secret_key'] ?? '';
+    $ch = curl_init('https://api.stripe.com/v1/' . ltrim($endpoint, '/'));
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => http_build_query($params),
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $secretKey,
+            'Content-Type: application/x-www-form-urlencoded',
+        ],
+        CURLOPT_TIMEOUT => 20,
+    ]);
+
+    $response = curl_exec($ch);
+    $error = curl_error($ch);
+    $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($response === false) {
+        throw new RuntimeException('Stripe connection failed: ' . $error);
+    }
+
+    $decoded = json_decode($response, true);
+    if ($status < 200 || $status >= 300) {
+        $message = $decoded['error']['message'] ?? ('Stripe returned HTTP ' . $status);
+        throw new RuntimeException($message);
+    }
+
+    return $decoded;
 }
 
 $coinsPackages = [];
@@ -161,6 +238,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['payment_action'] ?? '') ==
             $db->quote('manual_review') . ', NOW())'
         );
         $message = ['type' => 'success', 'text' => 'Payment confirmation received. Reference: ' . $reference . '. Your order will be reviewed by staff.'];
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['payment_action'] ?? '') === 'stripe_checkout') {
+    paymentCenterEnsureTable();
+
+    $packageKey = trim((string)($_POST['package_key'] ?? ''));
+    $package = paymentCenterFindPackage($coinsPackages, $packageKey);
+    $stripeConfig = $config['stripe'] ?? [];
+
+    if ($package === null) {
+        $message = ['type' => 'error', 'text' => 'Please select a valid coin package.'];
+    } elseif (!paymentCenterStripeEnabled($stripeConfig)) {
+        $message = ['type' => 'error', 'text' => 'Stripe test keys are not configured yet.'];
+    } elseif ((float)$package['price'] < 1) {
+        $message = ['type' => 'error', 'text' => 'The minimum Stripe payment is USD 1.00.'];
+    } else {
+        try {
+            $coinsAmount = (int)($package['coins'] + ($package['bonus'] ?? 0));
+            $amountCents = (int)round(((float)$package['price']) * 100);
+            $coinField = $stripeConfig['coin_field'] ?? 'coins_transferable';
+            if (!in_array($coinField, ['coins', 'coins_transferable'], true)) {
+                $coinField = 'coins_transferable';
+            }
+
+            $session = paymentCenterStripeRequest('checkout/sessions', [
+                'mode' => 'payment',
+                'payment_method_types[0]' => 'card',
+                'wallet_options[link][display]' => 'never',
+                'success_url' => BASE_URL . '?subtopic=donate&action=final&provider=stripe',
+                'cancel_url' => BASE_URL . '?subtopic=donate&type=coins&payment=cancelled',
+                'client_reference_id' => (string)$account_logged->getId(),
+                'line_items[0][price_data][currency]' => strtolower($stripeConfig['currency'] ?? $paymentCenter['currency']),
+                'line_items[0][price_data][unit_amount]' => $amountCents,
+                'line_items[0][price_data][product_data][name]' => $package['label'],
+                'line_items[0][quantity]' => 1,
+                'metadata[account_id]' => (string)$account_logged->getId(),
+                'metadata[package_key]' => $package['key'],
+                'metadata[coins]' => (string)$coinsAmount,
+                'metadata[coin_field]' => $coinField,
+            ]);
+
+            $db->query(
+                'INSERT INTO `myaac_stripe_transactions` ' .
+                '(`checkout_session_id`, `payment_intent_id`, `account_id`, `package_key`, `coins`, `amount_total`, `currency`, `coin_field`, `status`, `created_at`) VALUES (' .
+                $db->quote($session['id']) . ', NULL, ' .
+                (int)$account_logged->getId() . ', ' .
+                $db->quote($package['key']) . ', ' .
+                $coinsAmount . ', ' .
+                $amountCents . ', ' .
+                $db->quote(strtolower($stripeConfig['currency'] ?? $paymentCenter['currency'])) . ', ' .
+                $db->quote($coinField) . ', ' .
+                $db->quote('created') . ', NOW())'
+            );
+
+            header('Location: ' . $session['url']);
+            exit;
+        } catch (Exception $e) {
+            $message = ['type' => 'error', 'text' => 'Stripe checkout could not be created: ' . $e->getMessage()];
+        }
     }
 }
 

@@ -95,11 +95,20 @@
             <div class="payment-methods">
               <div class="payment-method">
                 <h3>Credit / Debit Card</h3>
-                <div>Recommended for international players. Use Stripe Checkout when production keys are configured.</div>
-                {% if payment.stripe_checkout_url %}
-                  <a class="payment-button" href="{{ payment.stripe_checkout_url }}" target="_blank" rel="noopener">Open Card Checkout</a>
+                <div>Pay securely with Stripe Checkout. Test mode is configured for coin packages.</div>
+                {% if selected_type == 'coins' and packages|length > 0 %}
+                  <form method="post" action="?subtopic=donate&type=coins">
+                    <input type="hidden" name="payment_action" value="stripe_checkout">
+                    <select name="package_key">
+                      {% for package in coins_packages %}
+                        <option value="{{ package.key }}">{{ package.label }} - {{ payment.currency }} {{ package.price|number_format(2, '.', ',') }}</option>
+                      {% endfor %}
+                    </select>
+                    <br>
+                    <input class="payment-button" type="submit" value="Open Stripe Checkout">
+                  </form>
                 {% else %}
-                  <span class="payment-button disabled">Stripe not configured</span>
+                  <span class="payment-button disabled">Select coin packages</span>
                 {% endif %}
               </div>
               <div class="payment-method">
