@@ -1,0 +1,229 @@
+/*
+ * Zealot UI kit
+ * A 2D component layer for the TibiaCom template. Legacy artwork remains in
+ * place for the frame, while reusable controls use the Zealot colour system.
+ */
+
+:root {
+  --zealot-surface: #15221c;
+  --zealot-surface-raised: #1e3329;
+  --zealot-forest: #183a2e;
+  --zealot-forest-hover: #285a45;
+  --zealot-gold: #c99a4b;
+  --zealot-gold-light: #e7c47d;
+  --zealot-parchment: #f2e4c8;
+  --zealot-parchment-deep: #d7bf93;
+  --zealot-ink: #3c2919;
+  --zealot-ruby: #8e292d;
+  --zealot-ruby-hover: #ad3c3f;
+  --zealot-success: #3f9360;
+  --zealot-warning: #bd8129;
+  --zealot-danger: #a9363c;
+  --zealot-muted: #746754;
+}
+
+/* Reusable panel and card primitives for new PHP/Twig content. */
+.zealot-panel,
+.zealot-card {
+  box-sizing: border-box;
+  border: 1px solid #826843;
+  background: var(--zealot-parchment);
+  color: var(--zealot-ink);
+  box-shadow: inset 0 0 0 1px #fff6df, 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.zealot-panel__title,
+.zealot-card__title {
+  margin: 0;
+  padding: 7px 10px;
+  border-bottom: 1px solid #0c1d16;
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 10pt;
+  font-weight: bold;
+  line-height: 16px;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-panel__body,
+.zealot-card__body {
+  padding: 10px;
+}
+
+.zealot-card {
+  background: #ead8b6;
+}
+
+/* 2D buttons: used by the legacy BigButton markup and available as classes. */
+.zealot-button,
+.Content .BigButton,
+#Themeboxes .BigButton {
+  box-sizing: border-box;
+  min-height: 28px;
+  border: 1px solid #0c1d16;
+  outline: 1px solid var(--zealot-gold);
+  background: var(--zealot-forest) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 239, 191, 0.2), 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+.zealot-button,
+.zealot-button:link,
+.zealot-button:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  font-weight: bold;
+  line-height: 28px;
+  text-decoration: none;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-button:hover,
+.zealot-button:focus,
+.Content .BigButton:hover,
+#Themeboxes .BigButton:hover {
+  background: var(--zealot-forest-hover) !important;
+  color: #fff1c8;
+}
+
+.zealot-button--ruby {
+  background: var(--zealot-ruby) !important;
+  outline-color: #d18a78;
+}
+
+.zealot-button--ruby:hover,
+.zealot-button--ruby:focus {
+  background: var(--zealot-ruby-hover) !important;
+}
+
+.Content .BigButtonOver,
+#Themeboxes .BigButtonOver {
+  background: rgba(40, 90, 69, 0.82) !important;
+}
+
+.Content .BigButtonText,
+#Themeboxes .BigButtonText {
+  color: var(--zealot-gold-light);
+  font-weight: bold;
+}
+
+/* Fields and selects share a single parchment treatment. */
+.zealot-field,
+.Content input[type='text'],
+.Content input[type='password'],
+.Content input[type='email'],
+.Content input[type='number'],
+.Content select,
+.Content textarea,
+.searchchar_input {
+  box-sizing: border-box;
+  min-height: 24px;
+  padding: 3px 6px;
+  border: 1px solid #9a7b4d;
+  border-radius: 0;
+  background: #fff7e6;
+  color: var(--zealot-ink);
+  font-family: Verdana, Arial, sans-serif;
+}
+
+.zealot-field:focus,
+.Content input[type='text']:focus,
+.Content input[type='password']:focus,
+.Content input[type='email']:focus,
+.Content input[type='number']:focus,
+.Content select:focus,
+.Content textarea:focus,
+.searchchar_input:focus {
+  outline: 1px solid var(--zealot-gold);
+  border-color: var(--zealot-forest-hover);
+  box-shadow: 0 0 0 2px rgba(201, 154, 75, 0.22);
+}
+
+/* Alerts use colour plus a label-friendly border, never colour alone. */
+.zealot-alert,
+.SmallBox .Message,
+.SmallBox .ErrorMessage {
+  box-sizing: border-box;
+  border: 1px solid #9a7b4d;
+  border-left: 4px solid var(--zealot-warning);
+  background: #ead8b6;
+  color: var(--zealot-ink);
+}
+
+.zealot-alert--success {
+  border-left-color: var(--zealot-success);
+}
+
+.zealot-alert--warning {
+  border-left-color: var(--zealot-warning);
+}
+
+.zealot-alert--danger,
+.SmallBox .ErrorMessage {
+  border-left-color: var(--zealot-danger);
+  color: #7b2228;
+}
+
+/* Shared 2D table appearance for account, rankings, houses and store history. */
+.zealot-table,
+.TableContainer .TableContent {
+  border-collapse: collapse;
+}
+
+.zealot-table th,
+.TableContainer .TableContent th {
+  border: 1px solid #0c1d16;
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light);
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-table td,
+.TableContainer .TableContent td {
+  border-color: #e9d8b8;
+}
+
+.zealot-table tbody tr:nth-child(odd) td {
+  background: #f1e2c5;
+}
+
+.zealot-table tbody tr:nth-child(even) td {
+  background: #dfca9f;
+}
+
+.zealot-table tbody tr:hover td,
+.moduleRowOver {
+  background: #ead5ae !important;
+}
+
+/* Small utility labels for future store/account components. */
+.zealot-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1px solid currentColor;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+  font-weight: bold;
+  line-height: 12px;
+}
+
+.zealot-badge--success { color: var(--zealot-success); }
+.zealot-badge--warning { color: var(--zealot-warning); }
+.zealot-badge--danger { color: var(--zealot-danger); }
+.zealot-badge--gold { color: #9b6c25; }
+
+.zealot-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #826843;
+  background: var(--zealot-surface-raised);
+  color: var(--zealot-gold-light);
+}
