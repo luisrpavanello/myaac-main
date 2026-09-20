@@ -1,91 +1,7 @@
-<style>
-	.faq-panel {
-		border: 1px solid #7a5a35;
-		background: #f1e0c6;
-		box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
-		margin-bottom: 12px;
-	}
-
-	.faq-toolbar {
-		align-items: center;
-		background: #505050;
-		color: #fff;
-		display: flex;
-		justify-content: space-between;
-		padding: 8px 10px;
-	}
-
-	.faq-toolbar a {
-		color: #f0d1a4;
-		font-weight: bold;
-		text-decoration: none;
-	}
-
-	.faq-intro {
-		background: #d4c0a1;
-		color: #5a2800;
-		line-height: 1.45;
-		padding: 10px;
-	}
-
-	.faq-item {
-		border-top: 1px solid #c7ad87;
-	}
-
-	.faq-question {
-		align-items: center;
-		cursor: pointer;
-		display: flex;
-		font-weight: bold;
-		gap: 8px;
-		padding: 10px;
-	}
-
-	.faq-question:hover {
-		background: #e8d2ad;
-	}
-
-	.faq-marker {
-		background: #5f4d41;
-		color: #fff;
-		display: inline-block;
-		font-size: 12px;
-		height: 18px;
-		line-height: 18px;
-		text-align: center;
-		width: 18px;
-	}
-
-	.faq-answer {
-		background: #fff2d9;
-		border-top: 1px dotted #9f7d55;
-		color: #5a2800;
-		line-height: 1.5;
-		padding: 10px 12px 12px 36px;
-	}
-
-	.faq-answer a {
-		color: #004294;
-		font-weight: bold;
-	}
-
-	.faq-actions {
-		background: #d4c0a1;
-		border-top: 1px solid #c7ad87;
-		padding: 6px 10px 8px 36px;
-	}
-
-	.faq-actions a {
-		display: inline-block;
-		margin-right: 8px;
-		white-space: nowrap;
-	}
-</style>
-
 <div class="faq-panel">
 	<div class="faq-toolbar">
 		<strong>Frequently Asked Questions</strong>
-		<a href="#" onclick="toggleAll(); return false;">Toggle all</a>
+		<button class="faq-toggle-all" id="faq_toggle_all" type="button" onclick="toggleAll();">Expand all</button>
 	</div>
 	<div class="faq-intro">
 		Find quick answers about accounts, the client, characters, houses, guilds, the shop and support.
@@ -95,11 +11,11 @@
 	{% for faq in faqs %}
 		{% set i = i + 1 %}
 		<div class="faq-item">
-			<div class="faq-question" onclick="toggleVisibility('faq_{{ i }}'); return false;">
+			<button class="faq-question" id="faq_question_{{ i }}" type="button" aria-controls="faq_{{ i }}" aria-expanded="false" onclick="toggleVisibility('faq_{{ i }}');">
 				<span class="faq-marker" id="faq_marker_{{ i }}">+</span>
 				<span>{{ faq.question }}</span>
-			</div>
-			<div id="faq_{{ i }}" class="faq-answer" style="display: none;">{{ faq.answer|raw }}</div>
+			</button>
+			<div id="faq_{{ i }}" class="faq-answer" hidden>{{ faq.answer|raw }}</div>
 			{% if canEdit %}
 				<div class="faq-actions">
 					<a href="?subtopic=faq&action=edit&id={{ faq.id }}" title="Edit"><img src="images/edit.png"/> Edit</a>
@@ -117,7 +33,7 @@
 			{% endif %}
 		</div>
 	{% else %}
-		<div class="faq-answer" style="display: block; padding-left: 12px;">
+		<div class="faq-answer faq-answer--empty">
 			No questions have been added yet.
 		</div>
 	{% endfor %}
@@ -131,11 +47,15 @@
 	{
 		var answer = document.getElementById('faq_' + id);
 		var marker = document.getElementById('faq_marker_' + id);
+		var question = document.getElementById('faq_question_' + id);
 		if(answer) {
-			answer.style.display = visible ? '' : 'none';
+			answer.hidden = !visible;
 		}
 		if(marker) {
-			marker.innerHTML = visible ? '-' : '+';
+			marker.textContent = visible ? '\u2212' : '+';
+		}
+		if(question) {
+			question.setAttribute('aria-expanded', visible ? 'true' : 'false');
 		}
 	}
 
@@ -147,7 +67,7 @@
 		}
 
 		var number = id.replace('faq_', '');
-		setFaqVisible(number, answer.style.display == 'none');
+		setFaqVisible(number, answer.hidden);
 	}
 
 	function toggleAll()
@@ -157,5 +77,6 @@
 		}
 
 		expanded = !expanded;
+		document.getElementById('faq_toggle_all').textContent = expanded ? 'Collapse all' : 'Expand all';
 	}
 </script>

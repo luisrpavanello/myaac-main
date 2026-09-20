@@ -20,13 +20,29 @@
         background-image: url('templates/tibiacom/images/themeboxes/box_bottom.png');
     }
     .donate_content{
+        box-sizing: border-box;
         padding: 0px 10px;
         width: 160px;
         height: 125px;
         background-image: url('templates/tibiacom/images/themeboxes/box_bg.png');
-        display: grid;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
         justify-content: center;
         align-items: center;
+    }
+    .donate_content img{
+        display: block;
+        max-width: 160px;
+        max-height: 82px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+    }
+    .donate_content > div,
+    .donate_content a{
+        display: block;
+        line-height: 0;
     }
     .donate_outfit{
         position: absolute;
@@ -62,7 +78,7 @@
     <div class="donate_header">Payment Center</div>
     <div class="donate_content">
         <div>
-            <img src="templates/tibiacom/images/themeboxes/donate/donate.png">
+            <img src="<?= $template_path; ?>/images/themeboxes/donate/zealot-coins.gif?v=<?= filemtime(__DIR__ . '/../images/themeboxes/donate/zealot-coins.gif'); ?>" alt="Zealot coins increasing from 1 to 100">
         </div>
         <a href="<?php echo BASE_URL ?>?subtopic=donate&type=coins">
             <button type="button" class="donate_button">Buy Coins</button>

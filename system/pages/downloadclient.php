@@ -52,7 +52,7 @@ if (empty($getpage_download)) {
                                                         <span style="font-size: 12pt;">
                                                         Download <?= configLua('serverName') ?> Client
                                                         <br>
-                                                        <span style="font-size: 10pt;">Windows Client</span></span>
+                                                        <span style="font-size: 10pt;">MacOS Client</span></span>
                                                         <br>
                                                         <small>Version <?= config('client') / 100 ?></small>
                                                     </a>

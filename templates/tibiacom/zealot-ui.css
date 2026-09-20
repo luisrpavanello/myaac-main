@@ -5,9 +5,11 @@
  */
 
 :root {
+  --zealot-night: #0d1410;
   --zealot-surface: #15221c;
   --zealot-surface-raised: #1e3329;
   --zealot-forest: #183a2e;
+  --zealot-forest-light: #285a45;
   --zealot-forest-hover: #285a45;
   --zealot-gold: #c99a4b;
   --zealot-gold-light: #e7c47d;
@@ -15,11 +17,52 @@
   --zealot-parchment-deep: #d7bf93;
   --zealot-ink: #3c2919;
   --zealot-ruby: #8e292d;
+  --zealot-ruby-light: #bf4847;
   --zealot-ruby-hover: #ad3c3f;
   --zealot-success: #3f9360;
   --zealot-warning: #bd8129;
   --zealot-danger: #a9363c;
   --zealot-muted: #746754;
+}
+
+html {
+  min-height: 100%;
+  background: var(--zealot-night);
+}
+
+/* index.php previously applied a repeating theme-box image directly on body.
+ * It leaked below the content and made the end of long pages look unfinished. */
+body {
+  min-height: 100vh;
+  height: auto !important;
+  background-color: var(--zealot-night) !important;
+  background-image: linear-gradient(180deg, #101a15 0, var(--zealot-night) 520px) !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
+}
+
+/* The original artwork is intentionally retained; this layer prevents the
+ * surrounding page from falling back to a disconnected flat black surface. */
+#ArtworkHelper {
+  min-height: 100vh;
+  background-color: var(--zealot-night);
+}
+
+/* The header mark is an alpha PNG, so the artwork belongs directly to the
+ * night canvas rather than being trapped in the old rectangular banner. */
+#LeftArtwork #TibiaLogoArtworkTop {
+  top: -13px;
+  left: -85px;
+  width: 320px;
+  height: 170px;
+  object-position: center center;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.72));
+}
+
+*:focus-visible {
+  outline: 2px solid var(--zealot-gold-light);
+  outline-offset: 2px;
 }
 
 /* Reusable panel and card primitives for new PHP/Twig content. */
@@ -101,6 +144,20 @@
   background: var(--zealot-ruby-hover) !important;
 }
 
+.zealot-button--quiet {
+  border-color: #826843;
+  outline-color: transparent;
+  background: transparent !important;
+  color: #80561e;
+  text-shadow: none;
+}
+
+.zealot-button--quiet:hover,
+.zealot-button--quiet:focus {
+  background: #ead8b6 !important;
+  color: var(--zealot-ruby);
+}
+
 .Content .BigButtonOver,
 #Themeboxes .BigButtonOver {
   background: rgba(40, 90, 69, 0.82) !important;
@@ -110,6 +167,700 @@
 #Themeboxes .BigButtonText {
   color: var(--zealot-gold-light);
   font-weight: bold;
+}
+
+/* The account-login template keeps its two actions in a legacy table cell.
+ * Reserve an explicit gutter on the right so the fixed-width buttons never
+ * sit on top of the panel frame when the content column grows. */
+.Content #LoginFormButtonCell {
+  box-sizing: border-box;
+  width: 156px !important;
+  min-width: 156px;
+  padding: 4px 12px 4px 5px !important;
+  vertical-align: top;
+}
+
+.Content #LoginFormButtonCell .BigButton {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Zealot Market is the branded entry point for character transfers. It is
+ * intentionally a marketplace surface, not a copy of the item shop. */
+.zealot-exchange {
+  box-sizing: border-box;
+  border: 1px solid #826843;
+  background: var(--zealot-parchment);
+  box-shadow: inset 0 0 0 1px #fff6df, 0 2px 5px rgba(0, 0, 0, 0.35);
+  color: var(--zealot-ink);
+}
+
+.zealot-exchange__hero {
+  padding: 24px 26px 22px;
+  border-bottom: 1px solid var(--zealot-gold);
+  background:
+    radial-gradient(circle at right 12% top 20%, rgba(201, 154, 75, 0.22), transparent 32%),
+    linear-gradient(135deg, #10261d, var(--zealot-forest) 58%, #10261d);
+  color: #fff1c8;
+}
+
+.zealot-exchange__eyebrow,
+.zealot-exchange__card-kicker {
+  display: block;
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7.5pt;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.zealot-exchange h1,
+.zealot-exchange h2,
+.zealot-exchange p {
+  margin-top: 0;
+}
+
+.zealot-exchange h1 {
+  margin-bottom: 6px;
+  color: #fff1c8;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 23pt;
+  line-height: 1.1;
+  text-shadow: 1px 2px 1px #09140f;
+}
+
+.zealot-exchange__hero p {
+  max-width: 570px;
+  margin-bottom: 17px;
+  color: #dfd0b3;
+  font-size: 10pt;
+  line-height: 1.5;
+}
+
+.zealot-exchange__hero-actions,
+.zealot-exchange__card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.zealot-exchange__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 13px;
+  border: 1px solid #0b1c15;
+  outline: 1px solid var(--zealot-gold);
+  background: #214a39;
+  color: var(--zealot-gold-light) !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8.5pt;
+  font-weight: bold;
+  text-decoration: none;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-exchange__button:hover,
+.zealot-exchange__button:focus {
+  background: var(--zealot-forest-hover);
+  color: #fff1c8 !important;
+}
+
+.zealot-exchange__button--quiet {
+  background: rgba(8, 20, 15, 0.52);
+  outline-color: rgba(231, 196, 125, 0.65);
+}
+
+.zealot-exchange__summary {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 11px 20px;
+  border-bottom: 1px solid #c9a978;
+  background: var(--zealot-parchment-deep);
+  color: #59401f;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+}
+
+.zealot-exchange__summary strong {
+  color: #614117;
+  font-size: 15pt;
+  line-height: 1;
+}
+
+.zealot-exchange__summary-rule {
+  margin-left: auto;
+  color: #695943;
+}
+
+.zealot-exchange__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.zealot-exchange__card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #b18c56;
+  background: #fff4dc;
+  box-shadow: inset 0 0 0 1px #fffaf0;
+}
+
+.zealot-exchange__card h2 {
+  margin: 5px 0 7px;
+  color: #4c2f16;
+  font-size: 11pt;
+}
+
+.zealot-exchange__card p {
+  margin-bottom: 13px;
+  color: #5e4930;
+  font-size: 8.5pt;
+  line-height: 1.5;
+}
+
+.zealot-exchange__card > a,
+.zealot-exchange__card-links a {
+  color: #68431b;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+}
+
+.zealot-exchange__card > a:hover,
+.zealot-exchange__card > a:focus,
+.zealot-exchange__card-links a:hover,
+.zealot-exchange__card-links a:focus {
+  color: var(--zealot-ruby);
+}
+
+.zealot-exchange__notice {
+  margin: 0;
+  padding: 12px 16px;
+  border-top: 1px solid #c9a978;
+  background: #ead8b6;
+  color: #604522;
+  font-size: 8.5pt;
+  line-height: 1.45;
+}
+
+/* Live character listings: the marketplace uses real player and auction data
+ * but presents it as a scan-friendly card catalogue. */
+.zealot-market-listings {
+  border: 1px solid #826843;
+  background: var(--zealot-parchment);
+  box-shadow: inset 0 0 0 1px #fff6df, 0 2px 5px rgba(0, 0, 0, 0.35);
+  color: var(--zealot-ink);
+}
+
+.zealot-market-listings__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--zealot-gold);
+  background: linear-gradient(135deg, #10261d, var(--zealot-forest) 62%, #10261d);
+  color: #fff1c8;
+}
+
+.zealot-market-listings__eyebrow,
+.zealot-market-card__eyebrow {
+  display: block;
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.zealot-market-listings h1 {
+  margin: 3px 0 4px;
+  color: #fff1c8;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20pt;
+  line-height: 1.1;
+  text-shadow: 1px 2px 1px #09140f;
+}
+
+.zealot-market-listings__header p {
+  margin: 0;
+  color: #dfd0b3;
+  font-size: 8.5pt;
+}
+
+.zealot-market-listings__sell,
+.zealot-market-empty a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 29px;
+  padding: 0 12px;
+  border: 1px solid #0b1c15;
+  outline: 1px solid var(--zealot-gold);
+  background: #214a39;
+  color: var(--zealot-gold-light) !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-decoration: none;
+  text-shadow: 1px 1px 1px #000;
+  white-space: nowrap;
+}
+
+.zealot-market-listings__sell:hover,
+.zealot-market-listings__sell:focus,
+.zealot-market-empty a:hover,
+.zealot-market-empty a:focus {
+  background: var(--zealot-forest-hover);
+  color: #fff1c8 !important;
+}
+
+.zealot-market-filters {
+  display: grid;
+  grid-template-columns: minmax(135px, 1.35fr) repeat(2, minmax(100px, 1fr)) minmax(130px, 1.2fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding: 13px 16px;
+  border-bottom: 1px solid #c9a978;
+  background: var(--zealot-parchment-deep);
+}
+
+.zealot-market-filters label {
+  display: block;
+  min-width: 0;
+}
+
+.zealot-market-filters label span {
+  display: block;
+  margin-bottom: 3px;
+  color: #604522;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+  font-weight: bold;
+}
+
+.zealot-market-filters select,
+.zealot-market-filters input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 27px;
+  padding: 3px 6px;
+  border: 1px solid #9a7b4d;
+  background: #fff7e6;
+  color: var(--zealot-ink);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+}
+
+.zealot-market-filters button {
+  box-sizing: border-box;
+  min-height: 27px;
+  padding: 0 10px;
+  border: 1px solid #0b1c15;
+  outline: 1px solid var(--zealot-gold);
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+  cursor: pointer;
+}
+
+.zealot-market-filters button:hover,
+.zealot-market-filters button:focus {
+  background: var(--zealot-forest-hover);
+  color: #fff1c8;
+}
+
+.zealot-market-card {
+  margin: 13px 16px;
+  border: 1px solid #aa8756;
+  background: #fff4dc;
+  box-shadow: inset 0 0 0 1px #fffaf0, 0 1px 3px rgba(45, 28, 12, 0.2);
+}
+
+.zealot-market-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-bottom: 1px solid #b18c56;
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d);
+}
+
+.zealot-market-card__header h2 {
+  margin: 2px 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15pt;
+  line-height: 1.05;
+}
+
+.zealot-market-card__header h2 a {
+  color: #fff1c8;
+  text-decoration: none;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-market-card__header h2 a:hover,
+.zealot-market-card__header h2 a:focus {
+  color: var(--zealot-gold-light);
+  text-decoration: underline;
+}
+
+.zealot-market-card__timer {
+  flex: 0 0 auto;
+  padding: 5px 7px;
+  border: 1px solid rgba(231, 196, 125, 0.64);
+  background: rgba(8, 20, 15, 0.58);
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7.5pt;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-market-card__body {
+  display: grid;
+  grid-template-columns: 94px minmax(185px, 1fr) minmax(180px, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 13px;
+}
+
+.zealot-market-card__outfit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 106px;
+  border: 1px solid #b18c56;
+  background: linear-gradient(180deg, #e1cfae, #f9ecd4);
+  color: #5a3b18;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7.5pt;
+}
+
+.zealot-market-card__outfit img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.zealot-market-card__outfit strong {
+  margin-top: 3px;
+}
+
+.zealot-market-card__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 13px;
+  margin: 0;
+}
+
+.zealot-market-card__details div {
+  min-width: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #dec8a4;
+}
+
+.zealot-market-card__details dt {
+  margin-bottom: 2px;
+  color: #806344;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+}
+
+.zealot-market-card__details dd {
+  margin: 0;
+  overflow: hidden;
+  color: #432c18;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8.5pt;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zealot-market-card__equipment {
+  display: grid;
+  grid-template-columns: repeat(3, 38px);
+  justify-content: end;
+  gap: 5px;
+}
+
+.zealot-market-card__equipment > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #94754c;
+  background: #1b2b22;
+  box-shadow: inset 0 0 0 1px #516553;
+}
+
+.zealot-market-card__equipment img {
+  max-width: 32px;
+  max-height: 32px;
+  image-rendering: pixelated;
+}
+
+.zealot-market-card__empty-slot::after {
+  content: '—';
+  color: #8e9a8b;
+  font-family: Georgia, serif;
+  font-size: 14pt;
+}
+
+.zealot-market-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-top: 1px solid #c9a978;
+  background: #ead8b6;
+}
+
+.zealot-market-card__footer > div > span {
+  display: block;
+  color: #755b3d;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+}
+
+.zealot-market-card__footer strong {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #563614;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 11pt;
+}
+
+.zealot-market-card__footer strong img {
+  width: 12px;
+  height: 12px;
+  image-rendering: pixelated;
+}
+
+.zealot-market-card__footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border: 1px solid #0b1c15;
+  outline: 1px solid var(--zealot-gold);
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light) !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-decoration: none;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-market-card__footer a:hover,
+.zealot-market-card__footer a:focus {
+  background: var(--zealot-forest-hover);
+  color: #fff1c8 !important;
+}
+
+.zealot-market-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 16px;
+  padding: 28px 16px;
+  border: 1px dashed #a78351;
+  background: #fff4dc;
+  color: #604522;
+  text-align: center;
+}
+
+.zealot-market-empty strong {
+  font-size: 11pt;
+}
+
+.zealot-market-empty span {
+  font-size: 8.5pt;
+}
+
+.zealot-market-feedback {
+  margin: 12px 16px 0;
+  padding: 9px 11px;
+  border: 1px solid;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  line-height: 1.45;
+}
+
+.zealot-market-feedback--success {
+  border-color: #4e8a62;
+  background: #e1f0df;
+  color: #214d2e;
+}
+
+.zealot-market-feedback--error {
+  border-color: #a64c45;
+  background: #f5ded4;
+  color: #6e211d;
+}
+
+.zealot-market-feedback a {
+  color: inherit;
+  font-weight: bold;
+}
+
+.zealot-market-sell {
+  border: 1px solid #826843;
+  background: var(--zealot-parchment);
+  box-shadow: inset 0 0 0 1px #fff6df, 0 2px 5px rgba(0, 0, 0, 0.35);
+  color: var(--zealot-ink);
+}
+
+.zealot-market-sell__header {
+  padding: 19px 21px;
+  border-bottom: 1px solid var(--zealot-gold);
+  background: linear-gradient(135deg, #10261d, var(--zealot-forest) 62%, #10261d);
+  color: #fff1c8;
+}
+
+.zealot-market-sell__header > span {
+  display: block;
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.zealot-market-sell h1 {
+  margin: 4px 0 6px;
+  color: #fff1c8;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20pt;
+  line-height: 1.1;
+  text-shadow: 1px 2px 1px #09140f;
+}
+
+.zealot-market-sell__header p {
+  max-width: 620px;
+  margin: 0;
+  color: #dfd0b3;
+  font-size: 8.5pt;
+  line-height: 1.5;
+}
+
+.zealot-market-sell__balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #c9a978;
+  background: var(--zealot-parchment-deep);
+  color: #604522;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+}
+
+.zealot-market-sell__balance strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #563614;
+  font-size: 12pt;
+}
+
+.zealot-market-sell__balance img {
+  width: 12px;
+  height: 12px;
+  image-rendering: pixelated;
+}
+
+.zealot-market-sell__form {
+  display: grid;
+  grid-template-columns: minmax(200px, 2fr) minmax(145px, 1fr) minmax(130px, 1fr);
+  gap: 14px;
+  padding: 18px 16px;
+}
+
+.zealot-market-sell__form label span {
+  display: block;
+  margin-bottom: 4px;
+  color: #604522;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7.5pt;
+  font-weight: bold;
+}
+
+.zealot-market-sell__form select,
+.zealot-market-sell__form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 29px;
+  padding: 4px 6px;
+  border: 1px solid #9a7b4d;
+  background: #fff7e6;
+  color: var(--zealot-ink);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+}
+
+.zealot-market-sell__rules {
+  grid-column: span 3;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 14px;
+  padding: 10px 12px;
+  border: 1px solid #c9a978;
+  background: #fff4dc;
+  color: #624c2d;
+  font-size: 8pt;
+  line-height: 1.4;
+}
+
+.zealot-market-sell__rules strong {
+  grid-column: 1 / -1;
+  color: #4f3116;
+}
+
+.zealot-market-sell__form button {
+  grid-column: 1 / -1;
+  justify-self: end;
+  min-height: 30px;
+  padding: 0 14px;
+  border: 1px solid #0b1c15;
+  outline: 1px solid var(--zealot-gold);
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8.5pt;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+  cursor: pointer;
+}
+
+.zealot-market-sell__form button:hover,
+.zealot-market-sell__form button:focus {
+  background: var(--zealot-forest-hover);
+  color: #fff1c8;
 }
 
 /* Fields and selects share a single parchment treatment. */
@@ -226,4 +977,1299 @@
   border: 1px solid #826843;
   background: var(--zealot-surface-raised);
   color: var(--zealot-gold-light);
+}
+
+/* The old template renders form calls-to-action with image backgrounds. Keep
+ * its sizing hooks, but make the controls share the Zealot green/gold system. */
+#Loginbox #LoginButton,
+.MediumButtonBackground {
+  box-sizing: border-box;
+  height: 32px;
+  border: 1px solid #0c1d16;
+  outline: 1px solid var(--zealot-gold);
+  background: var(--zealot-forest) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 239, 191, 0.2), 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+#Loginbox #LoginButton:hover,
+#Loginbox #LoginButton:focus-within,
+.MediumButtonBackground:hover,
+.MediumButtonBackground:focus-within {
+  background: var(--zealot-forest-hover) !important;
+}
+
+#Loginbox #LoginButton .Button,
+.MediumButtonOver {
+  background-image: none !important;
+}
+
+#Loginbox #LoginButton #ButtonText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-image: none !important;
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+}
+
+#Loginbox #LoginButton #ButtonText::after {
+  content: 'Account';
+}
+
+.zealot-medium-button--download::after,
+.zealot-medium-button--account::after {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.zealot-medium-button--download::after {
+  content: 'Download client';
+}
+
+.zealot-medium-button--account::after {
+  content: 'Create account';
+}
+
+.MediumButtonText {
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* The quick-action strip is a component rather than a news headline, so it
+ * uses the same forest surface as the rest of the Zealot navigation. */
+.Content .zealot-status-bar {
+  background-image: none !important;
+  background-color: var(--zealot-forest) !important;
+}
+
+.Content .zealot-status-shell {
+  margin: 8px 5px 18px;
+  border: 1px solid #426755;
+  background: #10261d;
+  box-shadow: inset 0 0 0 1px rgba(231, 196, 125, 0.16), 0 2px 5px rgba(0, 0, 0, 0.46);
+}
+
+.Content .zealot-status-shell > .Corner-tl,
+.Content .zealot-status-shell > .Corner-tr,
+.Content .zealot-status-shell > .CornerWrapper-b {
+  display: none;
+}
+
+.Content .zealot-status-shell > .Border_1 {
+  height: 1px;
+  background: rgba(231, 196, 125, 0.42) !important;
+}
+
+.Content .zealot-status-shell .zealot-status-bar {
+  height: 34px !important;
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d) !important;
+}
+
+.Content .zealot-status-shell #statusbar {
+  background: var(--zealot-surface-raised) !important;
+  border-top: 1px solid rgba(231, 196, 125, 0.3);
+}
+
+/* Shared content shells retain their title artwork, but their old steel rails
+ * are replaced by the same forest-and-gold frame used by the side modules. */
+.Content .Box:not(.zealot-status-shell) {
+  border: 1px solid #426755;
+  background: #10261d;
+  box-shadow: inset 0 0 0 1px rgba(231, 196, 125, 0.16), 0 2px 5px rgba(0, 0, 0, 0.46);
+}
+
+.Content .Box:not(.zealot-status-shell) > .Corner-tl,
+.Content .Box:not(.zealot-status-shell) > .Corner-tr,
+.Content .Box:not(.zealot-status-shell) > .CornerWrapper-b {
+  display: none;
+}
+
+.Content .Box:not(.zealot-status-shell) > .Border_1 {
+  height: 1px;
+  background: rgba(231, 196, 125, 0.42) !important;
+}
+
+.Content .Box:not(.zealot-status-shell) > .Border_2 {
+  margin: 6px;
+  background: #826843;
+}
+
+.Content .Box:not(.zealot-status-shell) > .Border_3 {
+  margin: 1px;
+  border: 1px solid rgba(255, 246, 223, 0.72);
+}
+
+.zealot-status-bar .InfoBar a,
+.zealot-status-bar .InfoBar a:link,
+.zealot-status-bar .InfoBar a:visited,
+.zealot-status-bar .InfoBar a:focus {
+  color: var(--zealot-gold-light);
+}
+
+.zealot-status-bar .InfoBar a:hover,
+.zealot-status-bar .InfoBar a:active {
+  color: #fff1c8 !important;
+}
+
+/* Quick actions use small line icons that share the green/gold UI language.
+ * The old large raster symbols and blue scroll control pulled focus away from
+ * the navigation and did not align with their labels. */
+.Content .zealot-status-shell .InfoBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  height: 34px;
+  margin: 0;
+  padding: 0 10px;
+  top: 0;
+}
+
+.Content .zealot-status-shell .zealot-quick-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 26px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: var(--zealot-gold-light) !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt !important;
+  font-weight: bold;
+  line-height: 1;
+  text-decoration: none !important;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.Content .zealot-status-shell .zealot-quick-action:hover,
+.Content .zealot-status-shell .zealot-quick-action:focus-visible {
+  border-color: rgba(231, 196, 125, 0.48);
+  background: rgba(40, 90, 69, 0.7);
+  color: #fff1c8 !important;
+  text-decoration: none !important;
+}
+
+.zealot-quick-action__icon,
+.zealot-status-toggle svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.zealot-status-spacer {
+  flex: 1 1 auto;
+}
+
+.zealot-status-toggle-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.Content .zealot-status-shell .zealot-status-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #826843;
+  border-radius: 2px;
+  background: #10261d;
+  color: var(--zealot-gold-light) !important;
+  text-decoration: none !important;
+}
+
+.Content .zealot-status-shell .zealot-status-toggle:hover,
+.Content .zealot-status-shell .zealot-status-toggle:focus-visible {
+  border-color: var(--zealot-gold-light);
+  background: var(--zealot-forest-hover);
+  color: #fff1c8 !important;
+}
+
+/* A compact fixed scroll control replaces the isolated blue/yellow bitmap
+ * and remains legible over every page background. */
+.scrollToTop {
+  display: none;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50000;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--zealot-gold);
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--zealot-forest-light), var(--zealot-forest));
+  box-shadow: inset 0 1px 0 rgba(255, 239, 191, 0.22), 0 3px 7px rgba(0, 0, 0, 0.55);
+  color: var(--zealot-gold-light);
+  cursor: pointer;
+}
+
+.scrollToTop:hover,
+.scrollToTop:focus-visible {
+  border-color: #fff1c8;
+  background: var(--zealot-forest-hover);
+  color: #fff1c8;
+}
+
+.scrollToTop svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+}
+
+/* FAQ: native buttons make every question keyboard-accessible while preserving
+ * the compact, game-like information density of the original page. */
+.faq-panel {
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid #826843;
+  background: var(--zealot-parchment);
+  color: var(--zealot-ink);
+  box-shadow: inset 0 0 0 1px #fff6df, 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.faq-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #0c1d16;
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 10pt;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.faq-toggle-all {
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--zealot-gold-light);
+  cursor: pointer;
+  font: inherit;
+  font-size: 8pt;
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.faq-toggle-all:hover,
+.faq-toggle-all:focus-visible {
+  color: #fff1c8;
+}
+
+.faq-intro {
+  padding: 10px 12px;
+  border-bottom: 1px solid #b99a69;
+  background: var(--zealot-parchment-deep);
+  color: var(--zealot-ink);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  line-height: 1.5;
+}
+
+.faq-item {
+  border-bottom: 1px solid #c9a978;
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 0;
+  background: #f4e3c5;
+  color: var(--zealot-ink);
+  cursor: pointer;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9.5pt;
+  font-weight: bold;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.faq-question:hover,
+.faq-question:focus-visible {
+  background: #ead5ae;
+}
+
+.faq-question[aria-expanded='true'] {
+  background: #e2c99e;
+  color: #352416;
+}
+
+.faq-marker {
+  display: inline-flex;
+  flex: 0 0 20px;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #0c1d16;
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light);
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.faq-question[aria-expanded='true'] .faq-marker {
+  background: var(--zealot-ruby);
+  color: #fff1c8;
+}
+
+.faq-answer {
+  padding: 12px 14px 14px 42px;
+  border-top: 1px dotted #9a7b4d;
+  background: #fff7e6;
+  color: var(--zealot-ink);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  line-height: 1.55;
+}
+
+.faq-answer[hidden] {
+  display: none !important;
+}
+
+.faq-answer--empty {
+  padding-left: 14px;
+}
+
+.faq-answer a {
+  color: #80561e;
+  font-weight: bold;
+}
+
+.faq-answer a:hover,
+.faq-answer a:focus {
+  color: var(--zealot-ruby);
+}
+
+.faq-actions {
+  padding: 7px 12px 9px 42px;
+  border-top: 1px solid #c9a978;
+  background: var(--zealot-parchment-deep);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+}
+
+.faq-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 2px 10px 2px 0;
+  white-space: nowrap;
+}
+
+.faq-actions img {
+  max-width: 14px;
+  max-height: 14px;
+}
+
+.faq-editor {
+  margin-bottom: 14px;
+}
+
+.faq-editor__field {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 12px;
+  color: var(--zealot-ink);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  font-weight: bold;
+}
+
+.faq-editor__field .zealot-field {
+  width: min(100%, 680px);
+}
+
+.faq-editor__field textarea.zealot-field {
+  resize: vertical;
+}
+
+.faq-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.faq-editor__actions .zealot-button {
+  cursor: pointer;
+}
+
+/* Persistent navigation: preserve the illustrated menu, but give its active
+ * and hover states a single Zealot hierarchy instead of mixed legacy colours. */
+#MenuColumn #Menu .MenuButton .Button {
+  background-image: none !important;
+  background-color: rgba(24, 58, 46, 0.48);
+  box-shadow: inset 0 0 0 1px rgba(231, 196, 125, 0.18);
+}
+
+#MenuColumn #Menu .MenuButton {
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid #0b1c15;
+  background: linear-gradient(90deg, #10261d 0, #1d3e30 50%, #10261d 100%) !important;
+  box-shadow: inset 0 0 0 1px #496553, inset 0 1px 0 rgba(231, 196, 125, 0.2), 0 1px 1px rgba(0, 0, 0, 0.65);
+}
+
+#MenuColumn #Menu .MenuButton::before {
+  position: absolute;
+  inset: 3px;
+  z-index: 1;
+  border-top: 1px solid rgba(231, 196, 125, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+  content: '';
+  pointer-events: none;
+}
+
+#MenuColumn #Menu .MenuButton .Icon,
+#MenuColumn #Menu .MenuButton .Label,
+#MenuColumn #Menu .MenuButton .Extend,
+#MenuColumn #Menu .MenuButton .Lights {
+  z-index: 2;
+}
+
+/* Labels remain the original raster lettering; this only shifts their tone
+ * toward the logo's gold without changing their typeface or texture. */
+#MenuColumn #Menu .MenuButton .Label {
+  filter: sepia(0.28) saturate(1.35) brightness(1.08) drop-shadow(1px 1px 1px #000);
+}
+
+#MenuColumn #Menu .MenuButton:hover .Button {
+  background-color: rgba(40, 90, 69, 0.65);
+}
+
+#MenuColumn #Menu .Submenu {
+  border-right: 1px solid #426755;
+  border-left: 1px solid #426755;
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d);
+  box-shadow: inset 0 0 0 1px rgba(231, 196, 125, 0.1);
+}
+
+#MenuColumn #MenuTop,
+#MenuColumn #MenuBottom {
+  box-sizing: border-box;
+  border-right: 1px solid #426755;
+  border-left: 1px solid #426755;
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d) !important;
+}
+
+#MenuColumn #MenuTop {
+  border-top: 1px solid var(--zealot-gold);
+  box-shadow: inset 0 1px 0 rgba(231, 196, 125, 0.18);
+}
+
+#MenuColumn #MenuBottom {
+  border-bottom: 1px solid var(--zealot-gold);
+  box-shadow: inset 0 -1px 0 rgba(231, 196, 125, 0.18);
+}
+
+#MenuColumn #Menu .LeftChain,
+#MenuColumn #Menu .RightChain {
+  width: 5px;
+  background: linear-gradient(90deg, #0b1c15, #426755, #0b1c15) !important;
+}
+
+#MenuColumn #Menu .Submenuitem {
+  transition: background-color 120ms ease;
+}
+
+#MenuColumn #Menu .Submenuitem.zealot-menu-current {
+  background-color: #234b3b;
+  box-shadow: inset 3px 0 0 var(--zealot-gold);
+}
+
+#MenuColumn #Menu .Submenuitem.zealot-menu-current .SubmenuitemLabel {
+  color: var(--zealot-gold-light) !important;
+}
+
+#MenuColumn #Menu .Submenuitem:hover .SubmenuitemLabel {
+  color: #fff1c8 !important;
+}
+
+/* Sidebar calls-to-action share one green/gold treatment regardless of which
+ * legacy box emitted them. */
+#Themeboxes .ThemeboxButton,
+#Themeboxes .discord_button,
+#Themeboxes .donate_button,
+#Themeboxes .rank_button,
+#Themeboxes .searchchar_button {
+  box-sizing: border-box;
+  border: 1px solid #0c1d16 !important;
+  outline: 1px solid var(--zealot-gold);
+  background: var(--zealot-forest) !important;
+  color: var(--zealot-gold-light) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 239, 191, 0.2), 0 1px 1px rgba(0, 0, 0, 0.45);
+  font-family: Verdana, Arial, sans-serif;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+}
+
+#Themeboxes .ThemeboxButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+#Themeboxes .ThemeboxButton .BigButtonOver,
+#Themeboxes .ThemeboxButton .ButtonText {
+  background-image: none !important;
+}
+
+#Themeboxes .ThemeboxButton::after {
+  content: attr(data-zealot-label);
+  color: var(--zealot-gold-light);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+}
+
+#Themeboxes .ThemeboxButton:hover,
+#Themeboxes .ThemeboxButton:focus,
+#Themeboxes .discord_button:hover,
+#Themeboxes .discord_button:focus,
+#Themeboxes .donate_button:hover,
+#Themeboxes .donate_button:focus,
+#Themeboxes .rank_button:hover,
+#Themeboxes .rank_button:focus,
+#Themeboxes .searchchar_button:hover,
+#Themeboxes .searchchar_button:focus {
+  background: var(--zealot-forest-hover) !important;
+  color: #fff1c8 !important;
+}
+
+/* Standard frame for the dynamic sidebar modules. Their sprites, item art and
+ * existing Verdana lettering stay intact; only the surrounding chrome changes. */
+#Themeboxes .rank,
+#Themeboxes .discord,
+#Themeboxes .serversave,
+#Themeboxes .donate,
+#Themeboxes .searchchar,
+#Themeboxes .rashid {
+  box-sizing: border-box;
+  background: #101a15;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.42);
+}
+
+#Themeboxes .rank_header,
+#Themeboxes .discord_header,
+#Themeboxes .serversave_header,
+#Themeboxes .donate_header,
+#Themeboxes .searchchar_header,
+#Themeboxes .rashid_header {
+  box-sizing: border-box;
+  width: 180px;
+  border: 1px solid #0b1c15;
+  border-bottom-color: var(--zealot-gold);
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d) !important;
+  box-shadow: inset 0 1px 0 rgba(231, 196, 125, 0.2), inset 0 0 0 1px #426755;
+  color: var(--zealot-gold-light) !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-weight: bold;
+  line-height: 45px !important;
+  text-shadow: 1px 1px 1px #000;
+}
+
+#Themeboxes .rank_content,
+#Themeboxes .discord_content,
+#Themeboxes .serversave_content,
+#Themeboxes .donate_content,
+#Themeboxes .searchchar_content,
+#Themeboxes .rashid_content {
+  box-sizing: border-box;
+  width: 180px;
+  border-right: 1px solid #426755;
+  border-left: 1px solid #426755;
+  background: linear-gradient(90deg, #0d1712, #15221c, #0d1712) !important;
+  color: #dfd0b3;
+}
+
+#Themeboxes .rank_bottom,
+#Themeboxes .discord_bottom,
+#Themeboxes .serversave_bottom,
+#Themeboxes .donate_bottom,
+#Themeboxes .searchchar_bottom,
+#Themeboxes .rashid_bottom {
+  box-sizing: border-box;
+  width: 180px;
+  height: 12px;
+  margin-top: 0;
+  border-right: 1px solid #426755;
+  border-bottom: 1px solid var(--zealot-gold);
+  border-left: 1px solid #426755;
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d) !important;
+  box-shadow: inset 0 -1px 0 rgba(231, 196, 125, 0.16);
+}
+
+#Themeboxes .rank_text,
+#Themeboxes .rank_text a,
+#Themeboxes .donate_text,
+#Themeboxes .searchchar_text,
+#Themeboxes .serversave_text,
+#Themeboxes .rashid_text {
+  color: #dfd0b3 !important;
+}
+
+#Themeboxes .rank_text a:hover,
+#Themeboxes .rank_text a:focus {
+  color: var(--zealot-gold-light) !important;
+}
+
+#Themeboxes .serversave_countdown {
+  border-color: var(--zealot-gold);
+  border-radius: 0;
+  background: #0b1510;
+  color: var(--zealot-gold-light);
+  text-shadow: 1px 1px 1px #000;
+}
+
+/* Compact account and download calls-to-action keep their labels, but lose the
+ * chain/stone wrapper so they belong to the same navigation system. */
+#Loginbox,
+.SmallMenuBox#DownloadBox {
+  box-sizing: border-box;
+  left: 0;
+  width: 180px;
+  padding: 6px;
+  border: 1px solid #0b1c15;
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d);
+  box-shadow: inset 0 0 0 1px #426755, inset 0 1px 0 rgba(231, 196, 125, 0.2), 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#Loginbox {
+  margin-bottom: 20px;
+}
+
+.SmallMenuBox#DownloadBox {
+  top: 4px;
+  margin-bottom: 24px;
+}
+
+#Loginbox #LoginTop,
+#Loginbox #LoginBottom,
+#Loginbox .LoginBorder,
+.SmallMenuBox#DownloadBox .SmallBoxTop,
+.SmallMenuBox#DownloadBox .SmallBoxBorder,
+.SmallMenuBox#DownloadBox .SmallBoxBottom {
+  display: none;
+}
+
+#Loginbox #LoginButtonContainer,
+.SmallMenuBox#DownloadBox .SmallBoxButtonContainer {
+  box-sizing: border-box;
+  position: relative;
+  left: 0;
+  width: 100%;
+  height: 32px;
+  background-image: none !important;
+}
+
+#Loginbox #LoginButtonContainer {
+  left: -5px;
+}
+
+#Loginbox #LoginButton,
+#PlayNowContainer {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 32px;
+}
+
+#Loginbox #LoginButton .Button,
+.SmallMenuBox#DownloadBox .MediumButtonBackground,
+.SmallMenuBox#DownloadBox .MediumButtonOver,
+.SmallMenuBox#DownloadBox .MediumButtonText {
+  width: 100%;
+  height: 32px;
+}
+
+#Loginbox .Loginstatus {
+  box-sizing: border-box;
+  left: 0;
+  width: 100%;
+  height: 25px;
+  margin-top: 6px;
+  background-image: none !important;
+}
+
+#Loginbox #LoginstatusText_2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 25px;
+  background-image: none !important;
+  border-top: 1px solid rgba(231, 196, 125, 0.22);
+  color: var(--zealot-gold-light);
+  cursor: pointer;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px #000;
+}
+
+#Loginbox #LoginstatusText_2::after {
+  content: attr(data-zealot-label);
+}
+
+#Loginbox #LoginstatusText_2_1,
+#Loginbox #LoginstatusText_2_2 {
+  display: none !important;
+}
+
+/* Daily Boost is a true sidebar module too, so it receives the shared frame
+ * while the creature and boss sprites remain unchanged. */
+#DailyHighlights {
+  border-color: #426755;
+  padding: 4px 4px 6px;
+  background: linear-gradient(90deg, #0d1712, #15221c, #0d1712);
+  box-shadow: inset 0 0 0 1px #0b1c15, 0 2px 5px rgba(0, 0, 0, 0.42);
+}
+
+/* Daily Boost sits above the dynamic modules. Reserve its real rendered
+ * height plus a visual gap so longer boost labels cannot overlap Highscores. */
+#Themeboxes {
+  margin-top: 54px;
+}
+
+.DailyHighlightsTitle {
+  margin: -4px -4px 6px;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--zealot-gold);
+  background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d);
+  color: var(--zealot-gold-light);
+  text-shadow: 1px 1px 1px #000;
+}
+
+.DailyBoostStage {
+  color: #dfd0b3;
+}
+
+.DailyBoostType {
+  color: #bcae92;
+}
+
+#RightArtwork #PlayersOnline {
+  border-color: var(--zealot-gold);
+  background: var(--zealot-forest);
+  color: var(--zealot-gold-light);
+}
+
+/* Generic information frames, including the gallery hint, no longer expose
+ * the old metallic rail artwork. */
+.Content .SmallBox .Message {
+  border: 1px solid #826843;
+  background: var(--zealot-parchment);
+  color: var(--zealot-ink);
+  box-shadow: inset 0 0 0 1px #fff6df;
+}
+
+.Content .SmallBox .BoxFrameHorizontal {
+  height: 5px;
+  background: var(--zealot-forest) !important;
+}
+
+.Content .SmallBox .BoxFrameVerticalLeft,
+.Content .SmallBox .BoxFrameVerticalRight {
+  width: 2px;
+  background: var(--zealot-forest) !important;
+}
+
+.Content .SmallBox .BoxFrameEdgeLeftTop,
+.Content .SmallBox .BoxFrameEdgeRightTop,
+.Content .SmallBox .BoxFrameEdgeLeftBottom,
+.Content .SmallBox .BoxFrameEdgeRightBottom {
+  background: var(--zealot-gold) !important;
+}
+
+.zealot-gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.zealot-gallery-card {
+  box-sizing: border-box;
+  width: 170px;
+  margin: 0;
+  border: 1px solid #826843;
+  background: var(--zealot-parchment);
+  box-shadow: inset 0 0 0 1px #fff6df, 0 2px 4px rgba(0, 0, 0, 0.32);
+  color: var(--zealot-ink);
+  text-align: center;
+}
+
+.zealot-gallery-card__image {
+  display: block;
+  margin: 7px;
+  border: 2px solid var(--zealot-forest);
+  background: #0b1510;
+  line-height: 0;
+}
+
+.zealot-gallery-card__image img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.zealot-gallery-card__caption {
+  margin: 7px 8px 9px;
+  color: var(--zealot-ink);
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  font-weight: bold;
+}
+
+.zealot-gallery-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  justify-content: center;
+  padding: 7px;
+  border-top: 1px solid #c9a978;
+  background: var(--zealot-parchment-deep);
+  font-size: 8pt;
+}
+
+.zealot-gallery-card__actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* The old footer was transparent, exposing a disconnected texture underneath.
+ * A defined surface makes it the closing element of the content column. */
+#Footer {
+  box-sizing: border-box;
+  margin: 22px 5px 20px;
+  padding: 13px 18px;
+  border: 1px solid #526251;
+  border-top-color: var(--zealot-gold);
+  background: linear-gradient(180deg, rgba(30, 51, 41, 0.97), rgba(13, 20, 16, 0.97));
+  box-shadow: inset 0 0 0 1px rgba(231, 196, 125, 0.12), 0 2px 5px rgba(0, 0, 0, 0.35);
+  color: #e5dbc7;
+  line-height: 1.45;
+}
+
+#Footer a,
+#Footer a:link,
+#Footer a:visited {
+  color: var(--zealot-gold-light);
+}
+
+#Footer a:hover,
+#Footer a:focus {
+  color: #fff1c8;
+}
+
+/* On the original fixed-width frame, columns are positioned absolutely. The
+ * small-screen rules turn that same markup into a readable one-column flow. */
+@media (max-width: 1050px) {
+  #ArtworkHelper,
+  #Bodycontainer {
+    min-width: 0;
+  }
+
+  #Bodycontainer {
+    box-sizing: border-box;
+    display: block;
+    max-width: 900px;
+    padding: 0 14px;
+  }
+
+  #ContentRow {
+    top: 155px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  #MenuColumn,
+  #ThemeboxesColumn {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    flex: 0 0 180px;
+    margin: 0;
+  }
+
+  #ContentColumn {
+    flex: 1 1 460px;
+    min-width: 0;
+    margin: 0;
+  }
+
+  #RightArtwork {
+    position: static;
+    width: 180px;
+  }
+
+  #DailyHighlights {
+    position: static;
+    margin: 0 auto 18px;
+  }
+
+  #Themeboxes {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  #ArtworkHelper {
+    background-position: top center !important;
+  }
+
+  #Bodycontainer {
+    padding: 0 10px;
+  }
+
+  #ContentRow {
+    top: 155px;
+    display: block;
+  }
+
+  #MenuColumn,
+  #ThemeboxesColumn {
+    width: 180px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  #ContentColumn {
+    width: 100%;
+    margin-top: 22px;
+  }
+
+  #ThemeboxesColumn {
+    margin-top: 22px;
+  }
+
+  .Content .Box {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .Content .BoxContent {
+    min-height: 0;
+  }
+
+  .faq-toolbar {
+    align-items: flex-start;
+  }
+
+  .faq-question {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+
+  .faq-answer,
+  .faq-actions {
+    padding-left: 38px;
+  }
+
+  .Content #News .NewsHeadlineBackground,
+  .Content #NewsArchive .NewsHeadlineBackground,
+  .Content #FeaturedArticle .NewsHeadlineBackground {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: auto;
+    min-height: 28px;
+    padding: 4px 7px 4px 50px;
+  }
+
+  .Content #News .NewsHeadlineDate,
+  .Content #NewsArchive .NewsHeadlineDate,
+  .Content #FeaturedArticle .NewsHeadlineDate,
+  .Content #News .NewsHeadlineText,
+  .Content #NewsArchive .NewsHeadlineText,
+  .Content #FeaturedArticle .NewsHeadlineText {
+    position: static;
+    top: auto;
+    left: auto;
+  }
+
+  .Content #News .NewsHeadlineDate,
+  .Content #NewsArchive .NewsHeadlineDate,
+  .Content #FeaturedArticle .NewsHeadlineDate {
+    flex: 0 0 auto;
+    width: auto;
+    margin-right: 6px;
+  }
+
+  .Content #News .NewsHeadlineText,
+  .Content #NewsArchive .NewsHeadlineText,
+  .Content #FeaturedArticle .NewsHeadlineText {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .TableContainer,
+  .TableContentContainer {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .zealot-exchange__hero {
+    padding: 19px 16px;
+  }
+
+  .zealot-exchange h1 {
+    font-size: 19pt;
+  }
+
+  .zealot-exchange__summary-rule {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .zealot-exchange__grid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .zealot-market-listings__header,
+  .zealot-market-card__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .zealot-market-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .zealot-market-filters button {
+    grid-column: span 2;
+  }
+
+  .zealot-market-card__body {
+    grid-template-columns: 82px 1fr;
+  }
+
+  .zealot-market-card__equipment {
+    grid-column: span 2;
+    justify-content: start;
+  }
+}
+
+/* Zealot Market character detail */
+.zealot-market-detail {
+  margin: 13px 16px;
+  border: 1px solid #a7843c;
+  background: #f4e6ca;
+  box-shadow: 0 0 0 3px #173f32, 0 4px 12px rgb(0 0 0 / 38%);
+  color: #4b2a10;
+}
+
+.zealot-market-detail__back {
+  display: inline-block;
+  margin: 13px 15px 0;
+  color: #14533e;
+  font-weight: 700;
+}
+
+.zealot-market-detail__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 10px 15px 0;
+  padding: 18px 20px;
+  border: 1px solid #b78b32;
+  background: linear-gradient(135deg, #0a2119, #194d3b);
+  color: #f6d276;
+}
+
+.zealot-market-detail__header > div:first-child > span,
+.zealot-market-detail__purchase > span {
+  color: #e7c770;
+  font-size: 9pt;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.zealot-market-detail h1,
+.zealot-market-detail h2,
+.zealot-market-detail p { margin: 0; }
+
+.zealot-market-detail h1 {
+  margin-top: 3px;
+  color: #fff1c5;
+  font-size: 22pt;
+}
+
+.zealot-market-detail__header p { color: #d9cda8; }
+
+.zealot-market-detail__timer {
+  min-width: 128px;
+  align-self: center;
+  padding: 9px 12px;
+  border: 1px solid #c79d44;
+  text-align: center;
+}
+
+.zealot-market-detail__timer small,
+.zealot-market-detail__purchase small {
+  display: block;
+  color: #d8caab;
+}
+
+.zealot-market-detail__timer strong { display: block; color: #fff0b4; font-size: 13pt; }
+
+.zealot-market-detail__main {
+  display: grid;
+  grid-template-columns: 120px minmax(230px, 1fr) minmax(170px, .8fr);
+  gap: 15px;
+  align-items: center;
+  padding: 16px;
+}
+
+.zealot-market-detail__outfit {
+  min-height: 125px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #af8a4b;
+  background: #ede0c5;
+  text-align: center;
+}
+
+.zealot-market-detail__outfit img { image-rendering: pixelated; transform: scale(1.2); }
+.zealot-market-detail__outfit span { font-size: 8pt; color: #72522f; }
+
+.zealot-market-detail__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 15px;
+  margin: 0;
+}
+
+.zealot-market-detail__facts div,
+.zealot-market-detail__skills div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid #d3bd90;
+}
+
+.zealot-market-detail__facts dt,
+.zealot-market-detail__skills span { color: #795735; font-weight: 700; }
+.zealot-market-detail__facts dd { margin: 0; font-weight: 700; }
+
+.zealot-market-detail__equipment {
+  display: grid;
+  grid-template-columns: repeat(3, 46px);
+  gap: 6px;
+  justify-content: center;
+}
+
+.zealot-market-detail__equipment span {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #8e6c33;
+  background: #173f32;
+}
+
+.zealot-market-detail__equipment span img { max-width: 32px; max-height: 32px; }
+.zealot-market-detail__equipment .is-empty { color: #9a895f; }
+
+.zealot-market-detail__bottom {
+  display: grid;
+  grid-template-columns: 1fr minmax(250px, .85fr);
+  gap: 15px;
+  padding: 15px;
+  border-top: 1px solid #b5893b;
+  background: #e5d2aa;
+}
+
+.zealot-market-detail__skills h2 { font-size: 14pt; }
+.zealot-market-detail__skills { padding: 4px 8px; }
+
+.zealot-market-detail__purchase {
+  padding: 14px;
+  border: 1px solid #b4862f;
+  background: #123c2f;
+  color: #f7e5b5;
+}
+
+.zealot-market-detail__purchase > strong {
+  display: block;
+  margin: 3px 0 8px;
+  color: #ffd777;
+  font-size: 19pt;
+}
+
+.zealot-market-detail__purchase strong img { width: 17px; vertical-align: middle; }
+.zealot-market-detail__purchase form { margin-top: 12px; }
+.zealot-market-detail__purchase label { display: block; margin-bottom: 4px; font-weight: 700; }
+.zealot-market-detail__purchase input { width: calc(100% - 18px); margin-bottom: 8px; }
+.zealot-market-detail__purchase button,
+.zealot-market-detail__purchase a {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #c79d44;
+  background: #174735;
+  color: #ffe49b;
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+}
+
+.zealot-market-detail__purchase button:hover,
+.zealot-market-detail__purchase a:hover { background: #205b43; }
+
+@media (max-width: 750px) {
+  .zealot-market-detail__header,
+  .zealot-market-detail__main,
+  .zealot-market-detail__bottom { display: block; }
+  .zealot-market-detail__timer,
+  .zealot-market-detail__facts,
+  .zealot-market-detail__equipment,
+  .zealot-market-detail__skills,
+  .zealot-market-detail__purchase { margin-top: 13px; }
 }

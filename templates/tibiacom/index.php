@@ -9,9 +9,10 @@ if (isset($config['boxes']))
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <?= template_place_holder('head_start'); ?>
-    <link rel="icon" type="image/x-icon" href="<?= BASE_URL; ?>images/favicon.ico"/>
-    <link rel="shortcut icon" type="image/x-icon" href="<?= BASE_URL; ?>images/favicon.ico"/>
+    <link rel="icon" type="image/x-icon" href="<?= BASE_URL; ?>images/favicon.ico?v=<?= filemtime(__DIR__ . '/../../images/favicon.ico'); ?>"/>
+    <link rel="shortcut icon" type="image/x-icon" href="<?= BASE_URL; ?>images/favicon.ico?v=<?= filemtime(__DIR__ . '/../../images/favicon.ico'); ?>"/>
     <link href="<?= $template_path; ?>/basic.css?v=<?= filemtime(__DIR__ . '/basic.css'); ?>" rel="stylesheet" type="text/css"/>
     <link href="<?= $template_path; ?>/zealot-ui.css?v=<?= filemtime(__DIR__ . '/zealot-ui.css'); ?>" rel="stylesheet" type="text/css"/>
 
@@ -126,8 +127,15 @@ if (isset($config['boxes']))
 
         // load the menu and set the active submenu item by using the variable 'activeSubmenuItem'
         function LoadMenu() {
-            document.getElementById("submenu_" + activeSubmenuItem).style.color = "white";
-            document.getElementById("ActiveSubmenuItemIcon_" + activeSubmenuItem).style.visibility = "visible";
+            var activeMenuItem = document.getElementById("submenu_" + activeSubmenuItem);
+            var activeMenuIcon = document.getElementById("ActiveSubmenuItemIcon_" + activeSubmenuItem);
+            if (activeMenuItem) {
+                activeMenuItem.style.color = "#E7C47D";
+                activeMenuItem.classList.add("zealot-menu-current");
+            }
+            if (activeMenuIcon) {
+                activeMenuIcon.style.visibility = "visible";
+            }
             menus = localStorage.getItem('menus');
             if (menus.lastIndexOf("&") === -1) {
                 menus = "news=1&account=0&community=0&library=0&forum=0<?php if ($config['gifts_system']) echo '&shops=0'; ?>&charactertrade=0&";
@@ -238,13 +246,13 @@ if (isset($config['boxes']))
 
         function MouseOverSubmenuItem(source) {
             if (source.style) {
-                source.style.backgroundColor = "#14433F";
+                source.style.backgroundColor = "#285A45";
             }
         }
 
         function MouseOutSubmenuItem(source) {
             if (source.style) {
-                source.style.backgroundColor = "#0D2E2B";
+                source.style.backgroundColor = source.classList.contains("zealot-menu-current") ? "#234B3B" : "#183A2E";
             }
         }
     </script>
@@ -350,7 +358,7 @@ if (isset($config['boxes']))
 
                     <div class="Loginstatus"
                          style="background-image:url(<?= $template_path; ?>/images/loginbox/loginbox-textfield-background.gif)">
-                        <div id="LoginstatusText_2" onClick="LoginstatusTextAction(this);"
+                        <div id="LoginstatusText_2" data-zealot-label="<?= $logged ? 'Logout' : 'Create account'; ?>" onClick="LoginstatusTextAction(this);"
                              onMouseOver="MouseOverLoginBoxText(this);" onMouseOut="MouseOutLoginBoxText(this);">
                             <div id="LoginstatusText_2_1" class="LoginstatusText"
                                  style="background-image:url(<?= $template_path; ?>/images/loginbox/loginbox-font-create-account.gif)"></div>
@@ -374,7 +382,7 @@ if (isset($config['boxes']))
                          style="background-image:url(<?= $template_path; ?>/images/global/loginbox/loginbox-textfield-background.gif)">
                         <a href="?subtopic=downloadclient&step=downloadagreement">
                             <div id="PlayNowContainer">
-                                <div class="MediumButtonBackground"
+                                <div class="MediumButtonBackground zealot-medium-button--download"
                                      style="background-image:url(<?= $template_path; ?>/images/global/buttons/mediumbutton.gif)"
                                      onmouseover="MouseOverBigButton('DownloadButtonOver');"
                                      onmouseout="MouseOutBigButton('DownloadButtonOver');">
@@ -476,35 +484,37 @@ if (isset($config['boxes']))
                 <div class="Content">
 
                     <?php if ($config['status_bar']) { ?>
-                        <div class="Box">
+                        <div class="Box zealot-status-shell">
                             <div class="Corner-tl"
                                  style="background-image:url(<?= $template_path; ?>/images/global/content/corner-tl.gif);"></div>
                             <div class="Corner-tr"
                                  style="background-image:url(<?= $template_path; ?>/images/global/content/corner-tr.gif);"></div>
                             <div class="Border_1"
                                  style="background-image:url(<?= $template_path; ?>/images/global/content/border-1.gif);"></div>
-                            <div class="BorderTitleText"
+                            <div class="BorderTitleText zealot-status-bar"
                                  style="background-image:url(<?= $template_path; ?>/images/global/content/newsheadline_background.gif); height: 28px;">
                                 <div class="InfoBar">
-                                    <img class="InfoBarBigLogo"
-                                         src="<?= $template_path; ?>/images/global/header/icon-download.png">
-                                    <span class="InfoBarNumbers">
-                                        <a class="InfoBarLinks" href="?subtopic=downloadclient"><span
-                                                    class="InfoBarSmallElement">Download Client</span></a>
-                                    </span>
+                                    <a class="zealot-quick-action" href="?subtopic=downloadclient">
+                                        <svg class="zealot-quick-action__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14"/>
+                                        </svg>
+                                        <span>Download Client</span>
+                                    </a>
 
                                     <?php if (!empty($config['discord_link'])) { ?>
-                                        <img class="InfoBarBigLogo" style="margin-left: 8px"
-                                             src="<?= $template_path; ?>/images/global/header/icon-discord.png">
-                                        <span class="InfoBarNumbers">
-                                            <a class="InfoBarLinks" href="<?= $config['discord_link']; ?>" target="new"><span
-                                                        class="InfoBarSmallElement">Discord</span></a>
-                                        </span>
+                                        <a class="zealot-quick-action" href="<?= $config['discord_link']; ?>" target="new" rel="noopener">
+                                            <svg class="zealot-quick-action__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path d="M6 7.5c1.7-1.2 3.7-1.8 6-1.8s4.3.6 6 1.8c.8 1.8 1.2 3.8 1.2 6-1.1 1-2.5 1.7-4.2 2.1l-1-1.4c-1.3.2-2.7.2-4 0l-1 1.4c-1.7-.4-3.1-1.1-4.2-2.1 0-2.2.4-4.2 1.2-6Z"/>
+                                                <path d="M9.5 10.8h.01M14.5 10.8h.01"/>
+                                            </svg>
+                                            <span>Discord</span>
+                                        </a>
                                     <?php } ?>
-                                    <span style="float: right; margin-top: 1px; margin-right: 4px">
+                                    <span class="zealot-status-spacer"></span>
+                                    <span class="zealot-status-toggle-wrap">
                                         <?php if ($config['collapse_status']) { ?>
-                                            <a data-bs-toggle="collapse" href="#statusbar" role="button" aria-expanded="false" aria-controls="statusbar">
-                                                <img src="<?= $template_path; ?>/images/global/content/top-to-back.gif" class="InfoBarBigLogo">
+                                            <a class="zealot-status-toggle" data-bs-toggle="collapse" href="#statusbar" role="button" aria-expanded="false" aria-controls="statusbar" aria-label="Show status details">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 10 5 5 5-5"/></svg>
                                             </a>
                                         <?php } ?>
                                     </span>
@@ -699,9 +709,11 @@ if (isset($config['boxes']))
                         foreach ($candidates as $candidate) {
                             $singular = preg_replace('/s$/', '', $candidate);
                             foreach (array_unique([$candidate, $singular]) as $sprite) {
-                                $relativePath = 'images/library/' . $sprite . '.gif';
-                                if (file_exists(BASE . $relativePath)) {
-                                    return $relativePath;
+                                foreach (['gif', 'png'] as $extension) {
+                                    $relativePath = 'images/library/' . $sprite . '.' . $extension;
+                                    if (file_exists(BASE . $relativePath)) {
+                                        return $relativePath;
+                                    }
                                 }
                             }
                         }
@@ -776,26 +788,6 @@ if (isset($config['boxes']))
 </div>
 <?= template_place_holder('body_end'); ?>
 
-<style>
-    .scrollToTop {
-        padding: 10px;
-        text-align: center;
-        font-weight: bold;
-        color: #444;
-        text-decoration: none;
-        position: fixed;
-        bottom: 10px;
-        right: 12px;
-        display: none;
-        z-index: 50000;
-        cursor: pointer;
-    }
-
-    .scrollToTop img {
-        width: 42px;
-        height: auto;
-    }
-</style>
 <script>
     $(document).ready(function () {
         //Check to see if the window is top if not then display button
@@ -828,9 +820,9 @@ if (isset($config['boxes']))
         });
     });
 </script>
-<div class="scrollToTop" title="Voltar ao Topo">
-    <img alt style="border:0;" src="<?= $template_path . '/images/global/content/back-to-top.gif' ?>">
-</div>
+<button class="scrollToTop" type="button" title="Voltar ao topo" aria-label="Voltar ao topo">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5m0 0-5 5m5-5 5 5"/></svg>
+</button>
 <script src="<?= $template_path; ?>/js/generic.js"></script>
 <div id="HelperDivContainer"
      style="background-image: url(<?= $template_path; ?>/images/global/content/scroll.gif);">

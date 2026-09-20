@@ -2,25 +2,20 @@
     {% if action == 'edit' %}
         <input type="hidden" name="id" value="{{ id }}" />
     {% endif %}
-	<table width="100%" border="0" cellspacing="1" cellpadding="4">
-		<tr>
-			<td bgcolor="{{ config.vdarkborder }}" class="white"><b>{% if action == 'edit' %}Edit{% else %}Add{% endif %} FAQ</b></td>
-		</tr>
-		<tr>
-			<td bgcolor="{{ config.darkborder }}">
-				<table border="0" cellpadding="1">
-					<tr>
-						<td>Question:</td>
-						<td><input name="question" value="{% if question is not null %}{{ question }}{% endif %}" size="60" maxlength="255"/></td>
-					<tr>
-						<td>Answer:</td>
-						<td><textarea name="answer" maxlength="1020" cols="70" rows="7">{% if answer is not null %}{{ answer }}{% endif %}</textarea></td>
-					<tr/>
-					<tr>
-						<td colspan="2" align="center"><input type="submit" value="Submit"/>
-					</tr>
-				</table>
-			</td>
-		</tr>
-	</table>
+	<section class="faq-editor zealot-panel" aria-labelledby="faq-editor-title">
+		<h2 class="zealot-panel__title" id="faq-editor-title">{% if action == 'edit' %}Edit{% else %}Add{% endif %} FAQ</h2>
+		<div class="zealot-panel__body">
+			<label class="faq-editor__field">
+				<span>Question</span>
+				<input class="zealot-field" name="question" value="{% if question is not null %}{{ question }}{% endif %}" maxlength="255" required/>
+			</label>
+			<label class="faq-editor__field">
+				<span>Answer</span>
+				<textarea class="zealot-field" name="answer" maxlength="1020" rows="7" required>{% if answer is not null %}{{ answer }}{% endif %}</textarea>
+			</label>
+			<div class="faq-editor__actions">
+				<button class="zealot-button" type="submit">Save FAQ</button>
+			</div>
+		</div>
+	</section>
 </form>

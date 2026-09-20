@@ -18,48 +18,28 @@
 	</div>
 </div>
 <br>
-<div style="display: flex;">
-	<div style="box-shadow: 3px 3px 2px #875f3e; border: 1px solid #5f4d41;">
-		{% set i = 0 %}
-		{% for image in images %}
-			{% set i = i + 1 %}
-			<table>
-				<tr>
-					<td style="height: 120px;" >
-						<a href="{{ getLink('gallery') ~ '/' ~ image.id }}" >
-							<img src="{{ image.thumb }}" border="0" />
-						</a>
-					</td>
-				</tr>
-				<tr style="text-align: center;">
-					<td>{{ image.comment }}</td>
-				</tr>
-				<tr>
-					{% if canEdit %}
-						<td>
-							<a href="?subtopic=gallery&action=edit&id={{ image.id }}" title="Edit">
-								<img src="images/edit.png"/>Edit
-							</a>
-							<a id="delete" href="?subtopic=gallery&action=delete&id={{ image.id }}" onclick="return confirm('Are you sure?');" title="Delete">
-								<img src="images/del.png"/>Delete
-							</a>
-							<a href="?subtopic=gallery&action=hide&id={{ image.id }}" title="{% if image.hidden != 1 %}Hide{% else %}Show{% endif %}">
-								<img src="images/{% if image.hidden != 1 %}success{% else %}error{% endif %}.png"/>{% if image.hidden != 1 %}Hide{% else %}Show{% endif %}
-							</a>
-							{% if i != 1 %}
-								<a href="?subtopic=gallery&action=moveup&id={{ image.id }}" title="Move up">
-									<img src="images/icons/arrow_up.gif"/>Move up
-								</a>
-							{% endif %}
-							{% if i != last %}
-								<a href="?subtopic=gallery&action=movedown&id={{ image.id }}" title="Move down">
-									<img src="images/icons/arrow_down.gif"/>Move down
-								</a>
-							{% endif %}
-						</td>
+<div class="zealot-gallery-grid">
+	{% set i = 0 %}
+	{% for image in images %}
+		{% set i = i + 1 %}
+		<article class="zealot-gallery-card">
+			<a class="zealot-gallery-card__image" href="{{ getLink('gallery') ~ '/' ~ image.id }}">
+				<img src="{{ image.thumb }}" alt="{{ image.comment }}" />
+			</a>
+			<p class="zealot-gallery-card__caption">{{ image.comment }}</p>
+			{% if canEdit %}
+				<div class="zealot-gallery-card__actions">
+					<a href="?subtopic=gallery&action=edit&id={{ image.id }}" title="Edit"><img src="images/edit.png" alt=""/>Edit</a>
+					<a href="?subtopic=gallery&action=delete&id={{ image.id }}" onclick="return confirm('Are you sure?');" title="Delete"><img src="images/del.png" alt=""/>Delete</a>
+					<a href="?subtopic=gallery&action=hide&id={{ image.id }}" title="{% if image.hidden != 1 %}Hide{% else %}Show{% endif %}"><img src="images/{% if image.hidden != 1 %}success{% else %}error{% endif %}.png" alt=""/>{% if image.hidden != 1 %}Hide{% else %}Show{% endif %}</a>
+					{% if i != 1 %}
+						<a href="?subtopic=gallery&action=moveup&id={{ image.id }}" title="Move up"><img src="images/icons/arrow_up.gif" alt=""/>Move up</a>
 					{% endif %}
-				</tr>
-			</table>
-		{% endfor %}
-	</div>
+					{% if i != last %}
+						<a href="?subtopic=gallery&action=movedown&id={{ image.id }}" title="Move down"><img src="images/icons/arrow_down.gif" alt=""/>Move down</a>
+					{% endif %}
+				</div>
+			{% endif %}
+		</article>
+	{% endfor %}
 </div>

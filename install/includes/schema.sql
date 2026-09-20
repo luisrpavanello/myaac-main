@@ -56,12 +56,22 @@ CREATE TABLE `myaac_charbazaar` (
   `account_new` int(11) NOT NULL,
   `player_id` int(11) NOT NULL,
   `price` int(11) NOT NULL,
+  `starting_price` int(11) NOT NULL DEFAULT 0,
   `date_end` datetime NOT NULL,
   `date_start` datetime NOT NULL,
-  `bid_account` int(11) NOT NULL,
-  `bid_price` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `bid_account` int(11) NOT NULL DEFAULT 0,
+  `bid_price` int(11) NOT NULL DEFAULT 0,
+  `status` int(11) NOT NULL DEFAULT 0,
+  `escrow_account_id` int(11) NOT NULL DEFAULT 0,
+  `listing_fee` int(11) NOT NULL DEFAULT 0,
+  `tax_rate` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `final_price` int(11) NOT NULL DEFAULT 0,
+  `completed_at` datetime NULL DEFAULT NULL,
+  `cancelled_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `zealot_market_active` (`date_end`),
+  KEY `zealot_market_player` (`player_id`),
+  KEY `zealot_market_seller` (`account_old`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
 CREATE TABLE `myaac_charbazaar_bid` (
@@ -69,8 +79,25 @@ CREATE TABLE `myaac_charbazaar_bid` (
   `account_id` int(11) NOT NULL,
   `auction_id` int(11) NOT NULL,
   `bid` int(11) NOT NULL,
+  `is_winning` tinyint(1) NOT NULL DEFAULT 0,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `zealot_market_bid_auction` (`auction_id`),
+  KEY `zealot_market_bid_account` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
+CREATE TABLE `myaac_zealot_market_ledger` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
+  `auction_id` int(11) NULL DEFAULT NULL,
+  `entry_type` varchar(32) NOT NULL,
+  `amount` int(11) NOT NULL,
+  `balance_after` int(11) NOT NULL,
+  `description` varchar(190) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `zealot_market_ledger_account` (`account_id`, `created_at`),
+  KEY `zealot_market_ledger_auction` (`auction_id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
 CREATE TABLE `myaac_config`
@@ -180,17 +207,12 @@ INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VA
 INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Gallery', 'gallery', 5, 3);
 INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Server Info', 'serverInfo', 5, 4);
 INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Experience Table', 'experienceTable', 5, 5);
-/* MENU_CATEGORY_CHARBAZAAR tibiacom */
-INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Current Auctions', 'currentcharactertrades', 7, 0);
-INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Auction History', 'pastcharactertrades', 7, 1);
-INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'My Bids', 'ownbids', 7, 2);
-INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'My Auctions', 'owncharactertrades', 7, 3);
-INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Create Auction', 'createcharacterauction', 7, 4);
 /* MENU_CATEGORY_SHOP tibiacom */
 INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Donate', 'donate', 6, 0);
 INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Boxes', 'boxes', 6, 0);
-INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Shop Offer', 'gifts', 6, 1);
-INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Shop History', 'gifts/history', 6, 2);
+INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Zealot Market', 'exchange', 6, 1);
+INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Shop Offer', 'gifts', 6, 2);
+INSERT INTO `myaac_menu` (`template`, `name`, `link`, `category`, `ordering`) VALUES ('tibiacom', 'Shop History', 'gifts/history', 6, 3);
 
 CREATE TABLE `myaac_monsters` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,

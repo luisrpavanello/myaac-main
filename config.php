@@ -11,10 +11,9 @@
  * Minimally 'server_path' directive have to be filled, other options are optional.
  *
  * @package   MyAAC
- * @author    Slawkens <slawkens@gmail.com>
- * @author    OpenTibiaBR
- * @copyright 2023 MyAAC
- * @link      https://github.com/opentibiabr/myaac
+ * @author    Pavanello <luisrpavanello@gmail.com>
+ * @author    Zealot
+ * @copyright 2026 MyAAC
  */
 
 $config = array(
@@ -56,7 +55,7 @@ $config = array(
 	'title_separator' => ' - ',
 
 	// footer
-	'footer' => ''/*'<br/>Your Server &copy; 2016. All rights reserved.'*/,
+	'footer' => ''/*'<br/>Your Server &copy; 2026. All rights reserved.'*/,
 
 	'language' => 'en', // default language (currently only 'en' available)
 	'language_allow_change' => false,
