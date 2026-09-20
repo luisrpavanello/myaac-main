@@ -12,7 +12,7 @@ if (isset($config['boxes']))
     <?= template_place_holder('head_start'); ?>
     <link rel="icon" type="image/x-icon" href="<?= BASE_URL; ?>images/favicon.ico"/>
     <link rel="shortcut icon" type="image/x-icon" href="<?= BASE_URL; ?>images/favicon.ico"/>
-    <link href="<?= $template_path; ?>/basic.css" rel="stylesheet" type="text/css"/>
+    <link href="<?= $template_path; ?>/basic.css?v=<?= filemtime(__DIR__ . '/basic.css'); ?>" rel="stylesheet" type="text/css"/>
 
     <script type="text/javascript" src="tools/basic.js"></script>
     <script type="text/javascript" src="<?= $template_path; ?>/ticker.js"></script>
@@ -726,22 +726,31 @@ if (isset($config['boxes']))
                     $onlinePlayers = (int)($onlineQuery['playersOnline'] ?? $onlinePlayers);
                 }
 
-                $playersOnlineLabel = $onlinePlayers === 1 ? '1 Players On' : $onlinePlayers . ' Players Online';
+                $playersOnlineLabel = $onlinePlayers === 1 ? '1 Player Online' : $onlinePlayers . ' Players Online';
                 ?>
                 <div id="RightArtwork">
-                    <img id="Creature"
-                         src="<?= $creatureimage; ?>"
-                         alt="Creature of the Day"
-                         title="Today's boosted creature: <?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
-
-                    <img id="Boss"
-                         src="<?= $bossimage; ?>"
-                         alt="Boss of the Day"
-                         title="Today's boosted boss: <?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
-
-                    <img id="PedestalAndOnline" src="<?= $template_path; ?>/images/header/pedestal-and-online.gif"
-                         alt="Monster Pedestal and Players Online Box"/>
-                    <a id="PlayersOnline" href="?online"><?= htmlspecialchars($playersOnlineLabel, ENT_QUOTES, 'UTF-8'); ?></a>
+                    <section id="DailyHighlights" aria-label="Daily boosts">
+                        <div class="DailyHighlightsTitle">Daily Boosts</div>
+                        <div class="DailyBoostStages">
+                            <a class="DailyBoostStage" href="?subtopic=killstatistics"
+                               title="Today's boosted creature: <?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
+                                <span class="DailyBoostSprite">
+                                    <img src="<?= $creatureimage; ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
+                                </span>
+                                <span class="DailyBoostName"><?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?></span>
+                                <span class="DailyBoostType">Creature</span>
+                            </a>
+                            <a class="DailyBoostStage" href="?subtopic=killstatistics"
+                               title="Today's boosted boss: <?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
+                                <span class="DailyBoostSprite">
+                                    <img src="<?= $bossimage; ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
+                                </span>
+                                <span class="DailyBoostName"><?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?></span>
+                                <span class="DailyBoostType">Boss</span>
+                            </a>
+                        </div>
+                        <a id="PlayersOnline" href="?online"><?= htmlspecialchars($playersOnlineLabel, ENT_QUOTES, 'UTF-8'); ?></a>
+                    </section>
                 </div>
 
                 <div id="Themeboxes">

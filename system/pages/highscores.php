@@ -17,7 +17,7 @@ if ($config['account_country'] && $config['highscores_country_box'])
 
 $list = $_GET['list'] ?? '';
 $_page = $_GET['page'] ?? 0;
-$vocation = $_GET['vocation'] ?? null;
+$vocation = strtolower((string) ($_GET['vocation'] ?? ''));
 
 if (!is_numeric($_page) || $_page < 0 || $_page > PHP_INT_MAX) {
     $_page = 0;
@@ -27,7 +27,9 @@ $add_sql = '';
 $config_vocations = $config['vocations'];
 
 $normalized_vocations = array_map('strtolower', $config_vocations);
-if (!array_search(strtolower($vocation), $normalized_vocations)) $vocation = "None";
+if (!in_array($vocation, $normalized_vocations, true)) {
+    $vocation = 'none';
+}
 
 if ($config['highscores_vocation_box'] && isset($vocation)) {
     foreach ($config['vocations'] as $id => $name) {
