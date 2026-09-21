@@ -58,9 +58,11 @@ if (!$snapshot && $db->hasTable('player_items')) {
 
 $backpackItems = ZealotMarket::snapshotItemTree($snapshot, 'player_items', [3]);
 $depotItems = ZealotMarket::snapshotItemTree($snapshot, 'depot_items', range(0, 99));
-$renderItemTree = static function (array $items) use (&$renderItemTree): void {
+$renderItemTree = static function (array $items, bool $showEmpty = true) use (&$renderItemTree): void {
     if (!$items) {
-        echo '<p class="zealot-market-inventory__empty">No items recorded.</p>';
+        if ($showEmpty) {
+            echo '<p class="zealot-market-inventory__empty">No items recorded.</p>';
+        }
         return;
     }
 
@@ -68,10 +70,10 @@ $renderItemTree = static function (array $items) use (&$renderItemTree): void {
     foreach ($items as $item) {
         $itemType = (int) ($item['itemtype'] ?? 0);
         $count = max(1, (int) ($item['count'] ?? 1));
-        $name = getItemNameById($itemType) ?: 'Item #' . $itemType;
+        $name = trim((string) ($item['name'] ?? '')) ?: ZealotMarket::itemName($itemType);
         echo '<li><span class="zealot-market-inventory__item">' . getItemImage($itemType, $count)
             . '<span>' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . ($count > 1 ? ' <b>×' . $count . '</b>' : '') . '</span></span>';
-        $renderItemTree($item['children'] ?? []);
+        $renderItemTree($item['children'] ?? [], false);
         echo '</li>';
     }
     echo '</ul>';
@@ -130,7 +132,7 @@ $minimumBid = $market instanceof ZealotMarket ? $market->minimumBidFor($listing)
                 <span>Included with this character</span>
                 <h2>Inventory snapshot</h2>
             </div>
-            <small><?= $snapshot ? 'Captured when this listing was created' : 'Legacy listing — inventory snapshot unavailable'; ?></small>
+            <small><?= $snapshot ? ($isActive ? 'Synchronized from the latest server save' : 'Captured when this listing was completed') : 'Legacy listing — inventory snapshot unavailable'; ?></small>
         </header>
         <div class="zealot-market-inventory__groups">
             <details open>

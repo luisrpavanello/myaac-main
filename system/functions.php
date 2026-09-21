@@ -447,11 +447,25 @@ function getItemImage($id, $count = 1, $fallbackImage = 'empty.gif')
   global $config;
   $itemImagesUrl = rtrim($config['item_images_url'], '/') . '/';
   $fallback = $itemImagesUrl . basename($fallbackImage);
+  $imageExtension = 'gif';
+  // Newer OTClient assets are exported as PNG. Prefer them when available,
+  // while keeping the legacy GIF catalogue as the default for the rest site.
+  if (strpos($itemImagesUrl, '://') === false && is_file(BASE . $itemImagesUrl . $file_name . '.png')) {
+    $imageExtension = 'png';
+  } elseif (strpos($itemImagesUrl, '://') === false && $count > 1 && is_file(BASE . $itemImagesUrl . (int) $id . '.png')) {
+    // OTClient exports one sprite per item type. Legacy MyAAC sometimes has
+    // dedicated "item-amount.gif" files, so fall back to the base exported
+    // sprite for stackable items instead of rendering an empty placeholder.
+    $file_name = (int) $id;
+    $imageExtension = 'png';
+  } elseif (strpos($itemImagesUrl, '://') === false && $count > 1 && !is_file(BASE . $itemImagesUrl . $file_name . '.gif') && is_file(BASE . $itemImagesUrl . (int) $id . '.gif')) {
+    $file_name = (int) $id;
+  }
   $alt = (int) $id > 0
-    ? 'Item #' . (int) $id
+    ? (!empty($name) ? $name : 'Item')
     : ucwords(str_replace(['no_', '.gif', '_'], ['', '', ' '], basename($fallbackImage)));
 
-  return '<img src="' . $itemImagesUrl . $file_name . '.gif"' . $tooltip
+  return '<img src="' . $itemImagesUrl . $file_name . '.' . $imageExtension . '"' . $tooltip
     . ' width="32" height="32" border="0" alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '" loading="lazy"'
     . ' onerror="this.onerror=null;this.src=\'' . $fallback . '\';" />';
 }

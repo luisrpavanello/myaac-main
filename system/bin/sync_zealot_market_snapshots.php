@@ -10,6 +10,14 @@ require_once SYSTEM . 'init.php';
 require_once LIBS . 'ZealotMarket.php';
 
 $market = new ZealotMarket($db, $config);
-$updated = $market->backfillMissingSnapshots();
+$refreshActive = in_array('--refresh-active', $argv, true);
+if ($refreshActive) {
+    $updated = 0;
+    foreach ($db->query('SELECT `id` FROM `myaac_charbazaar` WHERE `status` = ' . ZealotMarket::STATUS_ACTIVE) as $listing) {
+        $updated += $market->refreshActiveListingSnapshot((int) $listing['id']) ? 1 : 0;
+    }
+} else {
+    $updated = $market->backfillMissingSnapshots();
+}
 
 echo "Zealot Market snapshots updated: {$updated}\n";

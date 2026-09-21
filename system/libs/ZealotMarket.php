@@ -94,6 +94,7 @@ class ZealotMarket
                 );
                 $this->db->commit();
                 $this->exportSnapshotOutfit($snapshot);
+                $this->exportSnapshotItemSprites($snapshot);
                 $updated++;
             } catch (Throwable $exception) {
                 $this->rollback();
@@ -102,6 +103,62 @@ class ZealotMarket
         }
 
         return $updated;
+    }
+
+    /**
+     * Active listings may be adjusted by staff tools. Keep their public
+     * preview aligned with the last state saved by the game server, while
+     * completed listings retain their final historical snapshot.
+     */
+    public function refreshActiveListingSnapshot(int $listingId): bool
+    {
+        if ($listingId < 1 || !$this->isInstalled()) {
+            return false;
+        }
+
+        $this->db->beginTransaction();
+        try {
+            $listing = $this->listingForUpdate($listingId);
+            if ((int) $listing['status'] !== self::STATUS_ACTIVE) {
+                $this->db->commit();
+                return false;
+            }
+            $player = $this->characterForUpdate((int) $listing['player_id']);
+            if (!$player) {
+                $this->db->commit();
+                return false;
+            }
+
+            $snapshot = $this->captureCharacterSnapshot($player);
+            $previous = self::decodeCharacterSnapshot($listing['character_snapshot'] ?? null);
+            if ($previous && $this->snapshotFingerprint($previous) === $this->snapshotFingerprint($snapshot)) {
+                $this->db->commit();
+                // A previous request may have stored the database snapshot
+                // while the web container did not yet have OTClient assets or
+                // write access to its preview cache. Re-attempt the derived
+                // image export so the UI never remains on a generic vocation
+                // icon when the character data itself is already current.
+                $this->exportSnapshotOutfit($snapshot);
+                $this->exportSnapshotItemSprites($snapshot);
+                return false;
+            }
+
+            $encoded = json_encode($snapshot, JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
+            if (!is_string($encoded)) {
+                throw new RuntimeException('The character inventory snapshot could not be encoded.');
+            }
+            $this->db->exec(
+                'UPDATE `myaac_charbazaar` SET `character_snapshot` = ' . $this->db->quote($encoded)
+                . ' WHERE `id` = ' . $listingId
+            );
+            $this->db->commit();
+            $this->exportSnapshotOutfit($snapshot);
+            $this->exportSnapshotItemSprites($snapshot);
+            return true;
+        } catch (Throwable $exception) {
+            $this->rollback();
+            throw $exception;
+        }
     }
 
     public function createListing(int $sellerId, int $playerId, int $startingPrice, int $days): int
@@ -163,6 +220,7 @@ class ZealotMarket
             $this->db->commit();
 
             $this->exportSnapshotOutfit($snapshot);
+            $this->exportSnapshotItemSprites($snapshot);
 
             return $listingId;
         } catch (Throwable $exception) {
@@ -386,6 +444,54 @@ class ZealotMarket
         return is_file(BASE . $path) ? $path : null;
     }
 
+    public static function itemName(int $itemId): string
+    {
+        $knownName = getItemNameById($itemId);
+        if (is_string($knownName) && $knownName !== '') {
+            return $knownName;
+        }
+
+        static $serverItems = null;
+        if ($serverItems === null) {
+            $serverItems = [];
+            // In development BASE and Canary are sibling folders, while the
+            // Docker image mounts Canary at /canary. Resolve the configured
+            // server data path first so the same item-name lookup works in
+            // both environments.
+            $itemsFiles = [];
+            if (function_exists('config')) {
+                $dataPath = config('data_path');
+                if (is_string($dataPath) && $dataPath !== '') {
+                    $itemsFiles[] = rtrim($dataPath, '/') . '/items/items.xml';
+                }
+            }
+            $itemsFiles[] = dirname(BASE) . '/canary/data/items/items.xml';
+            $itemsFile = null;
+            foreach (array_unique($itemsFiles) as $candidate) {
+                if (is_readable($candidate)) {
+                    $itemsFile = $candidate;
+                    break;
+                }
+            }
+            $handle = $itemsFile ? fopen($itemsFile, 'r') : false;
+            if ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    if (!preg_match('/<item\\b[^>]*\\bid="([^"]+)"[^>]*\\bname="([^"]+)"/i', $line, $matches)) {
+                        continue;
+                    }
+                    foreach (preg_split('/[;,]/', $matches[1]) as $id) {
+                        if (ctype_digit(trim($id))) {
+                            $serverItems[(int) $id] = html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8');
+                        }
+                    }
+                }
+                fclose($handle);
+            }
+        }
+
+        return $serverItems[$itemId] ?? 'Unknown item';
+    }
+
     /**
      * Hides a completed listing only from one account's Market History.
      * The listing, ownership transfer and financial ledger remain intact.
@@ -574,6 +680,7 @@ class ZealotMarket
                 'sid' => (int) $item['sid'],
                 'itemtype' => (int) $item['itemtype'],
                 'count' => max(1, (int) $item['count']),
+                'name' => self::itemName((int) $item['itemtype']),
                 // Attributes are retained for a verifiable snapshot, although
                 // the public listing intentionally renders only item metadata.
                 'attributes' => base64_encode((string) ($item['attributes'] ?? '')),
@@ -591,6 +698,65 @@ class ZealotMarket
         ]);
 
         return 'images/library/market-outfits/' . hash('sha256', $signature) . '.png';
+    }
+
+    private function snapshotFingerprint(array $snapshot): string
+    {
+        unset($snapshot['captured_at']);
+        return hash('sha256', json_encode($snapshot, JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE) ?: '');
+    }
+
+    private function exportSnapshotItemSprites(array $snapshot): void
+    {
+        $itemIds = [];
+        foreach (($snapshot['items'] ?? []) as $items) {
+            foreach (is_array($items) ? $items : [] as $item) {
+                $itemId = (int) ($item['itemtype'] ?? 0);
+                if ($itemId > 0) {
+                    $itemIds[$itemId] = true;
+                }
+            }
+        }
+        if (!$itemIds) {
+            return;
+        }
+
+        $assetsPath = $this->otClientAssetsPath();
+        $exporter = SYSTEM . 'bin/export_otclient_sprite.py';
+        if (!$assetsPath || !is_file($exporter)) {
+            return;
+        }
+        $outputDirectory = BASE . 'images/items';
+        foreach (array_slice(array_keys($itemIds), 0, 120) as $itemId) {
+            $png = $outputDirectory . '/' . $itemId . '.png';
+            if (is_file($png) || is_file($outputDirectory . '/' . $itemId . '.gif')) {
+                continue;
+            }
+            $arguments = [
+                'python3', $exporter, '--assets', $assetsPath, '--looktype', (string) $itemId,
+                '--category', 'object', '--output', $png, '--direction', '0',
+            ];
+            $command = implode(' ', array_map('escapeshellarg', $arguments));
+            exec($command . ' 2>&1', $ignoredOutput, $status);
+        }
+    }
+
+    private function otClientAssetsPath(): ?string
+    {
+        $assetsPath = getenv('ZEALOT_OTCLIENT_ASSETS');
+        if ($assetsPath && is_file(rtrim($assetsPath, '/') . '/catalog-content.json')) {
+            return rtrim($assetsPath, '/');
+        }
+
+        $versions = glob(dirname(BASE) . '/otclient/data/things/*', GLOB_ONLYDIR) ?: [];
+        usort($versions, static fn($left, $right) => strnatcasecmp(basename($right), basename($left)));
+        foreach ($versions as $version) {
+            if (is_file($version . '/catalog-content.json')) {
+                return $version;
+            }
+        }
+
+        return null;
     }
 
     private function exportSnapshotOutfit(array $snapshot): void

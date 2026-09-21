@@ -70,9 +70,14 @@ $listingId = filter_input(INPUT_GET, 'details', FILTER_VALIDATE_INT) ?: 0;
 if ($listingId > 0 && $marketError === null && $marketMessage === null) {
     // The legacy detail template expects this variable. Keep the route
     // compatible while the listing and transaction handling live here.
-    $getPageDetails = $listingId;
-    require SYSTEM . 'pages/char_bazaar/details.php';
-    return;
+    try {
+        $market->refreshActiveListingSnapshot($listingId);
+        $getPageDetails = $listingId;
+        require SYSTEM . 'pages/char_bazaar/details.php';
+        return;
+    } catch (Throwable $exception) {
+        $marketError = $exception->getMessage();
+    }
 }
 ?>
 
@@ -152,7 +157,20 @@ if ($listingId > 0 && $marketError === null && $marketMessage === null) {
         $auctions = $db->query(
             'SELECT a.*, UNIX_TIMESTAMP(a.`date_end`) AS `date_end_unix`, UNIX_TIMESTAMP(a.`date_start`) AS `date_start_unix` FROM `myaac_charbazaar` AS a INNER JOIN `players` AS p ON p.`id` = a.`player_id` '
             . 'WHERE ' . implode(' AND ', $marketConditions) . ' ORDER BY ' . $marketOrders[$marketOrder]
-        );
+        )->fetchAll();
+        foreach ($auctions as $auction) {
+            try {
+                $market->refreshActiveListingSnapshot((int) $auction['id']);
+            } catch (Throwable $exception) {
+                error_log('Zealot Market snapshot refresh failed for listing ' . (int) $auction['id'] . ': ' . $exception->getMessage());
+            }
+        }
+        // Re-read after a refresh so the cards always render the server's
+        // most recently saved outfit and inventory state.
+        $auctions = $db->query(
+            'SELECT a.*, UNIX_TIMESTAMP(a.`date_end`) AS `date_end_unix`, UNIX_TIMESTAMP(a.`date_start`) AS `date_start_unix` FROM `myaac_charbazaar` AS a INNER JOIN `players` AS p ON p.`id` = a.`player_id` '
+            . 'WHERE ' . implode(' AND ', $marketConditions) . ' ORDER BY ' . $marketOrders[$marketOrder]
+        )->fetchAll();
         require SYSTEM . 'pages/char_bazaar/list_auctions.php';
     } ?>
 </section>
