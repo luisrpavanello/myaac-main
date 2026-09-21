@@ -432,6 +432,7 @@ function getItemNameById($id)
 
 function getItemImage($id, $count = 1, $fallbackImage = 'empty.gif')
 {
+  $id = (int) $id;
   $tooltip = '';
 
   $name = getItemNameById($id);
@@ -448,6 +449,15 @@ function getItemImage($id, $count = 1, $fallbackImage = 'empty.gif')
   $itemImagesUrl = rtrim($config['item_images_url'], '/') . '/';
   $fallback = $itemImagesUrl . basename($fallbackImage);
   $imageExtension = 'gif';
+
+  // Use one official OTClient sprite source for every screen that calls this
+  // shared helper. A missing icon is exported once and then served from the
+  // local PNG cache; legacy GIFs remain only as a graceful fallback.
+  if ($id > 0 && strpos($itemImagesUrl, '://') === false && $itemImagesUrl === 'images/items/') {
+    require_once LIBS . 'OtClientItemSprites.php';
+    OtClientItemSprites::ensure($id);
+  }
+
   // Newer OTClient assets are exported as PNG. Prefer them when available,
   // while keeping the legacy GIF catalogue as the default for the rest site.
   if (strpos($itemImagesUrl, '://') === false && is_file(BASE . $itemImagesUrl . $file_name . '.png')) {

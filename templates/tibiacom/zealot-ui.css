@@ -1706,11 +1706,11 @@ body {
 
 .character-details-outfit__sprite {
   display: block;
-  max-width: 88px;
-  max-height: 104px;
+  width: 80px;
+  height: 96px;
   object-fit: contain;
   image-rendering: pixelated;
-  transform: scale(1.12);
+  transform: scale(1.1);
 }
 
 /* Compact, readable health and mana bars for the character sheet. */

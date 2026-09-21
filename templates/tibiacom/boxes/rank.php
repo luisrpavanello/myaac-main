@@ -33,7 +33,7 @@ unset($player);
 <style>
     .rank{
         width: 180px;
-        max-height: 360px;
+        max-height: none;
     }
     .rank_header{
         height: 45px;
@@ -47,13 +47,14 @@ unset($player);
     .rank_bottom{
         height: 30px;
         width: 180px;
-        margin-top: -20px;
+        margin-top: 0;
         background-image: url('templates/tibiacom/images/themeboxes/box_bottom.png');
     }
     .rank_content{
-        padding: 0px 10px;
+        box-sizing: border-box;
+        padding: 4px 10px 12px;
         width: 160px;
-        max-height: 290px;
+        max-height: none;
         background-image: url('templates/tibiacom/images/themeboxes/box_bg.png');
     }
     .rank_player{
@@ -62,19 +63,23 @@ unset($player);
         text-align: left;
         display: flex;
         align-items: center;
-        padding: 10px 5px;
+        min-height: 54px;
+        gap: 3px;
+        padding: 5px 2px;
     }
     .rank_outfit{
         position: relative;
-        flex: 0 0 56px;
-        width: 56px;
-        height: 56px;
-        margin: 0 -6px 0 -10px;
+        flex: 0 0 54px;
+        width: 54px;
+        height: 54px;
+        margin: 0 -2px 0 -7px;
         object-fit: contain;
         image-rendering: pixelated;
     }
     .rank_text{
-        margin-left: 45px;
+        min-width: 0;
+        margin-left: 0;
+        line-height: 1.2;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -86,6 +91,7 @@ unset($player);
     .rank_button{
         height: 30px;
         width: 148px;
+        margin: 5px 6px 0;
         border: 0;
         background: url('templates/tibiacom/images/themeboxes/button.png');
         font-family: Verdana;
