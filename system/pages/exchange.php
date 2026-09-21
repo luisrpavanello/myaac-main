@@ -29,6 +29,7 @@ $exchangeLinks = [
 ?>
 
 <section class="zealot-exchange" aria-labelledby="zealot-exchange-title">
+    <?php $marketNavActive = 'home'; require SYSTEM . 'templates/zealot_market_nav.php'; ?>
     <header class="zealot-exchange__hero">
         <span class="zealot-exchange__eyebrow">Official character marketplace</span>
         <h1 id="zealot-exchange-title">Zealot Market</h1>

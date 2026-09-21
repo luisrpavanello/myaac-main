@@ -39,6 +39,20 @@
         height: auto;
         object-fit: contain;
     }
+    .donate_content > .donate_shop_icons{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        min-height: 42px;
+    }
+    .donate_content .donate_shop_icons img{
+        width: 50px;
+        height: 50px;
+        max-width: none;
+        max-height: none;
+        image-rendering: pixelated;
+    }
     .donate_content > div,
     .donate_content a{
         display: block;
@@ -77,8 +91,8 @@
 <div class="donate">
     <div class="donate_header">Payment Center</div>
     <div class="donate_content">
-        <div>
-            <img src="<?= $template_path; ?>/images/themeboxes/donate/zealot-coins.gif?v=<?= filemtime(__DIR__ . '/../images/themeboxes/donate/zealot-coins.gif'); ?>" alt="Animated Zealot coin stacks">
+        <div class="donate_shop_icons" aria-label="Zealot shop icons">
+            <img src="<?= $template_path; ?>/images/menu/anim/icon-shops02.gif?v=<?= filemtime(__DIR__ . '/../images/menu/anim/icon-shops02.gif'); ?>" alt="Zealot shop">
         </div>
         <a href="<?php echo BASE_URL ?>?subtopic=donate&type=coins">
             <button type="button" class="donate_button">Buy Coins</button>

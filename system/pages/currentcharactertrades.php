@@ -88,6 +88,8 @@ if ($listingId > 0 && $marketError === null && $marketMessage === null) {
         </a>
     </header>
 
+    <?php $marketNavActive = 'browse'; require SYSTEM . 'templates/zealot_market_nav.php'; ?>
+
     <?php if ($marketMessage) { ?>
         <div class="zealot-market-feedback zealot-market-feedback--success"><?= htmlspecialchars($marketMessage, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php } ?>
@@ -129,6 +131,9 @@ if ($listingId > 0 && $marketError === null && $marketMessage === null) {
             </select>
         </label>
         <button type="submit">Apply filters</button>
+        <?php if ($marketVocation || $marketMinLevel || $marketMaxLevel || $marketOrder !== 'ending') { ?>
+            <a class="zealot-market-filters__reset" href="<?= getLink('currentcharactertrades'); ?>">Reset</a>
+        <?php } ?>
     </form>
 
     <?php if ($marketError !== null && !$market->isInstalled()) { ?>

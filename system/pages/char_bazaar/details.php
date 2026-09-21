@@ -29,11 +29,26 @@ $secondsLeft = max(0, (int) $listing['date_end_unix'] - time());
 $timeLeft = intdiv($secondsLeft, 86400) > 0
     ? intdiv($secondsLeft, 86400) . 'd ' . intdiv($secondsLeft % 86400, 3600) . 'h'
     : intdiv($secondsLeft, 3600) . 'h ' . intdiv($secondsLeft % 3600, 60) . 'm';
-$vocation = $config['vocations'][$listing['vocation']] ?? 'Adventurer';
-$gender = $config['genders'][$listing['sex']] ?? ((int) $listing['sex'] === 0 ? 'Male' : 'Female');
+$snapshot = ZealotMarket::decodeCharacterSnapshot($listing['character_snapshot'] ?? null);
+$character = $snapshot['player'] ?? $listing;
+$vocation = $config['vocations'][$character['vocation']] ?? 'Adventurer';
+$gender = $config['genders'][$character['sex']] ?? ((int) $character['sex'] === 0 ? 'Male' : 'Female');
+$outfitUrl = ZealotMarket::snapshotOutfitUrl($snapshot) ?? getVocationImage($character['vocation']);
 
-$equipment = [];
-if ($db->hasTable('player_items')) {
+$equipment = ZealotMarket::snapshotEquipment($snapshot);
+$equipmentFallbacks = [
+    1 => 'no_helmet.gif',
+    2 => 'no_necklace.gif',
+    3 => 'no_backpack.gif',
+    4 => 'no_armor.gif',
+    5 => 'no_handright.gif',
+    6 => 'no_handleft.gif',
+    7 => 'no_legs.gif',
+    8 => 'no_boots.gif',
+    9 => 'no_ring.gif',
+    10 => 'no_ammo.gif',
+];
+if (!$snapshot && $db->hasTable('player_items')) {
     foreach ($db->query('SELECT `pid`, `itemtype` FROM `player_items` WHERE `player_id` = ' . (int) $listing['player_id'] . ' AND `pid` BETWEEN 1 AND 10') as $item) {
         if ((int) $item['itemtype'] > 0) {
             $equipment[(int) $item['pid']] = (int) $item['itemtype'];
@@ -41,25 +56,43 @@ if ($db->hasTable('player_items')) {
     }
 }
 
+$backpackItems = ZealotMarket::snapshotItemTree($snapshot, 'player_items', [3]);
+$depotItems = ZealotMarket::snapshotItemTree($snapshot, 'depot_items', range(0, 99));
+$renderItemTree = static function (array $items) use (&$renderItemTree): void {
+    if (!$items) {
+        echo '<p class="zealot-market-inventory__empty">No items recorded.</p>';
+        return;
+    }
+
+    echo '<ul>';
+    foreach ($items as $item) {
+        $itemType = (int) ($item['itemtype'] ?? 0);
+        $count = max(1, (int) ($item['count'] ?? 1));
+        $name = getItemNameById($itemType) ?: 'Item #' . $itemType;
+        echo '<li><span class="zealot-market-inventory__item">' . getItemImage($itemType, $count)
+            . '<span>' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . ($count > 1 ? ' <b>×' . $count . '</b>' : '') . '</span></span>';
+        $renderItemTree($item['children'] ?? []);
+        echo '</li>';
+    }
+    echo '</ul>';
+};
+
 $blessings = 0;
 for ($number = 1; $number <= 7; $number++) {
-    $blessings += (int) ($listing['blessings' . $number] > 0);
+    $blessings += (int) (($character['blessings' . $number] ?? 0) > 0);
 }
-$statusLabel = match ((int) $listing['status']) {
-    ZealotMarket::STATUS_SOLD => 'Sold',
-    ZealotMarket::STATUS_CANCELLED => 'Cancelled',
-    ZealotMarket::STATUS_EXPIRED => 'Expired',
-    default => $isActive ? 'Live listing' : 'Awaiting settlement',
-};
+$statusLabel = $isActive ? 'Live listing' : ZealotMarket::statusLabel((int) $listing['status']);
+$minimumBid = $market instanceof ZealotMarket ? $market->minimumBidFor($listing) : $currentBid + 1;
 ?>
 
 <section class="zealot-market-detail" aria-labelledby="zealot-market-character">
     <a class="zealot-market-detail__back" href="?subtopic=currentcharactertrades">← Back to characters for sale</a>
+    <?php $marketNavActive = 'browse'; require SYSTEM . 'templates/zealot_market_nav.php'; ?>
     <header class="zealot-market-detail__header">
         <div>
             <span><?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8'); ?></span>
-            <h1 id="zealot-market-character"><?= htmlspecialchars($listing['name'], ENT_QUOTES, 'UTF-8'); ?></h1>
-            <p>Level <?= number_format((int) $listing['level']); ?> <?= htmlspecialchars($vocation, ENT_QUOTES, 'UTF-8'); ?> · <?= htmlspecialchars($gender, ENT_QUOTES, 'UTF-8'); ?></p>
+            <h1 id="zealot-market-character"><?= htmlspecialchars($character['name'], ENT_QUOTES, 'UTF-8'); ?></h1>
+            <p>Level <?= number_format((int) $character['level']); ?> <?= htmlspecialchars($vocation, ENT_QUOTES, 'UTF-8'); ?> · <?= htmlspecialchars($gender, ENT_QUOTES, 'UTF-8'); ?></p>
         </div>
         <div class="zealot-market-detail__timer">
             <small><?= $isActive ? 'Time remaining' : 'Listing status'; ?></small>
@@ -69,27 +102,47 @@ $statusLabel = match ((int) $listing['status']) {
 
     <div class="zealot-market-detail__main">
         <div class="zealot-market-detail__outfit">
-            <img src="<?= htmlspecialchars(getVocationImage($listing['vocation']), ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars($vocation, ENT_QUOTES, 'UTF-8'); ?> outfit">
+            <img src="<?= htmlspecialchars($outfitUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars($vocation, ENT_QUOTES, 'UTF-8'); ?> outfit">
             <span>Character preview</span>
         </div>
 
         <dl class="zealot-market-detail__facts">
-            <div><dt>Health</dt><dd><?= number_format((int) $listing['health']); ?> / <?= number_format((int) $listing['healthmax']); ?></dd></div>
-            <div><dt>Mana</dt><dd><?= number_format((int) $listing['mana']); ?> / <?= number_format((int) $listing['manamax']); ?></dd></div>
-            <div><dt>Capacity</dt><dd><?= number_format((int) $listing['cap']); ?></dd></div>
-            <div><dt>Soul</dt><dd><?= number_format((int) $listing['soul']); ?></dd></div>
-            <div><dt>Magic level</dt><dd><?= number_format((int) $listing['maglevel']); ?></dd></div>
-            <div><dt>Blessings</dt><dd><?= $blessings; ?> / 7<?= (int) $listing['blessings8'] > 0 ? ' + Twist' : ''; ?></dd></div>
+            <div><dt>Health</dt><dd><?= number_format((int) $character['health']); ?> / <?= number_format((int) $character['healthmax']); ?></dd></div>
+            <div><dt>Mana</dt><dd><?= number_format((int) $character['mana']); ?> / <?= number_format((int) $character['manamax']); ?></dd></div>
+            <div><dt>Capacity</dt><dd><?= number_format((int) $character['cap']); ?></dd></div>
+            <div><dt>Soul</dt><dd><?= number_format((int) $character['soul']); ?></dd></div>
+            <div><dt>Magic level</dt><dd><?= number_format((int) $character['maglevel']); ?></dd></div>
+            <div><dt>Blessings</dt><dd><?= $blessings; ?> / 7<?= (int) $character['blessings8'] > 0 ? ' + Twist' : ''; ?></dd></div>
         </dl>
 
         <div class="zealot-market-detail__equipment" aria-label="Character equipment">
-            <?php foreach ([1, 4, 5, 6, 7, 8] as $slot) { ?>
+            <?php foreach (range(1, 10) as $slot) { ?>
                 <span class="<?= isset($equipment[$slot]) ? '' : 'is-empty'; ?>">
-                    <?= isset($equipment[$slot]) ? getItemImage($equipment[$slot]) : '—'; ?>
+                    <?= isset($equipment[$slot]) ? getItemImage((int) (is_array($equipment[$slot]) ? $equipment[$slot]['itemtype'] : $equipment[$slot]), (int) (is_array($equipment[$slot]) ? $equipment[$slot]['count'] : 1), $equipmentFallbacks[$slot]) : getItemImage(0, 1, $equipmentFallbacks[$slot]); ?>
                 </span>
             <?php } ?>
         </div>
     </div>
+
+    <section class="zealot-market-inventory" aria-label="Included character inventory">
+        <header>
+            <div>
+                <span>Included with this character</span>
+                <h2>Inventory snapshot</h2>
+            </div>
+            <small><?= $snapshot ? 'Captured when this listing was created' : 'Legacy listing — inventory snapshot unavailable'; ?></small>
+        </header>
+        <div class="zealot-market-inventory__groups">
+            <details open>
+                <summary>Backpack<?= $backpackItems ? '' : ' — empty'; ?></summary>
+                <?php $renderItemTree($backpackItems); ?>
+            </details>
+            <details>
+                <summary>Depot<?= $depotItems ? '' : ' — empty'; ?></summary>
+                <?php $renderItemTree($depotItems); ?>
+            </details>
+        </div>
+    </section>
 
     <div class="zealot-market-detail__bottom">
         <section class="zealot-market-detail__skills">
@@ -98,7 +151,7 @@ $statusLabel = match ((int) $listing['status']) {
                 'Fist' => 'skill_fist', 'Club' => 'skill_club', 'Sword' => 'skill_sword', 'Axe' => 'skill_axe',
                 'Distance' => 'skill_dist', 'Shielding' => 'skill_shielding', 'Fishing' => 'skill_fishing',
             ] as $label => $field) { ?>
-                <div><span><?= $label; ?></span><strong><?= number_format((int) $listing[$field]); ?></strong></div>
+                <div><span><?= $label; ?></span><strong><?= number_format((int) $character[$field]); ?></strong></div>
             <?php } ?>
         </section>
 
@@ -114,7 +167,7 @@ $statusLabel = match ((int) $listing['status']) {
                     <input type="hidden" name="market_csrf" value="<?= htmlspecialchars($marketCsrf ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     <input type="hidden" name="auction_iden" value="<?= (int) $listing['id']; ?>">
                     <label for="zealot-market-bid">Your bid</label>
-                    <input id="zealot-market-bid" name="maxbid" type="number" min="<?= $currentBid + 1; ?>" required placeholder="At least <?= number_format($currentBid + 1); ?>">
+                    <input id="zealot-market-bid" name="maxbid" type="number" min="<?= $minimumBid; ?>" required placeholder="At least <?= number_format($minimumBid); ?>">
                     <button type="submit"><?= $isWinningBidder ? 'Increase bid' : 'Place bid'; ?></button>
                 </form>
             <?php } elseif ($isActive && $isSeller && (int) $listing['bid_account'] === 0) { ?>

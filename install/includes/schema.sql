@@ -65,11 +65,14 @@ CREATE TABLE `myaac_charbazaar` (
   `escrow_account_id` int(11) NOT NULL DEFAULT 0,
   `listing_fee` int(11) NOT NULL DEFAULT 0,
   `tax_rate` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `character_snapshot` LONGTEXT NULL DEFAULT NULL,
   `final_price` int(11) NOT NULL DEFAULT 0,
   `completed_at` datetime NULL DEFAULT NULL,
   `cancelled_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `zealot_market_active` (`date_end`),
+  KEY `zealot_market_status_end` (`status`, `date_end`),
+  KEY `zealot_market_status_completed` (`status`, `completed_at`),
   KEY `zealot_market_player` (`player_id`),
   KEY `zealot_market_seller` (`account_old`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
@@ -83,7 +86,8 @@ CREATE TABLE `myaac_charbazaar_bid` (
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `zealot_market_bid_auction` (`auction_id`),
-  KEY `zealot_market_bid_account` (`account_id`)
+  KEY `zealot_market_bid_account` (`account_id`),
+  KEY `zealot_market_bid_account_auction` (`account_id`, `auction_id`, `id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
 CREATE TABLE `myaac_zealot_market_ledger` (
@@ -98,6 +102,14 @@ CREATE TABLE `myaac_zealot_market_ledger` (
   PRIMARY KEY (`id`),
   KEY `zealot_market_ledger_account` (`account_id`, `created_at`),
   KEY `zealot_market_ledger_auction` (`auction_id`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
+CREATE TABLE `myaac_zealot_market_hidden_history` (
+  `account_id` int(11) NOT NULL,
+  `auction_id` int(11) NOT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`account_id`, `auction_id`),
+  KEY `zealot_market_hidden_history_auction` (`auction_id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
 CREATE TABLE `myaac_config`

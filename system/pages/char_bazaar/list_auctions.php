@@ -14,12 +14,15 @@ foreach ($auctions as $auction) {
         continue;
     }
 
+    $snapshot = ZealotMarket::decodeCharacterSnapshot($auction['character_snapshot'] ?? null);
+    $character = $snapshot['player'] ?? $character;
+
     $marketListingCount++;
     $characterName = htmlspecialchars((string) $character['name'], ENT_QUOTES, 'UTF-8');
     $vocationName = htmlspecialchars((string) ($config['vocations'][$character['vocation']] ?? 'Adventurer'), ENT_QUOTES, 'UTF-8');
     $genderName = htmlspecialchars((string) ($config['genders'][$character['sex']] ?? 'Unknown'), ENT_QUOTES, 'UTF-8');
-    $outfitUrl = getVocationImage($character['vocation']);
-    $detailUrl = '?subtopic=' . urlencode($subtopic) . '&details=' . (int) $auction['id'];
+    $outfitUrl = ZealotMarket::snapshotOutfitUrl($snapshot) ?? getVocationImage($character['vocation']);
+    $detailUrl = getLinkWithQuery($subtopic, ['details' => (int) $auction['id']]);
     $currentBid = max((int) $auction['price'], (int) ($auction['bid_price'] ?? 0));
     $endsAt = (int) ($auction['date_end_unix'] ?? strtotime($auction['date_end']));
     $secondsLeft = max(0, $endsAt - time());
@@ -28,8 +31,20 @@ foreach ($auctions as $auction) {
     $minutesLeft = intdiv($secondsLeft % 3600, 60);
     $timeLeft = $daysLeft > 0 ? $daysLeft . 'd ' . $hoursLeft . 'h left' : $hoursLeft . 'h ' . $minutesLeft . 'm left';
 
-    $equipment = [];
-    if ($db->hasTable('player_items')) {
+    $equipment = ZealotMarket::snapshotEquipment($snapshot);
+    $equipmentFallbacks = [
+        1 => 'no_helmet.gif',
+        2 => 'no_necklace.gif',
+        3 => 'no_backpack.gif',
+        4 => 'no_armor.gif',
+        5 => 'no_handright.gif',
+        6 => 'no_handleft.gif',
+        7 => 'no_legs.gif',
+        8 => 'no_boots.gif',
+        9 => 'no_ring.gif',
+        10 => 'no_ammo.gif',
+    ];
+    if (!$snapshot && $db->hasTable('player_items')) {
         $equipmentQuery = $db->query(
             'SELECT `pid`, `itemtype` FROM `player_items` WHERE `player_id` = ' . (int) $auction['player_id'] . ' AND `pid` BETWEEN 1 AND 10'
         );
@@ -63,11 +78,11 @@ foreach ($auctions as $auction) {
             </dl>
 
             <div class="zealot-market-card__equipment" aria-label="Visible equipment">
-                <?php foreach ([1, 4, 5, 6, 7, 8] as $slot) {
+                <?php foreach (range(1, 10) as $slot) {
                     if (isset($equipment[$slot])) { ?>
-                        <span><?= getItemImage($equipment[$slot]); ?></span>
+                        <span><?= getItemImage((int) (is_array($equipment[$slot]) ? $equipment[$slot]['itemtype'] : $equipment[$slot]), (int) (is_array($equipment[$slot]) ? $equipment[$slot]['count'] : 1), $equipmentFallbacks[$slot]); ?></span>
                     <?php } else { ?>
-                        <span class="zealot-market-card__empty-slot" aria-hidden="true"></span>
+                        <span class="zealot-market-card__empty-slot"><?= getItemImage(0, 1, $equipmentFallbacks[$slot]); ?></span>
                     <?php }
                 } ?>
             </div>

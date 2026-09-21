@@ -88,7 +88,7 @@ define('TFS_03', 4);
 define('TFS_FIRST', TFS_02);
 define('TFS_LAST', TFS_03);
 
-if (!IS_CLI) {
+if (!IS_CLI && !defined('MYAAC_NO_SESSION')) {
     session_save_path(SYSTEM . 'php_sessions');
     session_set_cookie_params([
         "httponly" => true

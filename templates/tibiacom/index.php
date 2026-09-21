@@ -493,23 +493,24 @@ if (isset($config['boxes']))
                             <div class="BorderTitleText zealot-status-bar"
                                  style="background-image:url(<?= $template_path; ?>/images/global/content/newsheadline_background.gif); height: 28px;">
                                 <div class="InfoBar">
-                                    <a class="zealot-quick-action" href="?subtopic=downloadclient">
-                                        <svg class="zealot-quick-action__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                            <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14"/>
-                                        </svg>
-                                        <span>Download Zealot Client</span>
-                                    </a>
-
-                                    <?php if (!empty($config['discord_link'])) { ?>
-                                        <a class="zealot-quick-action" href="<?= $config['discord_link']; ?>" target="new" rel="noopener">
+                                    <div class="zealot-quick-actions">
+                                        <a class="zealot-quick-action" href="?subtopic=downloadclient">
                                             <svg class="zealot-quick-action__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                                <path d="M6 7.5c1.7-1.2 3.7-1.8 6-1.8s4.3.6 6 1.8c.8 1.8 1.2 3.8 1.2 6-1.1 1-2.5 1.7-4.2 2.1l-1-1.4c-1.3.2-2.7.2-4 0l-1 1.4c-1.7-.4-3.1-1.1-4.2-2.1 0-2.2.4-4.2 1.2-6Z"/>
-                                                <path d="M9.5 10.8h.01M14.5 10.8h.01"/>
+                                                <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14"/>
                                             </svg>
-                                            <span>Discord</span>
+                                            <span>Download Zealot Client</span>
                                         </a>
-                                    <?php } ?>
-                                    <span class="zealot-status-spacer"></span>
+
+                                        <?php if (!empty($config['discord_link'])) { ?>
+                                            <a class="zealot-quick-action" href="<?= $config['discord_link']; ?>" target="new" rel="noopener">
+                                                <svg class="zealot-quick-action__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                    <path d="M6 7.5c1.7-1.2 3.7-1.8 6-1.8s4.3.6 6 1.8c.8 1.8 1.2 3.8 1.2 6-1.1 1-2.5 1.7-4.2 2.1l-1-1.4c-1.3.2-2.7.2-4 0l-1 1.4c-1.7-.4-3.1-1.1-4.2-2.1 0-2.2.4-4.2 1.2-6Z"/>
+                                                    <path d="M9.5 10.8h.01M14.5 10.8h.01"/>
+                                                </svg>
+                                                <span>Discord</span>
+                                            </a>
+                                        <?php } ?>
+                                    </div>
                                     <span class="zealot-status-toggle-wrap">
                                         <?php if ($config['collapse_status']) { ?>
                                             <a class="zealot-status-toggle" data-bs-toggle="collapse" href="#statusbar" role="button" aria-expanded="false" aria-controls="statusbar" aria-label="Show status details">
@@ -662,51 +663,17 @@ if (isset($config['boxes']))
 
             <div id="ThemeboxesColumn">
                 <?php
-                if (!function_exists('tibiacomLibrarySpriteUrl')) {
-                    function tibiacomLibrarySpriteUrl($name, $fallback = 'demon')
-                    {
-                        $normalize = static function ($value) {
-                            $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string)$value);
-                            return strtolower(preg_replace('/[^a-z0-9]/i', '', $value));
-                        };
-
-                        $name = trim((string)$name);
-                        $candidates = [];
-                        $exact = $normalize($name);
-                        if ($exact !== '') {
-                            $candidates[] = $exact;
-                            $words = preg_split('/\s+/', $name);
-                            for ($i = 1, $count = count($words); $i < $count; $i++) {
-                                $candidate = $normalize(implode(' ', array_slice($words, $i)));
-                                if ($candidate !== '') {
-                                    $candidates[] = $candidate;
-                                }
-                            }
-                        }
-
-                        foreach ($candidates as $candidate) {
-                            $singular = preg_replace('/s$/', '', $candidate);
-                            foreach (array_unique([$candidate, $singular]) as $sprite) {
-                                foreach (['gif', 'png'] as $extension) {
-                                    $relativePath = 'images/library/' . $sprite . '.' . $extension;
-                                    if (file_exists(BASE . $relativePath)) {
-                                        return $relativePath;
-                                    }
-                                }
-                            }
-                        }
-
-                        return 'images/library/' . $fallback . '.gif';
-                    }
-                }
-
-                $creaturequery = $db->query("SELECT `boostname` FROM `boosted_creature`")->fetch();
+                $creaturequery = $db->query("SELECT `boostname`, `looktype` FROM `boosted_creature`")->fetch();
                 $creaturename = $creaturequery ? $creaturequery['boostname'] : 'Boosted Creature';
-                $creatureimage = tibiacomLibrarySpriteUrl($creaturename, 'dragon');
+                $creatureimage = getDailyBoostSpriteUrl($creaturename, $creaturequery['looktype'] ?? null);
+                $creatureimageurl = $creatureimage === null ? null : $creatureimage . '?v=' . filemtime(BASE . $creatureimage);
+                $creatureimagesize = getDailyBoostSpriteDisplaySize($creatureimage);
 
-                $bossquery = $db->query("SELECT `boostname` FROM `boosted_boss`")->fetch();
+                $bossquery = $db->query("SELECT `boostname`, `looktype`, `looktypeEx` FROM `boosted_boss`")->fetch();
                 $bossname = $bossquery ? $bossquery['boostname'] : 'Boosted Boss';
-                $bossimage = tibiacomLibrarySpriteUrl($bossname, 'demon');
+                $bossimage = getDailyBoostSpriteUrl($bossname, $bossquery['looktype'] ?? null, $bossquery['looktypeEx'] ?? null);
+                $bossimageurl = $bossimage === null ? null : $bossimage . '?v=' . filemtime(BASE . $bossimage);
+                $bossimagesize = getDailyBoostSpriteDisplaySize($bossimage);
 
                 $onlinePlayers = (int)($status['playersTotal'] ?? $status['players'] ?? 0);
                 if ($db->hasTable('players_online')) {
@@ -725,22 +692,33 @@ if (isset($config['boxes']))
                         <div class="DailyBoostStages">
                             <a class="DailyBoostStage" href="?subtopic=killstatistics"
                                title="Today's boosted creature: <?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
-                                <span class="DailyBoostSprite">
-                                    <img src="<?= $creatureimage; ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
+                                <span class="DailyBoostSprite<?= $creatureimage === null ? ' DailyBoostSprite--missing' : ''; ?>" style="--daily-boost-sprite-size: <?= $creatureimagesize; ?>px;">
+                                    <?php if ($creatureimage !== null): ?>
+                                    <img src="<?= htmlspecialchars($creatureimageurl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
+                                    <?php else: ?>
+                                    <span class="DailyBoostSpritePlaceholder" aria-label="Verified sprite unavailable">?</span>
+                                    <?php endif; ?>
                                 </span>
                                 <span class="DailyBoostName"><?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?></span>
                                 <span class="DailyBoostType">Creature</span>
                             </a>
                             <a class="DailyBoostStage" href="?subtopic=killstatistics"
                                title="Today's boosted boss: <?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
-                                <span class="DailyBoostSprite">
-                                    <img src="<?= $bossimage; ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
+                                <span class="DailyBoostSprite<?= $bossimage === null ? ' DailyBoostSprite--missing' : ''; ?>" style="--daily-boost-sprite-size: <?= $bossimagesize; ?>px;">
+                                    <?php if ($bossimage !== null): ?>
+                                    <img src="<?= htmlspecialchars($bossimageurl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
+                                    <?php else: ?>
+                                    <span class="DailyBoostSpritePlaceholder" aria-label="Verified sprite unavailable">?</span>
+                                    <?php endif; ?>
                                 </span>
                                 <span class="DailyBoostName"><?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?></span>
                                 <span class="DailyBoostType">Boss</span>
                             </a>
                         </div>
-                        <a id="PlayersOnline" href="?online"><?= htmlspecialchars($playersOnlineLabel, ENT_QUOTES, 'UTF-8'); ?></a>
+                        <a id="PlayersOnline" href="?online"
+                           data-online-count-endpoint="<?= htmlspecialchars(BASE_URL . 'tools/players_online.php', ENT_QUOTES, 'UTF-8'); ?>"
+                           data-online-count="<?= $onlinePlayers; ?>"
+                           aria-live="polite"><?= htmlspecialchars($playersOnlineLabel, ENT_QUOTES, 'UTF-8'); ?></a>
                     </section>
                 </div>
 
@@ -825,6 +803,68 @@ if (isset($config['boxes']))
 <button class="scrollToTop" type="button" title="Voltar ao topo" aria-label="Voltar ao topo">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5m0 0-5 5m5-5 5 5"/></svg>
 </button>
+<script>
+    // The Daily Boosts card must not wait for a full-page refresh. This small,
+    // same-origin request reads the game-maintained online list directly and
+    // deliberately bypasses browser/proxy caches.
+    (function () {
+        const counter = document.getElementById('PlayersOnline');
+        if (!counter || !window.fetch || !counter.dataset.onlineCountEndpoint) {
+            return;
+        }
+
+        let isRefreshing = false;
+        const setCount = function (players) {
+            if (!Number.isInteger(players) || players < 0) {
+                return;
+            }
+
+            const label = players === 1 ? '1 Player Online' : players + ' Players Online';
+            counter.textContent = label;
+            counter.dataset.onlineCount = String(players);
+            counter.title = 'Live player count updated just now';
+        };
+
+        const refreshCount = function () {
+            if (isRefreshing || document.hidden) {
+                return;
+            }
+
+            isRefreshing = true;
+            const separator = counter.dataset.onlineCountEndpoint.indexOf('?') === -1 ? '?' : '&';
+            fetch(counter.dataset.onlineCountEndpoint + separator + 't=' + Date.now(), {
+                cache: 'no-store',
+                credentials: 'same-origin',
+                headers: {'Accept': 'application/json'}
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Online count request failed.');
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    setCount(data.players);
+                })
+                .catch(function () {
+                    // Keep the last known total visible if the site is briefly
+                    // unavailable; the next polling cycle retries silently.
+                })
+                .finally(function () {
+                    isRefreshing = false;
+                });
+        };
+
+        refreshCount();
+        window.setInterval(refreshCount, 5000);
+        window.addEventListener('focus', refreshCount);
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                refreshCount();
+            }
+        });
+    }());
+</script>
 <script src="<?= $template_path; ?>/js/generic.js"></script>
 <div id="HelperDivContainer"
      style="background-image: url(<?= $template_path; ?>/images/global/content/scroll.gif);">

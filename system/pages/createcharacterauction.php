@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['market_action'] ?? '') ===
             (int) ($_POST['starting_price'] ?? 0),
             (int) ($_POST['duration_days'] ?? 0)
         );
-        echo '<div class="zealot-market-feedback zealot-market-feedback--success">Your character is now listed in Zealot Market. <a href="?subtopic=currentcharactertrades&amp;details=' . $listingId . '">View listing</a></div>';
+        echo '<div class="zealot-market-feedback zealot-market-feedback--success">Your character is now listed in Zealot Market. <a href="' . htmlspecialchars(getLinkWithQuery('currentcharactertrades', ['details' => $listingId]), ENT_QUOTES, 'UTF-8') . '">View listing</a></div>';
     } catch (Throwable $exception) {
         $marketError = $exception->getMessage();
     }
@@ -58,6 +58,8 @@ $marketTax = max(0, min(100, (int) ($config['bazaar_tax'] ?? 0)));
         <h1 id="zealot-market-sell-title">Sell a character</h1>
         <p>Your character is held safely in Market escrow for the duration of the listing. It is returned if the listing expires or is cancelled without bids.</p>
     </header>
+
+    <?php $marketNavActive = 'sell'; require SYSTEM . 'templates/zealot_market_nav.php'; ?>
 
     <div class="zealot-market-sell__balance">
         <span>Available transferable Zealot Coins</span>

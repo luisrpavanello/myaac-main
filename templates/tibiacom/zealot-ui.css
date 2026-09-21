@@ -283,6 +283,41 @@ body {
   color: var(--zealot-ink);
 }
 
+/* Persistent Market navigation: every market surface exposes the same quick
+ * routes, so a buyer never has to return to the sidebar to manage an auction. */
+.zealot-market-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 9px 12px;
+  border-bottom: 1px solid #b89047;
+  background: #ddc595;
+}
+
+.zealot-market-nav a {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid #805d2f;
+  background: #f8ecd1;
+  color: #563617 !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.zealot-market-nav a:hover,
+.zealot-market-nav a:focus,
+.zealot-market-nav a.is-active {
+  border-color: #0b2118;
+  background: #174735;
+  color: #fff0bc !important;
+  text-shadow: 1px 1px 1px #07140e;
+}
+
 .zealot-exchange__hero {
   padding: 24px 26px 22px;
   border-bottom: 1px solid var(--zealot-gold);
@@ -564,6 +599,127 @@ body {
   cursor: pointer;
 }
 
+.zealot-market-filters__reset {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid #8b6c3d;
+  color: #65431e;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.zealot-market-filters__reset:hover,
+.zealot-market-filters__reset:focus {
+  background: #f8eed8;
+  color: #244631;
+}
+
+.zealot-market-activity {
+  margin: 14px 16px 16px;
+  border: 1px solid #a98446;
+  background: #f9edcf;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 22%);
+  color: #59391b;
+}
+
+.zealot-market-activity__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 17px;
+  border-bottom: 1px solid #bc9148;
+  background: linear-gradient(135deg, #10291e, #174735);
+  color: #fff0c0;
+}
+
+.zealot-market-activity__header h1,
+.zealot-market-activity__header p { margin: 0; }
+.zealot-market-activity__header h1 { font-size: 17pt; }
+.zealot-market-activity__header p { margin-top: 4px; color: #dfd0b3; font-size: 8.5pt; }
+
+.zealot-market-activity__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8.5pt;
+}
+
+.zealot-market-activity__table th,
+.zealot-market-activity__table td {
+  padding: 10px 11px;
+  border-bottom: 1px solid #ddcaa0;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.zealot-market-activity__table th {
+  background: #e0c99a;
+  color: #63431d;
+  font-weight: bold;
+}
+
+.zealot-market-activity__table tbody tr:nth-child(even) { background: #f1dfbb; }
+.zealot-market-activity__table tbody tr:last-child td { border-bottom: 0; }
+.zealot-market-activity__table .is-action { width: 264px; text-align: center; }
+
+.zealot-market-activity__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.zealot-market-activity__actions form { margin: 0; }
+
+.zealot-market-activity__action {
+  display: inline-flex;
+  min-width: 116px;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #0b1c15;
+  outline: 1px solid #c99c43;
+  background: #174735;
+  color: #ffe5a0 !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8.5pt;
+  font-weight: bold;
+  text-decoration: none;
+  text-shadow: 1px 1px 1px #07140e;
+}
+
+.zealot-market-activity__action:hover,
+.zealot-market-activity__action:focus { background: #246047; color: #fff7da !important; }
+
+.zealot-market-activity__hide {
+  min-width: 104px;
+  min-height: 30px;
+  border: 1px solid #6d4c27;
+  outline: 1px solid #c99c43;
+  background: #ead8b6;
+  color: #67431f;
+  cursor: pointer;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8.5pt;
+  font-weight: bold;
+}
+
+.zealot-market-activity__hide:hover,
+.zealot-market-activity__hide:focus {
+  background: #f7ebcf;
+  color: #2d5a3e;
+}
+
+.zealot-market-activity__status { font-weight: bold; }
+.zealot-market-activity__status--live { color: #1c6b3f; }
+.zealot-market-activity__status--sold { color: #705018; }
+.zealot-market-activity__status--closed { color: #86403a; }
+
 .zealot-market-filters button:hover,
 .zealot-market-filters button:focus {
   background: var(--zealot-forest-hover);
@@ -683,7 +839,7 @@ body {
 
 .zealot-market-card__equipment {
   display: grid;
-  grid-template-columns: repeat(3, 38px);
+  grid-template-columns: repeat(5, 38px);
   justify-content: end;
   gap: 5px;
 }
@@ -706,7 +862,7 @@ body {
   image-rendering: pixelated;
 }
 
-.zealot-market-card__empty-slot::after {
+.zealot-market-card__empty-slot:empty::after {
   content: '—';
   color: #8e9a8b;
   font-family: Georgia, serif;
@@ -1145,7 +1301,10 @@ body {
 }
 
 .Content .zealot-status-shell {
-  margin: 8px 5px 18px;
+  /* The legacy box flow collapses its first margin. A relative offset keeps
+   * this strip level with the Account card without moving either sidebar. */
+  top: 8px;
+  margin: 23px 5px 18px;
   border: 1px solid #426755;
   background: #10261d;
   box-shadow: inset 0 0 0 1px rgba(231, 196, 125, 0.16), 0 2px 5px rgba(0, 0, 0, 0.46);
@@ -1219,12 +1378,20 @@ body {
 .Content .zealot-status-shell .InfoBar {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
   box-sizing: border-box;
   height: 34px;
   margin: 0;
   padding: 0 10px;
+  position: relative;
   top: 0;
+}
+
+.zealot-quick-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
 }
 
 .Content .zealot-status-shell .zealot-quick-action {
@@ -1232,7 +1399,7 @@ body {
   align-items: center;
   gap: 7px;
   min-height: 26px;
-  padding: 0 8px;
+  padding: 0 4px;
   border: 1px solid transparent;
   border-radius: 2px;
   color: var(--zealot-gold-light) !important;
@@ -1271,6 +1438,8 @@ body {
 .zealot-status-toggle-wrap {
   display: flex;
   align-items: center;
+  position: absolute;
+  right: 10px;
 }
 
 .Content .zealot-status-shell .zealot-status-toggle {
@@ -1914,6 +2083,32 @@ body {
   color: #bcae92;
 }
 
+/* Missing assets are deliberately obvious and neutral. A generic demon or
+ * dragon in this slot makes the Daily Boost information factually wrong. */
+.DailyBoostSprite--missing {
+  background-color: #18251e;
+  background-image: none;
+  border: 1px dashed rgba(231, 196, 125, 0.52);
+  box-sizing: border-box;
+}
+
+.DailyBoostSpritePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 9px;
+  border: 1px solid rgba(231, 196, 125, 0.56);
+  border-radius: 50%;
+  color: var(--zealot-gold-light);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 1px 1px 1px #000;
+}
+
 #RightArtwork #PlayersOnline {
   border-color: var(--zealot-gold);
   background: var(--zealot-forest);
@@ -2197,6 +2392,11 @@ body {
     padding: 10px;
   }
 
+  .zealot-market-nav { gap: 5px; }
+  .zealot-market-nav a { flex: 1 1 auto; padding: 0 8px; }
+  .zealot-market-activity { margin: 12px 8px; overflow-x: auto; }
+  .zealot-market-activity__table { min-width: 620px; }
+
   .zealot-market-listings__header,
   .zealot-market-card__footer {
     align-items: flex-start;
@@ -2327,7 +2527,7 @@ body {
 
 .zealot-market-detail__equipment {
   display: grid;
-  grid-template-columns: repeat(3, 46px);
+  grid-template-columns: repeat(5, 46px);
   gap: 6px;
   justify-content: center;
 }
@@ -2343,6 +2543,43 @@ body {
 
 .zealot-market-detail__equipment span img { max-width: 32px; max-height: 32px; }
 .zealot-market-detail__equipment .is-empty { color: #9a895f; }
+
+.zealot-market-inventory {
+  margin: 0 15px;
+  border: 1px solid #b4862f;
+  background: #f3e5c8;
+}
+
+.zealot-market-inventory > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #b4862f;
+  background: #123c2f;
+  color: #f7e5b5;
+}
+
+.zealot-market-inventory > header span {
+  color: #e7c770;
+  font-size: 8pt;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.zealot-market-inventory h2 { margin: 2px 0 0; font-size: 14pt; }
+.zealot-market-inventory > header small { color: #d8caab; text-align: right; }
+.zealot-market-inventory__groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.zealot-market-inventory details + details { border-left: 1px solid #d2b77f; }
+.zealot-market-inventory summary { padding: 10px 13px; cursor: pointer; color: #5e3e20; font-weight: 800; }
+.zealot-market-inventory ul { margin: 0; padding: 0 13px 12px 28px; list-style: none; }
+.zealot-market-inventory li { margin: 3px 0; }
+.zealot-market-inventory li ul { padding: 2px 0 0 18px; }
+.zealot-market-inventory__item { display: inline-flex; align-items: center; gap: 5px; color: #5e3e20; font-size: 9pt; }
+.zealot-market-inventory__item img { width: 28px; height: 28px; image-rendering: pixelated; }
+.zealot-market-inventory__empty { margin: 0; padding: 0 13px 12px; color: #806b4b; font-size: 9pt; }
 
 .zealot-market-detail__bottom {
   display: grid;
@@ -2400,4 +2637,232 @@ body {
   .zealot-market-detail__equipment,
   .zealot-market-detail__skills,
   .zealot-market-detail__purchase { margin-top: 13px; }
+  .zealot-market-detail__equipment { grid-template-columns: repeat(5, 44px); }
+  .zealot-market-inventory { margin: 0 10px; }
+}
+
+/* Marketplace-specific small-screen polish.  The legacy site is table-first,
+ * while the Market is frequently used on a phone; these rules keep every
+ * action and listing readable without horizontal page overflow. */
+@media (max-width: 720px) {
+  .zealot-market-nav {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .zealot-market-nav a {
+    flex: 1 1 112px;
+    min-height: 36px;
+    padding: 0 9px;
+  }
+
+  .zealot-market-listings__header,
+  .zealot-market-sell__header,
+  .zealot-market-activity__header {
+    padding: 16px;
+  }
+
+  .zealot-market-listings h1,
+  .zealot-market-sell h1 {
+    font-size: 18pt;
+  }
+
+  .zealot-market-listings__sell,
+  .zealot-market-activity__action,
+  .zealot-market-filters button,
+  .zealot-market-sell__form button {
+    min-height: 36px;
+  }
+
+  .zealot-market-listings__header > div,
+  .zealot-market-activity__header > div {
+    min-width: 0;
+  }
+
+  .zealot-market-filters,
+  .zealot-market-sell__form {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .zealot-market-filters select,
+  .zealot-market-filters input,
+  .zealot-market-sell__form select,
+  .zealot-market-sell__form input,
+  .zealot-market-detail__purchase input {
+    min-height: 36px;
+    font-size: 16px;
+  }
+
+  .zealot-market-card {
+    margin: 10px;
+  }
+
+  .zealot-market-card__body {
+    gap: 10px;
+    padding: 11px;
+  }
+
+  .zealot-market-card__footer a {
+    min-height: 34px;
+  }
+
+  .zealot-market-detail {
+    margin: 10px;
+  }
+
+  .zealot-market-detail__back {
+    margin: 12px 12px 0;
+  }
+
+  .zealot-market-detail__header,
+  .zealot-market-detail__main,
+  .zealot-market-detail__bottom {
+    margin-right: 10px;
+    margin-left: 10px;
+    padding: 13px;
+  }
+
+  .zealot-market-detail__main,
+  .zealot-market-detail__bottom {
+    margin: 0;
+  }
+}
+
+@media (max-width: 500px) {
+  .zealot-market-listings__header,
+  .zealot-market-activity__header,
+  .zealot-market-card__header,
+  .zealot-market-card__footer,
+  .zealot-market-sell__balance {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .zealot-market-listings__sell,
+  .zealot-market-activity__header > .zealot-market-activity__action,
+  .zealot-market-card__footer a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .zealot-market-filters,
+  .zealot-market-sell__form {
+    grid-template-columns: 1fr;
+  }
+
+  .zealot-market-filters button,
+  .zealot-market-sell__rules,
+  .zealot-market-sell__form button {
+    grid-column: auto;
+  }
+
+  .zealot-market-filters__reset {
+    min-height: 36px;
+  }
+
+  .zealot-market-card__body {
+    grid-template-columns: 1fr;
+  }
+
+  .zealot-market-card__outfit {
+    flex-direction: row;
+    min-height: 76px;
+    gap: 10px;
+  }
+
+  .zealot-market-card__details {
+    grid-template-columns: 1fr;
+  }
+
+  .zealot-market-card__equipment {
+    grid-column: auto;
+    grid-template-columns: repeat(3, 36px);
+  }
+
+  .zealot-market-card__equipment > span {
+    width: 36px;
+    height: 36px;
+  }
+
+  .zealot-market-detail__equipment { grid-template-columns: repeat(3, 44px); }
+  .zealot-market-inventory > header,
+  .zealot-market-inventory__groups { display: block; }
+  .zealot-market-inventory > header small { display: block; margin-top: 5px; text-align: left; }
+  .zealot-market-inventory details + details { border-top: 1px solid #d2b77f; border-left: 0; }
+
+  .zealot-market-sell__rules {
+    grid-template-columns: 1fr;
+  }
+
+  .zealot-market-activity {
+    margin: 10px 0;
+    overflow: hidden;
+  }
+
+  .zealot-market-activity__table,
+  .zealot-market-activity__table tbody,
+  .zealot-market-activity__table tr,
+  .zealot-market-activity__table td {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .zealot-market-activity__table thead {
+    display: none;
+  }
+
+  .zealot-market-activity__table tbody tr {
+    padding: 6px 0;
+    border-bottom: 1px solid #b68c4b;
+  }
+
+  .zealot-market-activity__table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .zealot-market-activity__table td {
+    display: grid;
+    grid-template-columns: minmax(92px, .8fr) minmax(0, 1.2fr);
+    gap: 10px;
+    padding: 8px 11px;
+    border: 0;
+  }
+
+  .zealot-market-activity__table td::before {
+    content: attr(data-label);
+    color: #795735;
+    font-size: 7.5pt;
+    font-weight: bold;
+  }
+
+  .zealot-market-activity__table .is-action {
+    align-items: center;
+  }
+
+  .zealot-market-activity__actions {
+    justify-content: stretch;
+    flex-wrap: wrap;
+  }
+
+  .zealot-market-activity__action,
+  .zealot-market-activity__hide {
+    flex: 1 1 126px;
+    min-height: 36px;
+  }
+
+  .zealot-market-detail h1 {
+    font-size: 18pt;
+  }
+
+  .zealot-market-detail__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .zealot-market-detail__equipment {
+    grid-template-columns: repeat(3, 42px);
+    justify-content: start;
+  }
 }

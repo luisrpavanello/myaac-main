@@ -378,11 +378,12 @@ img {
 .DailyBoostSprite img {
   position: relative;
   z-index: 1;
-  width: 54px;
-  height: 54px;
+  width: var(--daily-boost-sprite-size, 54px);
+  height: var(--daily-boost-sprite-size, 54px);
   object-fit: contain;
   object-position: center bottom;
   margin-bottom: 7px;
+  image-rendering: pixelated;
 }
 
 .DailyBoostName {

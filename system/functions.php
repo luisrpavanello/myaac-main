@@ -118,6 +118,98 @@ function getLibraryCreatureImage($name, $fallback = 'demon')
   return 'images/library/' . $fallback . '.gif';
 }
 
+/**
+ * Resolves a Daily Boost sprite without ever substituting another creature.
+ *
+ * The generic library resolver above predates Daily Boosts and intentionally
+ * attempts a few loose name variations before falling back to a default
+ * monster. That behaviour is useful for legacy library pages, but is unsafe
+ * for a featured creature: displaying a Demon for an Eradicator is worse than
+ * explicitly showing that the verified sprite has not been registered yet.
+ */
+function getDailyBoostSpriteUrl($name, $lookType = null, $lookTypeEx = null)
+{
+  static $registry = null;
+
+  if ($registry === null) {
+    $registry = [];
+    $registryFile = SYSTEM . 'config/daily_boost_sprites.php';
+    if (file_exists($registryFile)) {
+      $configuredSprites = require $registryFile;
+      if (is_array($configuredSprites)) {
+        $registry = $configuredSprites;
+      }
+    }
+  }
+
+  $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', trim((string) $name));
+  $spriteKey = strtolower(preg_replace('/[^a-z0-9]/i', '', $transliterated === false ? (string) $name : $transliterated));
+  if ($spriteKey === '') {
+    return null;
+  }
+
+  // The preferred source is the sprite exported from the installed OTClient
+  // assets. The server persists this exact looktype with each daily boost, so
+  // this is independent from monster names and always mirrors the client.
+  if (is_numeric($lookType) && (int) $lookType > 0) {
+    $clientSpritePath = 'images/library/daily-boost/' . (int) $lookType . '.png';
+    if (file_exists(BASE . $clientSpritePath)) {
+      return $clientSpritePath;
+    }
+  }
+
+  // Some legacy outfits are represented by an item appearance (lookTypeEx)
+  // instead of a creature outfit. Keep that client-native path separate to
+  // avoid collisions with regular outfit looktypes.
+  if (is_numeric($lookTypeEx) && (int) $lookTypeEx > 0) {
+    $clientSpritePath = 'images/library/daily-boost/item-' . (int) $lookTypeEx . '.png';
+    if (file_exists(BASE . $clientSpritePath)) {
+      return $clientSpritePath;
+    }
+  }
+
+  // A registry entry is required only when the approved sprite filename does
+  // not match the boosted creature's normalized name.
+  if (isset($registry[$spriteKey]) && is_string($registry[$spriteKey])) {
+    $registeredPath = ltrim($registry[$spriteKey], '/');
+    if (strpos($registeredPath, 'images/library/') === 0 && strpos($registeredPath, '..') === false && file_exists(BASE . $registeredPath)) {
+      return $registeredPath;
+    }
+  }
+
+  // Normalized exact-name files are the convention for verified sprites.
+  // Do not try suffixes, singular forms, or a generic monster fallback here.
+  foreach (['gif', 'png', 'webp'] as $extension) {
+    $relativePath = 'images/library/' . $spriteKey . '.' . $extension;
+    if (file_exists(BASE . $relativePath)) {
+      return $relativePath;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Keeps small, original 32px client sprites from being enlarged more than
+ * larger 64px appearances in the Daily Boosts panel. The result preserves the
+ * size relationship the player sees in the client while leaving room for the
+ * pedestal artwork.
+ */
+function getDailyBoostSpriteDisplaySize($relativePath)
+{
+  if (!is_string($relativePath) || $relativePath === '' || strpos($relativePath, '..') !== false) {
+    return 54;
+  }
+
+  $dimensions = @getimagesize(BASE . ltrim($relativePath, '/'));
+  if ($dimensions === false) {
+    return 54;
+  }
+
+  $nativeSize = max((int) $dimensions[0], (int) $dimensions[1]);
+  return min(54, max(40, (int) ceil($nativeSize * 1.375)));
+}
+
 function message($message, $type, $return)
 {
   if (IS_CLI) {
@@ -226,6 +318,28 @@ function getLink($page, $action = null)
   return BASE_URL . ($config['friendly_urls'] ? '' : '?') . $page . ($action ? '/' . $action : '');
 }
 
+/**
+ * Builds a route URL with query parameters in both URL modes.
+ *
+ * Non-friendly routes use the first query token as the page name, so appending
+ * "&details" to getLink() would create an invalid route. Keep the page in the
+ * explicit subtopic parameter whenever a query string is needed.
+ */
+function getLinkWithQuery($page, array $query = [])
+{
+  global $config;
+  if (!$query) {
+    return getLink($page);
+  }
+
+  $queryString = http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+  if ($config['friendly_urls']) {
+    return getLink($page) . '?' . $queryString;
+  }
+
+  return BASE_URL . '?subtopic=' . rawurlencode($page) . '&' . $queryString;
+}
+
 function internalLayoutLink($page, $action = null)
 {
   return getLink($page, $action);
@@ -316,7 +430,7 @@ function getItemNameById($id)
   return !empty($item['name']) ? $item['name'] : '';
 }
 
-function getItemImage($id, $count = 1)
+function getItemImage($id, $count = 1, $fallbackImage = 'empty.gif')
 {
   $tooltip = '';
 
@@ -331,14 +445,15 @@ function getItemImage($id, $count = 1)
   }
 
   global $config;
-  return '<img src="' .
-    $config['item_images_url'] .
-    $file_name .
-    '.gif"' .
-    $tooltip .
-    ' width="32" height="32" border="0" alt="' .
-    $id .
-    '" />';
+  $itemImagesUrl = rtrim($config['item_images_url'], '/') . '/';
+  $fallback = $itemImagesUrl . basename($fallbackImage);
+  $alt = (int) $id > 0
+    ? 'Item #' . (int) $id
+    : ucwords(str_replace(['no_', '.gif', '_'], ['', '', ' '], basename($fallbackImage)));
+
+  return '<img src="' . $itemImagesUrl . $file_name . '.gif"' . $tooltip
+    . ' width="32" height="32" border="0" alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '" loading="lazy"'
+    . ' onerror="this.onerror=null;this.src=\'' . $fallback . '\';" />';
 }
 
 function getFlagImage($country)
