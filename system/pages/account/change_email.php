@@ -122,7 +122,7 @@ else
 		<td width="30">&nbsp;</td>
 		<td align=left>
 			<form action="' . getLink('account/email') . '" method="post"><input type="hidden" name="changeemailsave" value=1 >
-				<INPUT TYPE=image NAME="I Agree" SRC="' . $template_path . '/images/global/buttons/sbutton_iagree.gif" BORDER=0 WIDTH=120 HEIGHT=17>
+				<button class="zealot-button" type="submit" name="I Agree" value="1">I agree</button>
 			</form>
 		</td>
 		<td align=left>

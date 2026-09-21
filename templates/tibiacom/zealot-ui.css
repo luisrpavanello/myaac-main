@@ -169,6 +169,94 @@ body {
   font-weight: bold;
 }
 
+/* Section controls sit inside their caption: the caption always remains
+ * visible while its panel body can be collapsed. */
+.Content .CaptionInnerContainer > .TopButtonContainer {
+  display: block !important;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 100%;
+  z-index: 80;
+}
+
+.Content .CaptionInnerContainer > .TopButtonContainer .TopButton {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%);
+  overflow: hidden;
+  z-index: 80;
+}
+
+.Content .TopButtonContainer .TopButton a {
+  display: grid;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #826843;
+  border-radius: 2px;
+  background: #10261d;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .45);
+  color: var(--zealot-gold-light);
+  font: 800 21px/24px Arial, sans-serif;
+  text-decoration: none;
+}
+
+.Content .TopButtonContainer .TopButton a::after {
+  position: relative;
+  top: -2px;
+  content: '⌃';
+}
+
+.Content .TopButtonContainer .TopButton a.is-collapsed::after {
+  top: -3px;
+  content: '⌄';
+}
+.Content .TopButtonContainer .TopButton img { display: none; }
+
+.Content .TopButtonContainer .TopButton a:hover,
+.Content .TopButtonContainer .TopButton a:focus-visible {
+  border-color: #fff1c8;
+  background: var(--zealot-forest-hover);
+  color: #fff1c8;
+}
+
+/* Download artwork supplied for the official Zealot client. It remains a
+ * large, obvious click target without overwhelming the client information. */
+.Content .zealot-client-download {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.Content .zealot-client-download__art {
+  display: block;
+  width: min(168px, 72vw);
+  height: min(168px, 72vw);
+  margin: 12px auto;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;
+  object-position: center;
+}
+
+.Content .zealot-client-download__title {
+  font-size: 12pt;
+}
+
+.Content .zealot-client-download__platform {
+  font-size: 10pt;
+}
+
 /* The account-login template keeps its two actions in a legacy table cell.
  * Reserve an explicit gutter on the right so the fixed-width buttons never
  * sit on top of the panel frame when the content column grows. */
@@ -1462,10 +1550,28 @@ body {
   z-index: 2;
 }
 
-/* Labels remain the original raster lettering; this only shifts their tone
- * toward the logo's gold without changing their typeface or texture. */
-#MenuColumn #Menu .MenuButton .Label {
-  filter: sepia(0.28) saturate(1.35) brightness(1.08) drop-shadow(1px 1px 1px #000);
+/* Category names are real text so the navigation shares the Market's
+ * editorial typeface while retaining the original illustrated icons. */
+#MenuColumn #Menu .MenuButton .Label.zealot-menu-category-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  top: 0;
+  left: 42px;
+  width: 116px;
+  height: 32px;
+  padding: 0 8px 0 0;
+  background: none !important;
+  color: #fff1c8;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 1px 2px 1px #09140f, 0 0 3px rgba(0, 0, 0, .8);
+  white-space: nowrap;
 }
 
 #MenuColumn #Menu .MenuButton:hover .Button {
@@ -1518,6 +1624,15 @@ body {
 
 #MenuColumn #Menu .Submenuitem:hover .SubmenuitemLabel {
   color: #fff1c8 !important;
+}
+
+#MenuColumn #Menu .SubmenuitemLabel {
+  color: #eadbbd !important;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  text-shadow: 1px 1px 1px #09140f;
 }
 
 /* Sidebar calls-to-action share one green/gold treatment regardless of which
@@ -1598,11 +1713,23 @@ body {
   border-bottom-color: var(--zealot-gold);
   background: linear-gradient(90deg, #10261d, var(--zealot-forest), #10261d) !important;
   box-shadow: inset 0 1px 0 rgba(231, 196, 125, 0.2), inset 0 0 0 1px #426755;
-  color: var(--zealot-gold-light) !important;
-  font-family: Verdana, Arial, sans-serif;
+  color: #fff1c8 !important;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 19px;
   font-weight: bold;
+  letter-spacing: 0.01em;
   line-height: 45px !important;
-  text-shadow: 1px 1px 1px #000;
+  text-shadow: 1px 2px 1px #09140f, 0 0 3px rgba(0, 0, 0, .8);
+}
+
+/* Central page and panel captions use the same Zealot Market hierarchy. */
+.Content .TitleText,
+.Content .TableContainer .CaptionContainer .Text {
+  color: #fff1c8 !important;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  text-shadow: 1px 2px 1px #09140f, 0 0 3px rgba(0, 0, 0, .8);
 }
 
 #Themeboxes .rank_content,
@@ -1880,6 +2007,7 @@ body {
  * A defined surface makes it the closing element of the content column. */
 #Footer {
   box-sizing: border-box;
+  width: calc(100% - 10px);
   margin: 22px 5px 20px;
   padding: 13px 18px;
   border: 1px solid #526251;

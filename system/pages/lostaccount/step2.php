@@ -78,6 +78,6 @@ if ($action == 'step2') {
     } else
         echo 'Invalid player name format. If you have other characters on account try with other name.';
     echo '<BR /><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<a href="?subtopic=lostaccount&action=step1&action_type=reckey&nick=' . urlencode($nick) . '" border="0"><IMG SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" NAME="Back" ALT="Back" BORDER=0 WIDTH=120 HEIGHT=18></a></div>
+				<a class="zealot-button" href="?subtopic=lostaccount&action=step1&action_type=reckey&nick=' . urlencode($nick) . '">Back</a></div>
 				</TD></TR></FORM></TABLE></TABLE>';
 }

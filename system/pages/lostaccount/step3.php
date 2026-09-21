@@ -63,7 +63,7 @@ if ($action == 'step3') {
 							<INPUT TYPE=hidden NAME="password_login" VALUE="' . $new_pass . '">
 							</TD></TR></TABLE><BR>
 							<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-							<INPUT TYPE=image NAME="Login" ALT="Login" SRC="' . $template_path . '/images/global/buttons/sbutton_login.gif" BORDER=0 WIDTH=120 HEIGHT=18></div>
+							<button class="zealot-button" type="submit" name="Login" value="1">Login</button></div>
 							</TD></TR></FORM></TABLE></TABLE>';
                         } else
                             echo Validator::getLastError();
@@ -78,6 +78,6 @@ if ($action == 'step3') {
     } else
         echo 'Invalid player name format. If you have other characters on account try with other name.';
     echo '<BR /><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<a href="?subtopic=lostaccount&action=step1&action_type=reckey&nick=' . urlencode($nick) . '" border="0"><IMG SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" NAME="Back" ALT="Back" BORDER=0 WIDTH=120 HEIGHT=18></a></div>
+				<a class="zealot-button" href="?subtopic=lostaccount&action=step1&action_type=reckey&nick=' . urlencode($nick) . '">Back</a></div>
 				</TD></TR></FORM></TABLE></TABLE>';
 }

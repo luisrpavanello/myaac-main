@@ -78,7 +78,7 @@
     <div class="donate_header">Payment Center</div>
     <div class="donate_content">
         <div>
-            <img src="<?= $template_path; ?>/images/themeboxes/donate/zealot-coins.gif?v=<?= filemtime(__DIR__ . '/../images/themeboxes/donate/zealot-coins.gif'); ?>" alt="Zealot coins increasing from 1 to 100">
+            <img src="<?= $template_path; ?>/images/themeboxes/donate/zealot-coins.gif?v=<?= filemtime(__DIR__ . '/../images/themeboxes/donate/zealot-coins.gif'); ?>" alt="Animated Zealot coin stacks">
         </div>
         <a href="<?php echo BASE_URL ?>?subtopic=donate&type=coins">
             <button type="button" class="donate_button">Buy Coins</button>

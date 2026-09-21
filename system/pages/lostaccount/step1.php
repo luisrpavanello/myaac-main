@@ -39,7 +39,7 @@ if ($action == 'step1' && $action_type == 'email') {
     }
 
     echo '<BR /><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<a href="?subtopic=lostaccount" border="0"><IMG SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" NAME="Back" ALT="Back" BORDER=0 WIDTH=120 HEIGHT=18></a></div>
+				<a class="zealot-button" href="?subtopic=lostaccount">Back</a></div>
 				</TD></TR></FORM></TABLE></TABLE>';
 } elseif ($action == 'step1' && $action_type == 'reckey') {
     $nick = stripslashes($_REQUEST['nick']);
@@ -72,6 +72,6 @@ if ($action == 'step1' && $action_type == 'email') {
     } else
         echo 'Invalid player name format. If you have other characters on account try with other name.';
     echo '<BR /><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<a href="?subtopic=lostaccount" border="0"><IMG SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" NAME="Back" ALT="Back" BORDER=0 WIDTH=120 HEIGHT=18></a></div>
+				<a class="zealot-button" href="?subtopic=lostaccount">Back</a></div>
 				</TD></TR></FORM></TABLE></TABLE>';
 }

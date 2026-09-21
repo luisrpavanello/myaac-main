@@ -42,20 +42,42 @@ if (empty($getpage_download)) {
                                         <table class="TableContent" width="100%" style="border:1px solid #faf0d7;">
                                             <tbody>
                                             <tr>
-                                                <td style="text-align: center; padding: 1.5rem;">
+                                                <td class="zealot-client-download">
                                                     <h1>Official <?= configLua('serverName') ?> Client</h1>
-                                                    <a href="<?= $config['client_link'] ?? '' ?>" target="_new">
+                                                    <a class="zealot-client-download__link" href="<?= $config['client_link'] ?? '' ?>" target="_new">
                                                         <img alt="<?= configLua('serverName') ?> Client"
-                                                             style="width: 90px; height: 90px; border: 0;"
-                                                             src="<?= $template_path ?>/images/download_windows.gif">
+                                                             class="zealot-client-download__art"
+                                                             src="<?= $template_path ?>/images/zealot-client-download.png">
                                                         <br>
-                                                        <span style="font-size: 12pt;">
+                                                        <span class="zealot-client-download__title">
                                                         Download <?= configLua('serverName') ?> Client
                                                         <br>
-                                                        <span style="font-size: 10pt;">MacOS Client</span></span>
+                                                        <span class="zealot-client-download__platform" data-platform-label>Client for your device</span></span>
                                                         <br>
                                                         <small>Version <?= config('client') / 100 ?></small>
                                                     </a>
+                                                    <script>
+                                                        (() => {
+                                                            const source = [
+                                                                navigator.userAgentData?.platform,
+                                                                navigator.platform,
+                                                                navigator.userAgent
+                                                            ].filter(Boolean).join(' ').toLowerCase();
+
+                                                            let platform = 'Client for your device';
+                                                            if (source.includes('win')) {
+                                                                platform = 'Windows Client';
+                                                            } else if (source.includes('mac')) {
+                                                                platform = 'macOS Client';
+                                                            } else if (source.includes('linux')) {
+                                                                platform = 'Linux Client';
+                                                            }
+
+                                                            document.querySelectorAll('[data-platform-label]').forEach((element) => {
+                                                                element.textContent = platform;
+                                                            });
+                                                        })();
+                                                    </script>
                                                 </td>
                                             </tr>
                                             </tbody>

@@ -33,7 +33,7 @@ if ($action == 'step1' && $action_type == 'no_char') {
         echo 'Invalid action. Try again.<br/>';
 
         echo '<BR /><BR /><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<a href="?subtopic=lostaccount" border="0"><IMG SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" NAME="Back" ALT="Back" BORDER=0 WIDTH=120 HEIGHT=18></a></div>
+				<a class="zealot-button" href="?subtopic=lostaccount">Back</a></div>
 				</TD></TR></FORM></TABLE></TABLE>';
         return;
     };
@@ -78,7 +78,7 @@ if ($action == 'step1' && $action_type == 'no_char') {
     }
 
     echo '<br /><br /><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<a href="?subtopic=lostaccount" border="0"><IMG SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" NAME="Back" ALT="Back" BORDER=0 WIDTH=120 HEIGHT=18></a></div>
+				<a class="zealot-button" href="?subtopic=lostaccount">Back</a></div>
 				</TD></TR></FORM></TABLE></TABLE>';
 
 } else {
@@ -131,7 +131,7 @@ if ($action == 'step1' && $action_type == 'no_char') {
             echo 'Invalid player name format. If you have other characters on account try with other name.';
 
         echo '<BR /><TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<a href="?subtopic=lostaccount&action=step1&action_type=email&nick=' . urlencode($nick) . '" border="0"><IMG SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" NAME="Back" ALT="Back" BORDER=0 WIDTH=120 HEIGHT=18></a></div>
+				<a class="zealot-button" href="?subtopic=lostaccount&action=step1&action_type=email&nick=' . urlencode($nick) . '">Back</a></div>
 				</TD></TR></FORM></TABLE></TABLE>';
     } elseif ($action == 'checkcode') {
         $code = trim($_REQUEST['code']);
@@ -221,7 +221,7 @@ if ($action == 'step1' && $action_type == 'no_char') {
             echo '<span style="color: red"><b>Error. Try again.</b></span><br />Please enter code from e-mail and name of one character from account. Then press Submit.<BR>
 				<BR><FORM ACTION="?subtopic=lostaccount&action=checkcode" METHOD=post>
 				<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
-				<INPUT TYPE=image NAME="Back" ALT="Back" SRC="' . $template_path . '/images/global/buttons/sbutton_back.gif" BORDER=0 WIDTH=120 HEIGHT=18></div>
+				<button class="zealot-button" type="submit" name="Back" value="1">Back</button></div>
 				</TD></TR></FORM></TABLE></TABLE>';
         else {
             $account = new OTS_Account();
@@ -274,7 +274,7 @@ if ($action == 'step1' && $action_type == 'no_char') {
 				<BR>
 				<TABLE CELLSPACING=0 CELLPADDING=0 BORDER=0 WIDTH=100%><TR><TD><div style="text-align:center">
 				<FORM ACTION="?subtopic=accountmanagement" METHOD=post>
-				<INPUT TYPE=image NAME="Login" ALT="Login" SRC="' . $template_path . '/images/global/buttons/sbutton_login.gif" BORDER=0 WIDTH=120 HEIGHT=18></div>
+				<button class="zealot-button" type="submit" name="Login" value="1">Login</button></div>
 				</TD></TR></FORM></TABLE></TABLE>';
                     } else
                         $error = Validator::getLastError();

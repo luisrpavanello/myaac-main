@@ -429,8 +429,7 @@ if (isset($config['boxes']))
                                         </span>
                                         <div id='<?= $cat['id']; ?>_Icon' class='Icon'
                                              style='background-image:url(<?= $template_path ?><?= getImageMenuRandom($cat['id']) ?>);'></div>
-                                        <div id='<?= $cat['id']; ?>_Label' class='Label'
-                                             style='background-image:url(<?= $template_path; ?>/images/menu/label-<?= $cat['id']; ?>.gif);'></div>
+                                        <div id='<?= $cat['id']; ?>_Label' class='Label zealot-menu-category-label'><?= htmlspecialchars($cat['name']); ?></div>
                                         <div id='<?= $cat['id']; ?>_Extend' class='Extend'
                                              style='background-image:url(<?= $template_path; ?>/images/general/plus.gif);'></div>
                                     </div>
@@ -498,7 +497,7 @@ if (isset($config['boxes']))
                                         <svg class="zealot-quick-action__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                             <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14"/>
                                         </svg>
-                                        <span>Download Client</span>
+                                        <span>Download Zealot Client</span>
                                     </a>
 
                                     <?php if (!empty($config['discord_link'])) { ?>
@@ -634,28 +633,7 @@ if (isset($config['boxes']))
                                  style="background-image:url(<?= $template_path; ?>/images/content/border-1.gif);"></div>
                             <div class="BorderTitleText"
                                  style="background-image:url(<?= $template_path; ?>/images/content/title-background-green.gif);"></div>
-                            <?php
-                            $headline = null;
-                            $headline_candidates = array_unique(array_filter([
-                                defined('PAGE') ? PAGE : null,
-                                isset($page) ? $page : null,
-                                preg_replace('/[^a-z0-9]/', '', strtolower((string)$title)),
-                            ]));
-
-                            foreach ($headline_candidates as $candidate) {
-                                $candidate = strtolower($candidate);
-                                $headline_file = $template_path . '/images/header/headline-' . $candidate . '.gif';
-                                if (file_exists(BASE . $headline_file)) {
-                                    $headline = $headline_file;
-                                    break;
-                                }
-                            }
-                            ?>
-                            <?php if ($headline !== null): ?>
-                                <img class="Title" src="<?= $headline; ?>" alt="<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?>"/>
-                            <?php else: ?>
-                                <div class="Title TitleText"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></div>
-                            <?php endif; ?>
+                            <div class="Title TitleText"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></div>
                             <div class="Border_2">
                                 <div class="Border_3">
                                     <?php $hooks->trigger(HOOK_TIBIACOM_BORDER_3); ?>
@@ -803,21 +781,45 @@ if (isset($config['boxes']))
             $('html, body').animate({scrollTop: 0}, 800);
             return false;
         });
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        //Check to see if the window is top if not then display button
-        $(window).scroll(function () {
-            if ($(this).scrollTop() > 100) {
-                $('.TopButton').fadeIn();
+
+        // Keep every section caption visible. The control lives in that caption
+        // and only collapses the body below it, never the section title itself.
+        $('.TopButtonContainer .TopButton a').each(function (index) {
+            const $trigger = $(this);
+            const $control = $trigger.closest('.TopButtonContainer');
+            const $content = $control.next('.TableContainer, table');
+            const $panel = $content.hasClass('TableContainer')
+                ? $content
+                : $content.find('.TableContainer').first();
+            const $caption = $panel.children('.CaptionContainer').first();
+            const $body = $panel.children().not('.CaptionContainer');
+
+            if (!$panel.length || !$caption.length || !$body.length) {
+                return;
             }
+
+            const sectionId = 'zealot-collapsible-section-' + index;
+            $body.attr('id', sectionId);
+            $control.appendTo($caption.find('.CaptionInnerContainer').first());
+            $trigger
+                .attr('href', '#' + sectionId)
+                .attr('role', 'button')
+                .attr('title', 'Recolher seção')
+                .attr('aria-label', 'Recolher seção')
+                .attr('aria-controls', sectionId)
+                .attr('aria-expanded', 'true')
+                .on('click', function (event) {
+                    event.preventDefault();
+                    const isExpanded = $trigger.attr('aria-expanded') === 'true';
+                    $body.stop(true, true).slideToggle(160);
+                    $trigger
+                        .attr('aria-expanded', String(!isExpanded))
+                        .attr('title', isExpanded ? 'Expandir seção' : 'Recolher seção')
+                        .attr('aria-label', isExpanded ? 'Expandir seção' : 'Recolher seção')
+                        .toggleClass('is-collapsed', isExpanded);
+                });
         });
-        //Click event to scroll to top
-        $('.TopButton').click(function () {
-            $('html, body').animate({scrollTop: 0}, 800);
-            return false;
-        });
+
     });
 </script>
 <button class="scrollToTop" type="button" title="Voltar ao topo" aria-label="Voltar ao topo">
