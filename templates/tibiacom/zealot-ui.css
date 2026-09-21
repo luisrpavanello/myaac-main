@@ -1836,6 +1836,60 @@ body {
   image-rendering: pixelated;
 }
 
+/* Account management reuses the real Zealot client artwork instead of the
+ * old Windows-only download GIF, while keeping a compact call to action. */
+.Content .account-download-client {
+  display: flex;
+  align-items: center;
+  min-height: 68px;
+  gap: 14px;
+  padding: 4px 8px;
+}
+
+.Content .account-download-client__art {
+  display: inline-flex;
+  flex: 0 0 74px;
+  flex-direction: column;
+  align-items: center;
+  color: #76521d;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+}
+
+.Content .account-download-client__art img {
+  display: block;
+  width: 64px;
+  height: 54px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.Content .account-download-client__art:hover,
+.Content .account-download-client__art:focus-visible {
+  color: #b27b26;
+  text-decoration: underline;
+}
+
+.Content .account-download-client__copy {
+  flex: 1;
+  color: #5a3416;
+}
+
+.Content .account-character-status {
+  min-width: 116px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.Content .account-character-status > img {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
 /* Quest completion is no longer a lone pixel-art X. The result is centered
  * in its column and remains understandable without relying on colour. */
 .character-quest-status-cell {

@@ -193,15 +193,12 @@
                     <tbody>
                     <tr>
                       <td>
-                        <div style="height: 55px;">
-                          <div id="DowloadBox" style="position: relative; float:right;">
-                            <a href="?downloadclient"><img
-                                style="width: 45px; height: 45px; border: 0px; margin-right: 10px;"
-                                src="{{ template_path }}/images/account/download_windows.gif"></a>
-                            <br>
-                            <a style="position: absolute; bottom: -5px; right: 0px;" href="?downloadclient">Download</a>
-                          </div>
-                          <span style="position: relative; top: 18px;">Click <a href="?downloadclient">here</a> to download the latest {{ config['lua']['serverName'] }} client!</span>
+                        <div class="account-download-client">
+                          <a class="account-download-client__art" href="?downloadclient" aria-label="Download {{ config['lua']['serverName'] }} Client">
+                            <img src="{{ template_path }}/images/zealot-client-download.png" alt="">
+                            <span>Download Client</span>
+                          </a>
+                          <span class="account-download-client__copy">Click <a href="?downloadclient">here</a> to download the latest {{ config['lua']['serverName'] }} client!</span>
                         </div>
                       </td>
                     </tr>
@@ -367,14 +364,14 @@
                             </small>
                           </span>
                         </td>
-                        <td>
+                        <td class="account-character-status">
                           <img id="DailyReawardState"
                                src="{{ template_path }}/images/global/content/icon-status-dailyreward-collected.png"
                                alt="Daily Reward collected" title="Daily Reward collected">
                           {% if player.isOnline() %}
-                            <img src="templates/tibiacom/images/on.gif" title="Online">
+                            <span class="character-status character-status--online" title="Online"><i aria-hidden="true"></i>Online</span>
                           {% else %}
-                            <img src="templates/tibiacom/images/off.gif" title="Offline">
+                            <span class="character-status character-status--offline" title="Offline"><i aria-hidden="true"></i>Offline</span>
                           {% endif %}
                         </td>
                         <td align="center">
