@@ -121,7 +121,10 @@ if ($db->hasColumn('players', 'deletion'))
 
 $outfit_addons = false;
 $outfit = '';
+$outfitRenderer = null;
 if ($config['highscores_outfit']) {
+    require_once LIBS . 'ZealotMarket.php';
+    $outfitRenderer = new ZealotMarket($db, $config);
     $outfit = ', lookbody, lookfeet, lookhead, looklegs, looktype';
     if ($db->hasColumn('players', 'lookaddons')) {
         $outfit .= ', lookaddons';
@@ -371,8 +374,17 @@ if (!$rank_vocation = $_POST['profession'] ?? null) {
                                                     $player['value'] = $player['level'];
                                                 echo '
 			<tr style="height: 64px;"><td>' . ($offset + $i) . '.</td>';
-                                                if ($config['highscores_outfit'])
-                                                    echo '<td style="width:72px; text-align:center;"><img style="display:block; width:64px; height:64px; object-fit:contain; margin:0 auto;" src="' . getVocationImage($player['vocation']) . '" alt="" /></td>';
+                                                if ($config['highscores_outfit']) {
+                                                    $outfitUrl = $outfitRenderer->currentOutfitUrl([
+                                                        'looktype' => $player['looktype'] ?? 0,
+                                                        'addons' => $player['lookaddons'] ?? 0,
+                                                        'head' => $player['lookhead'] ?? 0,
+                                                        'body' => $player['lookbody'] ?? 0,
+                                                        'legs' => $player['looklegs'] ?? 0,
+                                                        'feet' => $player['lookfeet'] ?? 0,
+                                                    ]) ?? getVocationImage($player['vocation']);
+                                                    echo '<td style="width:72px; text-align:center;"><img class="zealot-highscores-outfit" src="' . htmlspecialchars($outfitUrl, ENT_QUOTES, 'UTF-8') . '" alt="" /></td>';
+                                                }
 
                                                 echo '
 			<td>

@@ -1,3 +1,35 @@
+<?php
+global $db, $config;
+
+require_once LIBS . 'ZealotMarket.php';
+
+$topPlayers = getTopPlayers(5);
+$outfitRenderer = new ZealotMarket($db, $config);
+$appearanceByPlayer = [];
+$topPlayerIds = array_values(array_filter(array_map(static fn($player) => (int) ($player['id'] ?? 0), $topPlayers)));
+if ($topPlayerIds) {
+    $columns = '`id`, `looktype`, `lookhead`, `lookbody`, `looklegs`, `lookfeet`';
+    if ($db->hasColumn('players', 'lookaddons')) {
+        $columns .= ', `lookaddons`';
+    }
+    foreach ($db->query('SELECT ' . $columns . ' FROM `players` WHERE `id` IN (' . implode(', ', $topPlayerIds) . ')') as $appearance) {
+        $appearanceByPlayer[(int) $appearance['id']] = $appearance;
+    }
+}
+
+foreach ($topPlayers as &$player) {
+    $appearance = $appearanceByPlayer[(int) $player['id']] ?? $player;
+    $player['outfit'] = $outfitRenderer->currentOutfitUrl([
+        'looktype' => $appearance['looktype'] ?? 0,
+        'addons' => $appearance['lookaddons'] ?? 0,
+        'head' => $appearance['lookhead'] ?? 0,
+        'body' => $appearance['lookbody'] ?? 0,
+        'legs' => $appearance['looklegs'] ?? 0,
+        'feet' => $appearance['lookfeet'] ?? 0,
+    ]) ?? getVocationImage($player['vocation']);
+}
+unset($player);
+?>
 <style>
     .rank{
         width: 180px;
@@ -33,12 +65,13 @@
         padding: 10px 5px;
     }
     .rank_outfit{
-        position: absolute;
-        width: 64px;
-        height: 64px;
-        background-position: bottom right;
-        left: -15px;
-        margin-top: -30px;
+        position: relative;
+        flex: 0 0 56px;
+        width: 56px;
+        height: 56px;
+        margin: 0 -6px 0 -10px;
+        object-fit: contain;
+        image-rendering: pixelated;
     }
     .rank_text{
         margin-left: 45px;
@@ -70,13 +103,11 @@
     <div class="rank_header">Highscores</div>
     <div class="rank_content">
         <?php
-        $topPlayers = getTopPlayers(5);
         foreach($topPlayers as $player){
-            $player['outfit'] = getVocationImage($player['vocation']);
             $player_voc = $config['vocations'][$player['vocation']];
         ?>
         <div class="rank_player">
-            <div class="rank_outfit" style="background-image: url('<?php echo $player['outfit'] ?>')"></div>
+            <img class="rank_outfit" src="<?php echo htmlspecialchars($player['outfit'], ENT_QUOTES, 'UTF-8') ?>" alt=""/>
             <div class="rank_text">
                 <a href="<?php echo getPlayerLink($player['name'], false) ?>"><b><?php echo $player['name'] ?></b></a><br>
                 <small>Level: <?php echo $player['level'] ?> / <?php echo $player_voc ?></small>

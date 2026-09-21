@@ -1606,6 +1606,295 @@ body {
   color: #fff1c8;
 }
 
+/* Character page accordions use the same compact marker language as FAQ.
+ * The legacy implementation swaps blue circle GIFs through CollapseTable();
+ * these rules intentionally override that image while preserving its existing
+ * expand/collapse behaviour and class changes. */
+.character-accordion-marker.CircleSymbolMinus,
+.character-accordion-marker.CircleSymbolPlus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px !important;
+  height: 20px !important;
+  border: 1px solid #0c1d16;
+  background: var(--zealot-forest) !important;
+  background-image: none !important;
+  color: var(--zealot-gold-light);
+  cursor: pointer;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.character-accordion-marker.CircleSymbolMinus::after {
+  content: '+';
+}
+
+.character-accordion-marker.CircleSymbolPlus {
+  background: var(--zealot-ruby) !important;
+  color: #fff1c8;
+}
+
+.character-accordion-marker.CircleSymbolPlus::after {
+  content: '\2212';
+}
+
+.character-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 18px;
+  padding: 1px 7px 1px 6px;
+  border: 1px solid #92733f;
+  border-radius: 9px;
+  background: #eee0c2;
+  color: #49321c;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: bold;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.character-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .35), 0 0 5px currentColor;
+}
+
+.character-status--online {
+  border-color: #4b8657;
+  background: #d9ead2;
+  color: #1b6a39;
+}
+
+.character-status--online i {
+  background: #35a85b;
+}
+
+.character-status--offline {
+  border-color: #9a7653;
+  background: #e8d9c1;
+  color: #765237;
+}
+
+.character-status--offline i {
+  background: #98735a;
+}
+
+/* Character Details: give the live outfit the same framed presentation used
+ * by the Zealot Market without changing the original character data. */
+.character-details-outfit-cell {
+  padding: 6px !important;
+}
+
+.character-details-outfit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 112px;
+  overflow: hidden;
+  border: 1px solid #b18c56;
+  background: linear-gradient(180deg, #e1cfae, #f9ecd4);
+  box-shadow: inset 0 0 0 2px rgba(255, 248, 226, .48);
+}
+
+.character-details-outfit__sprite {
+  display: block;
+  max-width: 88px;
+  max-height: 104px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform: scale(1.12);
+}
+
+/* Compact, readable health and mana bars for the character sheet. */
+.character-vitals tr {
+  background: transparent !important;
+}
+
+.character-vitals tr,
+.character-experience tr {
+  height: 52px;
+}
+
+.character-vitals__label {
+  color: #72502d;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  letter-spacing: .02em;
+  text-align: center !important;
+  vertical-align: middle;
+}
+
+.character-vitals__value {
+  color: #4d2b13;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  padding: 7px 18px !important;
+  vertical-align: middle;
+}
+
+.character-vitals__value > span {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.character-vitals__value small {
+  color: #836143;
+  font-size: 7pt;
+}
+
+.character-vitals__bar {
+  height: 11px;
+  margin: 0 8px 3px;
+  overflow: hidden;
+  border: 1px solid #6d4a27;
+  border-radius: 7px;
+  background: #1a2f28;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .56), 0 1px 0 rgba(255, 248, 224, .66);
+}
+
+.character-vitals__bar .progress-bar {
+  min-width: 2px;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .42);
+}
+
+.character-vitals__bar--health .progress-bar {
+  background: linear-gradient(90deg, #a92833, #df3e49 55%, #f26b67) !important;
+}
+
+.character-vitals__bar--mana .progress-bar {
+  background: linear-gradient(90deg, #174f99, #248be5 55%, #63b6ff) !important;
+}
+
+/* The experience area follows the same two-column rhythm, with a distinct
+ * gold-to-green progression that makes it readable at a glance. */
+.character-experience tr {
+  background: transparent !important;
+}
+
+.character-experience__label {
+  color: #72502d;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+  letter-spacing: .02em;
+  text-align: center !important;
+  vertical-align: middle;
+}
+
+.character-experience__value {
+  color: #4d2b13;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  padding: 7px 18px !important;
+  vertical-align: middle;
+}
+
+.character-experience__value > span {
+  display: block;
+  margin-bottom: 3px;
+  text-align: center;
+}
+
+.character-experience__value small {
+  color: #836143;
+  font-size: 7pt;
+}
+
+.character-experience__bar {
+  height: 11px;
+  margin: 0 8px 3px;
+  overflow: hidden;
+  border: 1px solid #6d4a27;
+  border-radius: 7px;
+  background: #1a2f28;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .56), 0 1px 0 rgba(255, 248, 224, .66);
+}
+
+.character-experience__bar .progress-bar {
+  min-width: 2px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #93701f, #d1a946 55%, #91b35b) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .42);
+}
+
+.zealot-highscores-outfit {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* Quest completion is no longer a lone pixel-art X. The result is centered
+ * in its column and remains understandable without relying on colour. */
+.character-quest-status-cell {
+  width: 10%;
+  min-width: 116px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.character-quest-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 88px;
+  padding: 3px 7px;
+  border: 1px solid #92733f;
+  border-radius: 9px;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.character-quest-status i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-style: normal;
+  line-height: 1;
+}
+
+.character-quest-status--complete {
+  border-color: #4c8657;
+  background: #d9ead2;
+  color: #1b6a39;
+}
+
+.character-quest-status--complete i {
+  background: #35a85b;
+  color: #f4ffe8;
+}
+
+.character-quest-status--incomplete {
+  border-color: #9a7653;
+  background: #e8d9c1;
+  color: #765237;
+}
+
+.character-quest-status--incomplete i {
+  background: #9d493e;
+  color: #fff0df;
+}
+
 .faq-answer {
   padding: 12px 14px 14px 42px;
   border-top: 1px dotted #9a7b4d;

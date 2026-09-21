@@ -59,8 +59,8 @@
                             <td width="20%" class="LabelV175">Name:</td>
                             <td>{% if skull is not null %}<img
                                 src="images/{{ skull }}.gif">{% endif %} {{ player.getName() }} {{ oldName }} {% if player.isOnline() %}
-                                <img src="{{ template_path }}/images/on.gif" title="Online">{% else %}<img
-                                src="{{ template_path }}/images/off.gif" title="Offline">{% endif %}
+                                <span class="character-status character-status--online" title="Online"><i aria-hidden="true"></i>Online</span>{% else %}
+                                <span class="character-status character-status--offline" title="Offline"><i aria-hidden="true"></i>Offline</span>{% endif %}
                               <div style="float: right"></div>
                             </td>
                           </tr>
@@ -308,10 +308,10 @@
                     <table class="TableContent" width="100%" style="border:1px solid #faf0d7;">
                       <tbody>
                       <tr bgcolor="{{ getStyle(2) }}">
-                        <td style="border:0; width: 96px; height: 120px; text-align:center; vertical-align:middle;">
-                          <div style="width:96px; height:112px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                        <td class="character-details-outfit-cell" style="border:0; width: 96px; height: 120px; text-align:center; vertical-align:middle;">
+                          <div class="character-details-outfit">
                             <img
-                              style="display:block; max-width:88px; max-height:104px; object-fit:contain;"
+                              class="character-details-outfit__sprite"
                               src="{{ outfit }}" alt="" onerror="this.onerror=null; this.src='{{ outfit_fallback }}';"/>
                           </div>
                         </td>
@@ -422,23 +422,23 @@
             <tr>
               <td>
                 <div class="TableContentContainer">
-                  <table class="TableContent" width="100%" style="border:1px solid #faf0d7;">
+                  <table class="TableContent character-vitals" width="100%" style="border:1px solid #faf0d7;">
                     <tbody>
                     <tr bgcolor="{{ getStyle(2) }}">
-                      <td style="border:0px; width:15%; text-align: right;"><b>Health:</b></td>
-                      <td style="border:0px; text-align: center;">
-                        {{ health_current }}/{{ health_max }} ({{ health_percent }}%)
-                        <div class="progress">
+                      <td class="character-vitals__label" style="border:0px; width:15%; text-align: right;"><b>Health</b></td>
+                      <td class="character-vitals__value" style="border:0px; text-align: center;">
+                        <span>{{ health_current }}/{{ health_max }} <small>({{ health_percent }}%)</small></span>
+                        <div class="progress character-vitals__bar character-vitals__bar--health">
                           <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="{{ health_percent }}"
                                aria-valuemin="0" aria-valuemax="100" style="width: {{ health_percent }}%;"></div>
                         </div>
                       </td>
                     </tr>
                     <tr bgcolor="{{ getStyle(2) }}">
-                      <td style="border:0px; width:15%; text-align: right;"><b>Mana:</b></td>
-                      <td style="border:0px; text-align: center;">
-                        {{ mana_current }}/{{ mana_max }} ({{ mana_percent }}%)
-                        <div class="progress">
+                      <td class="character-vitals__label" style="border:0px; width:15%; text-align: right;"><b>Mana</b></td>
+                      <td class="character-vitals__value" style="border:0px; text-align: center;">
+                        <span>{{ mana_current }}/{{ mana_max }} <small>({{ mana_percent }}%)</small></span>
+                        <div class="progress character-vitals__bar character-vitals__bar--mana">
                           <div class="progress-bar bg-default" role="progressbar" aria-valuenow="{{ mana_percent }}"
                                aria-valuemin="0" aria-valuemax="100" style="width: {{ mana_percent }}%;"></div>
                         </div>
@@ -461,20 +461,20 @@
             <tr>
               <td>
                 <div class="TableContentContainer">
-                  <table class="TableContent" width="100%" style="border:1px solid #faf0d7;">
+                  <table class="TableContent character-experience" width="100%" style="border:1px solid #faf0d7;">
                     <tbody>
                     <tr bgcolor="{{ getStyle(2) }}">
-                      <td style="border:0px; width:15%; text-align: right;"><b>Experience:</b></td>
-                      <td style="border:0px; text-align: center;">
-                        Have <b>{{ player.getExperience() }}</b> and need <b>{{ expLeft }}</b> to Level
-                        <b>{{ player.getLevel() + 1 }}</b>.
+                      <td class="character-experience__label" style="border:0px; width:15%; text-align: right;"><b>Experience</b></td>
+                      <td class="character-experience__value" style="border:0px; text-align: center;">
+                        <span>Have <b>{{ player.getExperience() }}</b> and need <b>{{ expLeft }}</b> to Level
+                        <b>{{ player.getLevel() + 1 }}</b>.</span>
                       </td>
                     </tr>
                     <tr bgcolor="{{ getStyle(2) }}">
-                      <td style="border:0px; width:15%; text-align: right;"><b>Percent:</b></td>
-                      <td style="border:0px; text-align: center;">
-                        {{ player.getExperience() }}/{{ expNext }} ({{ expLeftPercent }}%)
-                        <div class="progress">
+                      <td class="character-experience__label" style="border:0px; width:15%; text-align: right;"><b>Progress</b></td>
+                      <td class="character-experience__value" style="border:0px; text-align: center;">
+                        <span>{{ player.getExperience() }}/{{ expNext }} <small>({{ expLeftPercent }}%)</small></span>
+                        <div class="progress character-experience__bar">
                           <div class="progress-bar bg-success" role="progressbar" aria-valuenow="{{ expLeftPercent }}"
                                aria-valuemin="0" aria-valuemax="100" style="width:{{ expLeftPercent }}%"></div>
                         </div>
@@ -596,7 +596,7 @@
        onclick="CollapseTable('QuestsCollapseContainer'); $('#labelshow').html($('#labelshow').html() == 'show' ? 'hide' : 'show');"
        onmouseover="ActivateHelperDiv($(this), '', 'Click here to expand the list of Quests.', '');"
        onmouseout="$('#HelperDivContainer').hide();">
-    <div id="Indicator_QuestsCollapseContainer" class="CircleSymbolMinus"
+    <div id="Indicator_QuestsCollapseContainer" class="character-accordion-marker CircleSymbolMinus"
          style="position: absolute; height: 18px; width: 18px; top: -8px; right: -8px; z-index: 99; cursor: pointer; background-image: url({{ BASE_URL }}templates/tibiacom/images/global/content/circle-symbol-plus.gif);"></div>
   </div>
   <table class="Table3" cellpadding="0" cellspacing="0">
@@ -617,9 +617,13 @@
                       {% set rows = rows + 1 %}
                       <tr bgcolor="{{ getStyle(rows) }}">
                         <td style="width: 90%;" class="LabelV175">{{ name }}</td>
-                        <td><img
-                            src="templates/tibiacom/images/premiumfeatures/icon_{% if done %}yes{% else %}no{% endif %}.png"
-                            title="{% if done %}Completed{% else %}Incomplete{% endif %}"></td>
+                        <td class="character-quest-status-cell">
+                          <span class="character-quest-status {% if done %}character-quest-status--complete{% else %}character-quest-status--incomplete{% endif %}"
+                                title="{% if done %}Completed{% else %}Incomplete{% endif %}">
+                            <i aria-hidden="true">{% if done %}✓{% else %}×{% endif %}</i>
+                            <span>{% if done %}Completed{% else %}Incomplete{% endif %}</span>
+                          </span>
+                        </td>
                       </tr>
                     {% endfor %}
                     </tbody>
@@ -662,7 +666,7 @@
        onclick="CollapseTable('AchievementsCollapseContainer'); $('#labelshow').html($('#labelshow').html() == 'show' ? 'hide' : 'show');"
        onmouseover="ActivateHelperDiv($(this), '', 'Click here to expand the Achievements list.', '');"
        onmouseout="$('#HelperDivContainer').hide();">
-    <div id="Indicator_AchievementsCollapseContainer" class="CircleSymbolMinus"
+    <div id="Indicator_AchievementsCollapseContainer" class="character-accordion-marker CircleSymbolMinus"
          style="position: absolute; height: 18px; width: 18px; top: -8px; right: -8px; z-index: 99; cursor: pointer; background-image: url({{ BASE_URL }}templates/tibiacom/images/global/content/circle-symbol-plus.gif);"></div>
   </div>
   <table class="Table3" cellpadding="0" cellspacing="0">
@@ -749,7 +753,7 @@
          onclick="CollapseTable('DeathsCollapseContainer'); $('#labelshow').html($('#labelshow').html() == 'show' ? 'hide' : 'show');"
          onmouseover="ActivateHelperDiv($(this), '', 'Click here to expand the list of Deaths.', '');"
          onmouseout="$('#HelperDivContainer').hide();">
-      <div id="Indicator_DeathsCollapseContainer" class="CircleSymbolMinus"
+      <div id="Indicator_DeathsCollapseContainer" class="character-accordion-marker CircleSymbolMinus"
            style="position: absolute; height: 18px; width: 18px; top: -8px; right: -8px; z-index: 99; cursor: pointer; background-image: url({{ BASE_URL }}templates/tibiacom/images/global/content/circle-symbol-plus.gif);"></div>
     </div>
     <table class="Table3" cellpadding="0" cellspacing="0">
@@ -820,7 +824,7 @@
          onclick="CollapseTable('FragsCollapseContainer'); $('#labelshow').html($('#labelshow').html() == 'show' ? 'hide' : 'show');"
          onmouseover="ActivateHelperDiv($(this), '', 'Click here to expand the list of Frags.', '');"
          onmouseout="$('#HelperDivContainer').hide();">
-      <div id="Indicator_FragsCollapseContainer" class="CircleSymbolMinus"
+      <div id="Indicator_FragsCollapseContainer" class="character-accordion-marker CircleSymbolMinus"
            style="position: absolute; height: 18px; width: 18px; top: -8px; right: -8px; z-index: 99; cursor: pointer; background-image: url({{ BASE_URL }}templates/tibiacom/images/global/content/circle-symbol-plus.gif);"></div>
     </div>
     <table class="Table3" cellpadding="0" cellspacing="0">
@@ -893,7 +897,7 @@
          onclick="CollapseTable('FragsCollapseContainer'); $('#labelshow').html($('#labelshow').html() == 'show' ? 'hide' : 'show');"
          onmouseover="ActivateHelperDiv($(this), '', 'Click here to view the Signature.', '');"
          onmouseout="$('#HelperDivContainer').hide();">
-      <div id="Indicator_FragsCollapseContainer" class="CircleSymbolMinus"
+      <div id="Indicator_FragsCollapseContainer" class="character-accordion-marker CircleSymbolMinus"
            style="position: absolute; height: 18px; width: 18px; top: -8px; right: -8px; z-index: 99; cursor: pointer; background-image: url({{ BASE_URL }}templates/tibiacom/images/global/content/circle-symbol-plus.gif);"></div>
     </div>
     <table class="Table5" cellpadding="0" cellspacing="0">
@@ -1030,9 +1034,11 @@
                                   </td>
                                   <td>{{ player.getLevel() }}</td>
                                   <td>{{ player.getVocationName() }}</td>
-                                  <td>{% if player.isOnline() %}<img src="{{ template_path }}/images/on.gif"
-                                                                     title="Online">{% else %}<img
-                                      src="{{ template_path }}/images/off.gif" title="Offline">{% endif %}</td>
+                                  <td>{% if player.isOnline() %}
+                                      <span class="character-status character-status--online"><i aria-hidden="true"></i>Online</span>
+                                    {% else %}
+                                      <span class="character-status character-status--offline"><i aria-hidden="true"></i>Offline</span>
+                                    {% endif %}</td>
                                   <td>
                                     <table border="0" cellspacing="0" cellpadding="0">
                                       <form action="{{ characters_link }}" method=post>

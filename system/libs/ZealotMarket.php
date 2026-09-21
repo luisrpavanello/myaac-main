@@ -444,6 +444,32 @@ class ZealotMarket
         return is_file(BASE . $path) ? $path : null;
     }
 
+    /**
+     * Render the outfit currently persisted for a character outside a market
+     * listing. This deliberately shares the Market exporter so the public
+     * character page and the Market show the identical OTClient sprite.
+     */
+    public function currentOutfitUrl(array $outfit): ?string
+    {
+        $normalized = [
+            'looktype' => (int) ($outfit['looktype'] ?? 0),
+            'addons' => (int) ($outfit['addons'] ?? 0),
+            'head' => (int) ($outfit['head'] ?? 0),
+            'body' => (int) ($outfit['body'] ?? 0),
+            'legs' => (int) ($outfit['legs'] ?? 0),
+            'feet' => (int) ($outfit['feet'] ?? 0),
+        ];
+        if ($normalized['looktype'] <= 0) {
+            return null;
+        }
+
+        $normalized['sprite'] = $this->outfitSpritePath($normalized);
+        $snapshot = ['player' => ['outfit' => $normalized]];
+        $this->exportSnapshotOutfit($snapshot);
+
+        return self::snapshotOutfitUrl($snapshot);
+    }
+
     public static function itemName(int $itemId): string
     {
         $knownName = getItemNameById($itemId);

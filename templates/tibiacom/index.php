@@ -42,11 +42,13 @@ if (isset($config['boxes']))
         function CollapseTable(a_ID) {
             $('#' + a_ID).slideToggle('slow');
             if ($('#Indicator_' + a_ID).hasClass('CircleSymbolPlus')) {
-                $('#Indicator_' + a_ID).attr('class', 'CircleSymbolMinus');
+                // Do not discard any page-specific marker styling while
+                // changing the legacy open/closed state.
+                $('#Indicator_' + a_ID).removeClass('CircleSymbolPlus').addClass('CircleSymbolMinus');
                 $('#Indicator_' + a_ID).css('background-image', 'url(' + IMAGES + '/global/content/circle-symbol-plus.gif)');
             } else {
                 $('#Indicator_' + a_ID).css('background-image', 'url(' + IMAGES + '/global/content/circle-symbol-minus.gif)');
-                $('#Indicator_' + a_ID).attr('class', 'CircleSymbolPlus');
+                $('#Indicator_' + a_ID).removeClass('CircleSymbolMinus').addClass('CircleSymbolPlus');
             }
         }
     </script>

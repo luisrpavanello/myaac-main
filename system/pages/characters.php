@@ -155,7 +155,16 @@ if ($player->isLoaded() && !$player->isDeleted()) {
     $outfit_fallback = getVocationImage($player->getVocation(), $playerGroupName, $playerGroupId);
 
     if ($config['characters']['outfit']) {
-        $outfit = $outfit_fallback;
+        require_once LIBS . 'ZealotMarket.php';
+        $outfitRenderer = new ZealotMarket($db, $config);
+        $outfit = $outfitRenderer->currentOutfitUrl([
+            'looktype' => $player->getLookType(),
+            'addons' => $player->getLookAddons(),
+            'head' => $player->getLookHead(),
+            'body' => $player->getLookBody(),
+            'legs' => $player->getLookLegs(),
+            'feet' => $player->getLookFeet(),
+        ]) ?? $outfit_fallback;
     }
 
     $flag = '';
