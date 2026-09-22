@@ -448,6 +448,15 @@ function getItemImage($id, $count = 1, $fallbackImage = 'empty.gif')
   global $config;
   $itemImagesUrl = rtrim($config['item_images_url'], '/') . '/';
   $fallback = $itemImagesUrl . basename($fallbackImage);
+
+  // Empty equipment slots are intentional. Serve their slot artwork directly
+  // instead of first requesting the non-existent images/items/0.gif and only
+  // then relying on the browser error handler to replace it.
+  if ($id <= 0) {
+    $alt = ucwords(str_replace(['no_', '.gif', '_'], ['', '', ' '], basename($fallbackImage)));
+    return '<img src="' . $fallback . '" width="32" height="32" border="0" alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '" loading="lazy" />';
+  }
+
   $imageExtension = 'gif';
 
   // Use one official OTClient sprite source for every screen that calls this
@@ -471,9 +480,7 @@ function getItemImage($id, $count = 1, $fallbackImage = 'empty.gif')
   } elseif (strpos($itemImagesUrl, '://') === false && $count > 1 && !is_file(BASE . $itemImagesUrl . $file_name . '.gif') && is_file(BASE . $itemImagesUrl . (int) $id . '.gif')) {
     $file_name = (int) $id;
   }
-  $alt = (int) $id > 0
-    ? (!empty($name) ? $name : 'Item')
-    : ucwords(str_replace(['no_', '.gif', '_'], ['', '', ' '], basename($fallbackImage)));
+  $alt = !empty($name) ? $name : 'Item';
 
   return '<img src="' . $itemImagesUrl . $file_name . '.' . $imageExtension . '"' . $tooltip
     . ' width="32" height="32" border="0" alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '" loading="lazy"'

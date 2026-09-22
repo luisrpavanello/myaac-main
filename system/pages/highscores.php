@@ -368,6 +368,7 @@ if (!$rank_vocation = $_POST['profession'] ?? null) {
                                             }
 
                                             if (++$i <= $limit) {
+                                                $tmp = 'Unknown';
                                                 if ($skill == POT::SKILL_MAGLEVEL)
                                                     $player['value'] = $player['maglevel'];
                                                 else if ($skill == POT::SKILL_LEVEL)
@@ -389,15 +390,13 @@ if (!$rank_vocation = $_POST['profession'] ?? null) {
                                                 echo '
 			<td>
 				<a href="' . getPlayerLink($player['name'], false) . '">
-					<span style="color: ' . ($player['online'] > 0 ? 'green' : 'red') . '">' . $player['name'] . '</span>
+					<span style="color: ' . ($player['online'] > 0 ? 'green' : 'red') . '">' . htmlspecialchars($player['name'], ENT_QUOTES, 'UTF-8') . '</span>
 				</a>';
                                                 if ($config['highscores_vocation']) {
                                                     if (isset($player['promotion'])) {
                                                         if ((int)$player['promotion'] > 0)
                                                             $player['vocation'] += ($player['promotion'] * $config['vocations_amount']);
                                                     }
-
-                                                    $tmp = 'Unknown';
                                                     if (isset($config['vocations'][$player['vocation']])) {
                                                         $tmp = $config['vocations'][$player['vocation']];
                                                     }

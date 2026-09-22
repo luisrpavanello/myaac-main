@@ -110,13 +110,13 @@ unset($player);
     <div class="rank_content">
         <?php
         foreach($topPlayers as $player){
-            $player_voc = $config['vocations'][$player['vocation']];
+            $player_voc = $config['vocations'][$player['vocation']] ?? 'Adventurer';
         ?>
         <div class="rank_player">
             <img class="rank_outfit" src="<?php echo htmlspecialchars($player['outfit'], ENT_QUOTES, 'UTF-8') ?>" alt=""/>
             <div class="rank_text">
-                <a href="<?php echo getPlayerLink($player['name'], false) ?>"><b><?php echo $player['name'] ?></b></a><br>
-                <small>Level: <?php echo $player['level'] ?> / <?php echo $player_voc ?></small>
+                <a href="<?php echo getPlayerLink($player['name'], false) ?>"><b><?php echo htmlspecialchars($player['name'], ENT_QUOTES, 'UTF-8') ?></b></a><br>
+                <small>Level: <?php echo (int) $player['level'] ?> / <?php echo htmlspecialchars($player_voc, ENT_QUOTES, 'UTF-8') ?></small>
             </div>
         </div>
         <?php } ?>
