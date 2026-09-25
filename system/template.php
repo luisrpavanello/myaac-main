@@ -188,7 +188,10 @@ function get_template_menus()
   foreach ($result as $menu) {
     $link_full = strpos(trim($menu['link']), 'http') === 0 ? $menu['link'] : getLink($menu['link']);
     $menus[$menu['category']][] = [
-      'name' => $menu['name'],
+      // Menu records are managed in the legacy database. Translate only the
+      // stable interface label, while leaving custom/admin-created names
+      // untouched when no translation exists.
+      'name' => siteText($menu['name']),
       'link' => $menu['link'],
       'link_full' => $link_full,
       'blank' => $menu['blank'] == 1,

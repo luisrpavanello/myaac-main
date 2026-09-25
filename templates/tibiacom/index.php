@@ -7,7 +7,7 @@ defined('MYAAC') or die('Direct access not allowed!');
 if (isset($config['boxes']))
     $config['boxes'] = explode(",", $config['boxes']);
 ?>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="<?= htmlspecialchars(siteLanguage(), ENT_QUOTES, 'UTF-8'); ?>">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <?= template_place_holder('head_start'); ?>
@@ -350,7 +350,7 @@ if (isset($config['boxes']))
                                  onMouseOut="MouseOutBigButton('LoginButtonOver');">
                                 <div id="LoginButtonOver" class="Button"
                                      style="background-image:url(<?= $template_path; ?>/images/global/buttons/mediumbutton-over.gif); visibility: hidden;"></div>
-                                <div id="ButtonText" <?= !$logged ? "style='background-image:url(\"$template_path/images/global/buttons/mediumbutton_login.png\")'" : '' ?>></div>
+                                <div id="ButtonText" data-zealot-label="<?= htmlspecialchars(t('nav.account'), ENT_QUOTES, 'UTF-8'); ?>" <?= !$logged ? "style='background-image:url(\"$template_path/images/global/buttons/mediumbutton_login.png\")'" : '' ?>></div>
                             </div>
                         </div>
 
@@ -360,7 +360,7 @@ if (isset($config['boxes']))
 
                     <div class="Loginstatus"
                          style="background-image:url(<?= $template_path; ?>/images/loginbox/loginbox-textfield-background.gif)">
-                        <div id="LoginstatusText_2" data-zealot-label="<?= $logged ? 'Logout' : 'Create account'; ?>" onClick="LoginstatusTextAction(this);"
+                        <div id="LoginstatusText_2" data-zealot-label="<?= htmlspecialchars($logged ? t('nav.logout', 'Logout') : t('account.create', 'Create account'), ENT_QUOTES, 'UTF-8'); ?>" onClick="LoginstatusTextAction(this);"
                              onMouseOver="MouseOverLoginBoxText(this);" onMouseOut="MouseOutLoginBoxText(this);">
                             <div id="LoginstatusText_2_1" class="LoginstatusText"
                                  style="background-image:url(<?= $template_path; ?>/images/loginbox/loginbox-font-create-account.gif)"></div>
@@ -384,13 +384,13 @@ if (isset($config['boxes']))
                          style="background-image:url(<?= $template_path; ?>/images/global/loginbox/loginbox-textfield-background.gif)">
                         <a href="?subtopic=downloadclient&step=downloadagreement">
                             <div id="PlayNowContainer">
-                                <div class="MediumButtonBackground zealot-medium-button--download"
+                                <div class="MediumButtonBackground zealot-medium-button--download" data-zealot-label="<?= htmlspecialchars(t('download.title', 'Download Client'), ENT_QUOTES, 'UTF-8'); ?>"
                                      style="background-image:url(<?= $template_path; ?>/images/global/buttons/mediumbutton.gif)"
                                      onmouseover="MouseOverBigButton('DownloadButtonOver');"
                                      onmouseout="MouseOutBigButton('DownloadButtonOver');">
                                     <div id="DownloadButtonOver" class="MediumButtonOver"
                                          style="background-image: url(<?= $template_path; ?>/images/global/buttons/mediumbutton-over.gif); visibility: hidden;"></div>
-                                    <input class="MediumButtonText" type="image" name="Download" alt="Download"
+                                    <input class="MediumButtonText" type="image" name="Download" alt="<?= htmlspecialchars(t('download.title', 'Download Client'), ENT_QUOTES, 'UTF-8'); ?>"
                                            src="<?= $template_path; ?>/images/global/buttons/mediumbutton_download.png">
                                 </div>
                             </div>
@@ -500,7 +500,7 @@ if (isset($config['boxes']))
                                             <svg class="zealot-quick-action__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                                 <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14"/>
                                             </svg>
-                                            <span>Download Zealot Client</span>
+                                            <span><?= htmlspecialchars(t('quick.download_client'), ENT_QUOTES, 'UTF-8'); ?></span>
                                         </a>
 
                                         <?php if (!empty($config['discord_link'])) { ?>
@@ -512,10 +512,22 @@ if (isset($config['boxes']))
                                                 <span>Discord</span>
                                             </a>
                                         <?php } ?>
+                                        <nav class="zealot-language-switcher" aria-label="<?= htmlspecialchars(t('language.label'), ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?php foreach (siteLanguages() as $languageCode => $language): ?>
+                                                <a class="zealot-language-option<?= siteLanguage() === $languageCode ? ' is-active' : ''; ?>"
+                                                   href="<?= htmlspecialchars(siteLanguageUrl($languageCode), ENT_QUOTES, 'UTF-8'); ?>"
+                                                   hreflang="<?= htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>"
+                                                   lang="<?= htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>"
+                                                   title="<?= htmlspecialchars(t('language.' . $languageCode), ENT_QUOTES, 'UTF-8'); ?>">
+                                                    <span aria-hidden="true"><?= $language['flag']; ?></span>
+                                                    <span class="zealot-language-option__label"><?= htmlspecialchars(t('language.' . $languageCode), ENT_QUOTES, 'UTF-8'); ?></span>
+                                                </a>
+                                            <?php endforeach; ?>
+                                        </nav>
                                     </div>
                                     <span class="zealot-status-toggle-wrap">
                                         <?php if ($config['collapse_status']) { ?>
-                                            <a class="zealot-status-toggle" data-bs-toggle="collapse" href="#statusbar" role="button" aria-expanded="false" aria-controls="statusbar" aria-label="Show status details">
+                                            <a class="zealot-status-toggle" data-bs-toggle="collapse" href="#statusbar" role="button" aria-expanded="false" aria-controls="statusbar" aria-label="<?= htmlspecialchars(t('quick.show_status'), ENT_QUOTES, 'UTF-8'); ?>">
                                                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 10 5 5 5-5"/></svg>
                                             </a>
                                         <?php } ?>
@@ -686,35 +698,37 @@ if (isset($config['boxes']))
                     $onlinePlayers = (int)($onlineQuery['playersOnline'] ?? $onlinePlayers);
                 }
 
-                $playersOnlineLabel = $onlinePlayers === 1 ? '1 Player Online' : $onlinePlayers . ' Players Online';
+                $playersOnlineLabel = $onlinePlayers === 1
+                    ? t('daily.player_online', null, ['count' => $onlinePlayers])
+                    : t('daily.players_online', null, ['count' => $onlinePlayers]);
                 ?>
                 <div id="RightArtwork">
-                    <section id="DailyHighlights" aria-label="Daily boosts">
-                        <div class="DailyHighlightsTitle">Daily Boosts</div>
+                    <section id="DailyHighlights" aria-label="<?= htmlspecialchars(t('daily.title'), ENT_QUOTES, 'UTF-8'); ?>">
+                        <div class="DailyHighlightsTitle"><?= htmlspecialchars(t('daily.title'), ENT_QUOTES, 'UTF-8'); ?></div>
                         <div class="DailyBoostStages">
                             <a class="DailyBoostStage" href="?subtopic=killstatistics"
-                               title="Today's boosted creature: <?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
+                               title="<?= htmlspecialchars(t('daily.boosted_creature', null, ['name' => ucwords(strtolower(trim($creaturename)))]), ENT_QUOTES, 'UTF-8'); ?>">
                                 <span class="DailyBoostSprite<?= $creatureimage === null ? ' DailyBoostSprite--missing' : ''; ?>" style="--daily-boost-sprite-size: <?= $creatureimagesize; ?>px;">
                                     <?php if ($creatureimage !== null): ?>
                                     <img src="<?= htmlspecialchars($creatureimageurl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?>">
                                     <?php else: ?>
-                                    <span class="DailyBoostSpritePlaceholder" aria-label="Verified sprite unavailable">?</span>
+                                    <span class="DailyBoostSpritePlaceholder" aria-label="<?= htmlspecialchars(t('daily.sprite_unavailable'), ENT_QUOTES, 'UTF-8'); ?>">?</span>
                                     <?php endif; ?>
                                 </span>
                                 <span class="DailyBoostName"><?= htmlspecialchars(ucwords(strtolower(trim($creaturename))), ENT_QUOTES, 'UTF-8'); ?></span>
-                                <span class="DailyBoostType">Creature</span>
+                                <span class="DailyBoostType"><?= htmlspecialchars(t('daily.creature'), ENT_QUOTES, 'UTF-8'); ?></span>
                             </a>
                             <a class="DailyBoostStage" href="?subtopic=killstatistics"
-                               title="Today's boosted boss: <?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
+                               title="<?= htmlspecialchars(t('daily.boosted_boss', null, ['name' => ucwords(strtolower(trim($bossname)))]), ENT_QUOTES, 'UTF-8'); ?>">
                                 <span class="DailyBoostSprite<?= $bossimage === null ? ' DailyBoostSprite--missing' : ''; ?>" style="--daily-boost-sprite-size: <?= $bossimagesize; ?>px;">
                                     <?php if ($bossimage !== null): ?>
                                     <img src="<?= htmlspecialchars($bossimageurl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?>">
                                     <?php else: ?>
-                                    <span class="DailyBoostSpritePlaceholder" aria-label="Verified sprite unavailable">?</span>
+                                    <span class="DailyBoostSpritePlaceholder" aria-label="<?= htmlspecialchars(t('daily.sprite_unavailable'), ENT_QUOTES, 'UTF-8'); ?>">?</span>
                                     <?php endif; ?>
                                 </span>
                                 <span class="DailyBoostName"><?= htmlspecialchars(ucwords(strtolower(trim($bossname))), ENT_QUOTES, 'UTF-8'); ?></span>
-                                <span class="DailyBoostType">Boss</span>
+                                <span class="DailyBoostType"><?= htmlspecialchars(t('daily.boss'), ENT_QUOTES, 'UTF-8'); ?></span>
                             </a>
                         </div>
                         <a id="PlayersOnline" href="?online"
@@ -802,7 +816,7 @@ if (isset($config['boxes']))
 
     });
 </script>
-<button class="scrollToTop" type="button" title="Voltar ao topo" aria-label="Voltar ao topo">
+<button class="scrollToTop" type="button" title="<?= htmlspecialchars(t('scroll_to_top'), ENT_QUOTES, 'UTF-8'); ?>" aria-label="<?= htmlspecialchars(t('scroll_to_top'), ENT_QUOTES, 'UTF-8'); ?>">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5m0 0-5 5m5-5 5 5"/></svg>
 </button>
 <script>
@@ -821,10 +835,12 @@ if (isset($config['boxes']))
                 return;
             }
 
-            const label = players === 1 ? '1 Player Online' : players + ' Players Online';
+            const label = players === 1
+                ? <?= json_encode(t('daily.player_online', null, ['count' => '{count}']), JSON_UNESCAPED_UNICODE); ?>.replace('{count}', players)
+                : <?= json_encode(t('daily.players_online', null, ['count' => '{count}']), JSON_UNESCAPED_UNICODE); ?>.replace('{count}', players);
             counter.textContent = label;
             counter.dataset.onlineCount = String(players);
-            counter.title = 'Live player count updated just now';
+            counter.title = <?= json_encode(t('online.live_updated'), JSON_UNESCAPED_UNICODE); ?>;
         };
 
         const refreshCount = function () {

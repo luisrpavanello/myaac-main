@@ -50,10 +50,10 @@ if (!$logged) {
                 $detailUrl = getLinkWithQuery('currentcharactertrades', ['details' => (int) $listing['id']]);
                 ?>
                 <tr>
-                    <td data-label="Character"><strong><?= htmlspecialchars($listing['name'], ENT_QUOTES, 'UTF-8'); ?></strong><br><small>Level <?= number_format((int) $listing['level']); ?> <?= htmlspecialchars($config['vocations'][$listing['vocation']] ?? 'Adventurer', ENT_QUOTES, 'UTF-8'); ?></small></td>
-                    <td data-label="Status"><span class="zealot-market-activity__status zealot-market-activity__status--<?= $statusClass; ?>"><?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8'); ?></span></td>
+                    <td data-label="Character"><strong><?= htmlspecialchars($listing['name'], ENT_QUOTES, 'UTF-8'); ?></strong><br><small><?= htmlspecialchars(siteText('Level'), ENT_QUOTES, 'UTF-8'); ?> <?= number_format((int) $listing['level']); ?> <?= htmlspecialchars(siteText($config['vocations'][$listing['vocation']] ?? 'Adventurer'), ENT_QUOTES, 'UTF-8'); ?></small></td>
+                    <td data-label="Status"><span class="zealot-market-activity__status zealot-market-activity__status--<?= $statusClass; ?>"><?= htmlspecialchars(siteText($status), ENT_QUOTES, 'UTF-8'); ?></span></td>
                     <td data-label="Current bid"><?= number_format($amount); ?> <img src="<?= $template_path; ?>/images/account/icon-tibiacointrusted.png" alt="Z"></td>
-                    <td data-label="Ends / completed"><?= htmlspecialchars(date('M j, Y' . ($open ? ' H:i' : ''), strtotime((string) $dateSource)), ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td data-label="Ends / completed"><?= htmlspecialchars(siteDate('M j, Y' . ($open ? ' H:i' : ''), strtotime((string) $dateSource)), ENT_QUOTES, 'UTF-8'); ?></td>
                     <td class="is-action" data-label="Action"><a class="zealot-market-activity__action" href="<?= htmlspecialchars($detailUrl, ENT_QUOTES, 'UTF-8'); ?>">Access</a></td>
                 </tr>
             <?php } ?>

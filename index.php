@@ -329,8 +329,17 @@ if ($config['backward_support']) {
     $topic = $title;
 }
 
+if (isset($title)) {
+    $title = siteText($title);
+}
 $title_full = (isset($title) ? $title . $config['title_separator'] : '') . $config['lua']['serverName'];
+// Legacy pages still echo their copy directly. Capture the final public theme
+// markup once so the stable interface labels from those pages also honour the
+// visitor's selected language without touching player-created content.
+ob_start();
 require $template_path . '/' . $template_index;
+$siteMarkup = ob_get_clean();
+echo translateSiteHtml($siteMarkup);
 
 echo base64_decode('PCEtLSBQb3dlcmVkIGJ5IE9wZW5UaWJpYUJSIE15QUFDIDo6IGh0dHBzOi8vZ2l0aHViLmNvbS9vcGVudGliaWFici9teWFhYyAtLT4=') . PHP_EOL;
 if (superAdmin()) {

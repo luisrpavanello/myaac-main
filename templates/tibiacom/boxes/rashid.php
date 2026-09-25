@@ -74,7 +74,7 @@ if($diasemana[$diasemana_numero] == 'sabado'){
     <div class="rashid_content">
         <div class="rashid_outfit" style="background-image: url('<?php echo $template_path ?>/images/themeboxes/rashid/Rashid.gif')"></div>
         <div class="rashid_text">
-            <b>City:</b><br>
+            <b><?= htmlspecialchars(t('rashid.city'), ENT_QUOTES, 'UTF-8'); ?></b><br>
             <small><?php echo $rashid_city ?></small>
         </div>
     </div>

@@ -27,12 +27,12 @@ $isWinningBidder = $viewerId > 0 && $viewerId === (int) $listing['bid_account'];
 $currentBid = max((int) $listing['starting_price'], (int) $listing['bid_price'], (int) $listing['price']);
 $secondsLeft = max(0, (int) $listing['date_end_unix'] - time());
 $timeLeft = intdiv($secondsLeft, 86400) > 0
-    ? intdiv($secondsLeft, 86400) . 'd ' . intdiv($secondsLeft % 86400, 3600) . 'h'
-    : intdiv($secondsLeft, 3600) . 'h ' . intdiv($secondsLeft % 3600, 60) . 'm';
+    ? t('market.time_remaining_short', '{days}d {hours}h left', ['days' => intdiv($secondsLeft, 86400), 'hours' => intdiv($secondsLeft % 86400, 3600)])
+    : t('market.time_remaining_minutes_short', '{hours}h {minutes}m left', ['hours' => intdiv($secondsLeft, 3600), 'minutes' => intdiv($secondsLeft % 3600, 60)]);
 $snapshot = ZealotMarket::decodeCharacterSnapshot($listing['character_snapshot'] ?? null);
 $character = $snapshot['player'] ?? $listing;
-$vocation = $config['vocations'][$character['vocation']] ?? 'Adventurer';
-$gender = $config['genders'][$character['sex']] ?? ((int) $character['sex'] === 0 ? 'Male' : 'Female');
+$vocation = siteText($config['vocations'][$character['vocation']] ?? 'Adventurer');
+$gender = siteText($config['genders'][$character['sex']] ?? ((int) $character['sex'] === 0 ? 'Male' : 'Female'));
 $outfitUrl = ZealotMarket::snapshotOutfitUrl($snapshot) ?? getVocationImage($character['vocation']);
 
 $equipment = ZealotMarket::snapshotEquipment($snapshot);
@@ -83,7 +83,7 @@ $blessings = 0;
 for ($number = 1; $number <= 7; $number++) {
     $blessings += (int) (($character['blessings' . $number] ?? 0) > 0);
 }
-$statusLabel = $isActive ? 'Live listing' : ZealotMarket::statusLabel((int) $listing['status']);
+$statusLabel = siteText($isActive ? 'Live listing' : ZealotMarket::statusLabel((int) $listing['status']));
 $minimumBid = $market instanceof ZealotMarket ? $market->minimumBidFor($listing) : $currentBid + 1;
 ?>
 
@@ -94,11 +94,11 @@ $minimumBid = $market instanceof ZealotMarket ? $market->minimumBidFor($listing)
         <div>
             <span><?= htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8'); ?></span>
             <h1 id="zealot-market-character"><?= htmlspecialchars($character['name'], ENT_QUOTES, 'UTF-8'); ?></h1>
-            <p>Level <?= number_format((int) $character['level']); ?> <?= htmlspecialchars($vocation, ENT_QUOTES, 'UTF-8'); ?> · <?= htmlspecialchars($gender, ENT_QUOTES, 'UTF-8'); ?></p>
+            <p><?= htmlspecialchars(siteText('Level'), ENT_QUOTES, 'UTF-8'); ?> <?= number_format((int) $character['level']); ?> <?= htmlspecialchars($vocation, ENT_QUOTES, 'UTF-8'); ?> · <?= htmlspecialchars($gender, ENT_QUOTES, 'UTF-8'); ?></p>
         </div>
         <div class="zealot-market-detail__timer">
-            <small><?= $isActive ? 'Time remaining' : 'Listing status'; ?></small>
-            <strong><?= $isActive ? $timeLeft . ' left' : htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8'); ?></strong>
+            <small><?= htmlspecialchars(siteText($isActive ? 'Time remaining' : 'Listing status'), ENT_QUOTES, 'UTF-8'); ?></small>
+            <strong><?= $isActive ? htmlspecialchars($timeLeft, ENT_QUOTES, 'UTF-8') : htmlspecialchars($statusLabel, ENT_QUOTES, 'UTF-8'); ?></strong>
         </div>
     </header>
 
@@ -117,7 +117,7 @@ $minimumBid = $market instanceof ZealotMarket ? $market->minimumBidFor($listing)
             <div><dt>Blessings</dt><dd><?= $blessings; ?> / 7<?= (int) $character['blessings8'] > 0 ? ' + Twist' : ''; ?></dd></div>
         </dl>
 
-        <div class="zealot-market-detail__equipment" aria-label="Character equipment">
+        <div class="zealot-market-detail__equipment" aria-label="<?= htmlspecialchars(siteText('Character equipment'), ENT_QUOTES, 'UTF-8'); ?>">
             <?php foreach (range(1, 10) as $slot) { ?>
                 <span class="<?= isset($equipment[$slot]) ? '' : 'is-empty'; ?>">
                     <?= isset($equipment[$slot]) ? getItemImage((int) (is_array($equipment[$slot]) ? $equipment[$slot]['itemtype'] : $equipment[$slot]), (int) (is_array($equipment[$slot]) ? $equipment[$slot]['count'] : 1), $equipmentFallbacks[$slot]) : getItemImage(0, 1, $equipmentFallbacks[$slot]); ?>
@@ -159,8 +159,8 @@ $minimumBid = $market instanceof ZealotMarket ? $market->minimumBidFor($listing)
 
         <aside class="zealot-market-detail__purchase">
             <span>Current bid</span>
-            <strong><?= number_format($currentBid); ?> <img src="<?= $template_path; ?>/images/account/icon-tibiacointrusted.png" alt="Zealot Coins"></strong>
-            <small>Started at <?= number_format((int) $listing['starting_price']); ?> · Ends <?= htmlspecialchars(date('M j, Y H:i', (int) $listing['date_end_unix']), ENT_QUOTES, 'UTF-8'); ?></small>
+            <strong><?= number_format($currentBid); ?> <img src="<?= $template_path; ?>/images/account/icon-tibiacointrusted.png" alt="<?= htmlspecialchars(siteText('Zealot Coins'), ENT_QUOTES, 'UTF-8'); ?>"></strong>
+            <small><?= htmlspecialchars(t('market.bid_summary', 'Started at {amount} · Ends {date}', ['amount' => number_format((int) $listing['starting_price']), 'date' => siteDate('M j, Y H:i', (int) $listing['date_end_unix'])]), ENT_QUOTES, 'UTF-8'); ?></small>
 
             <?php if (!$logged && $isActive) { ?>
                 <a href="?subtopic=account/manage">Log in to bid</a>

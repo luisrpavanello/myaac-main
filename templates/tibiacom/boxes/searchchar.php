@@ -60,10 +60,10 @@
 </style>
 <form method="post" action="<?php echo BASE_URL ?>?characters" style="margin-bottom: 0;">
 <div class="searchchar">
-    <div class="searchchar_header">Search Char</div>
+    <div class="searchchar_header"><?= htmlspecialchars(t('search.title'), ENT_QUOTES, 'UTF-8'); ?></div>
     <div class="searchchar_content">
-        <input type="text" class="searchchar_input" name="name" maxlength="29" placeholder="Character name">
-        <button type="submit" class="searchchar_button">Search</button>       
+        <input type="text" class="searchchar_input" name="name" maxlength="29" placeholder="<?= htmlspecialchars(t('search.placeholder'), ENT_QUOTES, 'UTF-8'); ?>">
+        <button type="submit" class="searchchar_button"><?= htmlspecialchars(t('search.submit'), ENT_QUOTES, 'UTF-8'); ?></button>
     </div>
     <div class="searchchar_bottom"></div>
 </div>

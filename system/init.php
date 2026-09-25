@@ -16,6 +16,8 @@ if (file_exists(BASE . 'config.local.php')) {
   // user customizations
   require BASE . 'config.local.php';
 }
+require_once SYSTEM . 'i18n.php';
+siteLanguage();
 
 if (!isset($config['installed']) || !$config['installed']) {
   throw new RuntimeException(

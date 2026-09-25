@@ -112,7 +112,7 @@ if ($listingId > 0 && $marketError === null && $marketMessage === null) {
                         continue;
                     }
                     ?>
-                    <option value="<?= (int) $id; ?>"<?= $marketVocation === (int) $id ? ' selected' : ''; ?>><?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?></option>
+                    <option value="<?= (int) $id; ?>"<?= $marketVocation === (int) $id ? ' selected' : ''; ?>><?= htmlspecialchars(siteText($name), ENT_QUOTES, 'UTF-8'); ?></option>
                 <?php } ?>
             </select>
         </label>

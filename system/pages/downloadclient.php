@@ -1,6 +1,6 @@
 <?php
 defined('MYAAC') or die('Direct access not allowed!');
-$title = 'Download Client';
+$title = t('download.title', 'Download Client');
 
 
 $getpage_download = $_GET['step'] ?? '';
@@ -18,7 +18,7 @@ if (empty($getpage_download)) {
                       style="background-image:url(<?= $template_path; ?>/images/global/content/table-headline-border.gif);"></span>
                 <span class="CaptionVerticalLeft"
                       style="background-image:url(<?= $template_path; ?>/images/global/content/box-frame-vertical.gif);"></span>
-                <div class="Text">Download Client</div>
+                <div class="Text"><?= t('download.title', 'Download Client') ?></div>
                 <span class="CaptionVerticalRight"
                       style="background-image:url(<?= $template_path; ?>/images/global/content/box-frame-vertical.gif);"></span>
                 <span class="CaptionBorderBottom"
@@ -43,16 +43,16 @@ if (empty($getpage_download)) {
                                             <tbody>
                                             <tr>
                                                 <td class="zealot-client-download">
-                                                    <h1>Official <?= configLua('serverName') ?> Client</h1>
+                                                    <h1><?= t('download.official_client', 'Official {server} Client', ['server' => configLua('serverName')]) ?></h1>
                                                     <a class="zealot-client-download__link" href="<?= $config['client_link'] ?? '' ?>" target="_new">
-                                                        <img alt="<?= configLua('serverName') ?> Client"
+                                                        <img alt="<?= t('download.client_alt', '{server} Client', ['server' => configLua('serverName')]) ?>"
                                                              class="zealot-client-download__art"
                                                              src="<?= $template_path ?>/images/zealot-client-download.png">
                                                         <br>
                                                         <span class="zealot-client-download__title">
-                                                        Download <?= configLua('serverName') ?> Client
+                                                        <?= t('download.download_client', 'Download {server} Client', ['server' => configLua('serverName')]) ?>
                                                         <br>
-                                                        <span class="zealot-client-download__platform" data-platform-label>Client for your device</span></span>
+                                                        <span class="zealot-client-download__platform" data-platform-label><?= t('download.platform.default', 'Client for your device') ?></span></span>
                                                         <br>
                                                         <small>Version <?= config('client') / 100 ?></small>
                                                     </a>
@@ -64,13 +64,13 @@ if (empty($getpage_download)) {
                                                                 navigator.userAgent
                                                             ].filter(Boolean).join(' ').toLowerCase();
 
-                                                            let platform = 'Client for your device';
+                                                            let platform = <?= json_encode(t('download.platform.default', 'Client for your device')) ?>;
                                                             if (source.includes('win')) {
-                                                                platform = 'Windows Client';
+                                                                platform = <?= json_encode(t('download.platform.windows', 'Windows Client')) ?>;
                                                             } else if (source.includes('mac')) {
-                                                                platform = 'macOS Client';
+                                                                platform = <?= json_encode(t('download.platform.macos', 'macOS Client')) ?>;
                                                             } else if (source.includes('linux')) {
-                                                                platform = 'Linux Client';
+                                                                platform = <?= json_encode(t('download.platform.linux', 'Linux Client')) ?>;
                                                             }
 
                                                             document.querySelectorAll('[data-platform-label]').forEach((element) => {
@@ -91,13 +91,10 @@ if (empty($getpage_download)) {
                                         <table class="TableContent" width="100%" style="border:1px solid #faf0d7;">
                                             <tbody>
                                             <tr>
-                                                <td class="LabelV">Disclaimer</td>
+                                                <td class="LabelV"><?= t('download.disclaimer', 'Disclaimer') ?></td>
                                             </tr>
                                             <tr>
-                                                <td>The software and any related documentation is provided "as is"
-                                                    without warranty of any kind. The entire risk arising out of use of
-                                                    the software remains with you. In no event shall Zealot be
-                                                    liable for any damages to your computer or loss of data.
+                                                <td><?= t('download.disclaimer_copy', 'The software and any related documentation is provided "as is" without warranty of any kind. The entire risk arising out of use of the software remains with you. In no event shall Zealot be liable for any damages to your computer or loss of data.') ?>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -118,8 +115,7 @@ if (empty($getpage_download)) {
 
 if ($download_subtopic == 'downloadclient' and $getpage_download == 'downloadagreement') {
     ?>
-    <p>Before you can download the client program please read the Tibia Service Agreement and state if you agree to it
-        by clicking on the appropriate button below.</p>
+    <p><?= t('download.agreement_intro', 'Before you can download the client program please read the Tibia Service Agreement and state if you agree to it by clicking on the appropriate button below.') ?></p>
 
     <div class="TableContainer">
         <div class="CaptionContainer">
@@ -132,7 +128,7 @@ if ($download_subtopic == 'downloadclient' and $getpage_download == 'downloadagr
                       style="background-image:url(<?= $template_path; ?>/images/global/content/table-headline-border.gif);"></span>
                 <span class="CaptionVerticalLeft"
                       style="background-image:url(<?= $template_path; ?>/images/global/content/box-frame-vertical.gif);"></span>
-                <div class="Text">Tibia Service Agreement</div>
+                <div class="Text"><?= t('download.agreement_title', 'Tibia Service Agreement') ?></div>
                 <span class="CaptionVerticalRight"
                       style="background-image:url(<?= $template_path; ?>/images/global/content/box-frame-vertical.gif);"></span>
                 <span class="CaptionBorderBottom"
@@ -147,28 +143,12 @@ if ($download_subtopic == 'downloadclient' and $getpage_download == 'downloadagr
             <tbody>
             <tr>
                 <td>
-                    <div class="InnerTableContainer"><p>This agreement describes the terms on which Zealot offers
-                            you access to an account for being able to play the online role playing game "Tibia". By
-                            creating an account or downloading the client software you accept the terms and conditions
-                            below and state that you are of full legal age in your country or have the permission of
-                            your parents to play this game.</p>
-                        <p>You agree that the use of the software is at your sole risk. We provide the software, the
-                            game, and all other services "as is". We disclaim all warranties or conditions of any kind,
-                            expressed, implied or statutory, including without limitation the implied warranties of
-                            title, non-infringement, merchantability and fitness for a particular purpose. We do not
-                            ensure continuous, error-free, secure or virus-free operation of the software, the game, or
-                            your account.</p>
-                        <p>We are not liable for any lost profits or special, incidental or consequential damages
-                            arising out of or in connection with the game, including, but not limited to, loss of data,
-                            items, accounts, or characters from errors, system downtime, or adjustments of the
-                            gameplay.</p>
-                        <p>While you are playing "Tibia", you must abide by some rules ("Tibia Rules") that are stated
-                            on this homepage. If you break any of these rules, your account may be removed and all other
-                            services terminated immediately.</p>
-                        <p>Zealot is neither willing nor required to take part in out-of-court dispute
-                            resolution.</p>
-                        <p>By creating an account or downloading the client software, you also accept the terms and
-                            conditions stated in the BattlEye End-User Licence Agreement.</p>
+                    <div class="InnerTableContainer"><p><?= t('download.agreement.paragraph_1', 'This agreement describes the terms on which Zealot offers you access to an account for being able to play the online role playing game "Tibia". By creating an account or downloading the client software you accept the terms and conditions below and state that you are of full legal age in your country or have the permission of your parents to play this game.') ?></p>
+                        <p><?= t('download.agreement.paragraph_2', 'You agree that the use of the software is at your sole risk. We provide the software, the game, and all other services "as is". We disclaim all warranties or conditions of any kind, expressed, implied or statutory, including without limitation the implied warranties of title, non-infringement, merchantability and fitness for a particular purpose. We do not ensure continuous, error-free, secure or virus-free operation of the software, the game, or your account.') ?></p>
+                        <p><?= t('download.agreement.paragraph_3', 'We are not liable for any lost profits or special, incidental or consequential damages arising out of or in connection with the game, including, but not limited to, loss of data, items, accounts, or characters from errors, system downtime, or adjustments of the gameplay.') ?></p>
+                        <p><?= t('download.agreement.paragraph_4', 'While you are playing "Tibia", you must abide by some rules ("Tibia Rules") that are stated on this homepage. If you break any of these rules, your account may be removed and all other services terminated immediately.') ?></p>
+                        <p><?= t('download.agreement.paragraph_5', 'Zealot is neither willing nor required to take part in out-of-court dispute resolution.') ?></p>
+                        <p><?= t('download.agreement.paragraph_6', 'By creating an account or downloading the client software, you also accept the terms and conditions stated in the BattlEye End-User Licence Agreement.') ?></p>
                         <table style="width:100%;"></table>
                     </div>
                 </td>
@@ -184,7 +164,7 @@ if ($download_subtopic == 'downloadclient' and $getpage_download == 'downloadagr
                 <div onmouseover="MouseOverBigButton(this);" onmouseout="MouseOutBigButton(this);">
                     <div class="BigButtonOver"
                          style="background-image:url(<?= $template_path; ?>/images/global/buttons/sbutton_over.gif);"></div>
-                    <input class="BigButtonText" type="submit" value="I agree"></div>
+                    <input class="BigButtonText" type="submit" value="<?= t('download.agree', 'I agree') ?>"></div>
             </div>
         </form>
     </center>

@@ -19,8 +19,8 @@ foreach ($auctions as $auction) {
 
     $marketListingCount++;
     $characterName = htmlspecialchars((string) $character['name'], ENT_QUOTES, 'UTF-8');
-    $vocationName = htmlspecialchars((string) ($config['vocations'][$character['vocation']] ?? 'Adventurer'), ENT_QUOTES, 'UTF-8');
-    $genderName = htmlspecialchars((string) ($config['genders'][$character['sex']] ?? 'Unknown'), ENT_QUOTES, 'UTF-8');
+    $vocationName = htmlspecialchars(siteText((string) ($config['vocations'][$character['vocation']] ?? 'Adventurer')), ENT_QUOTES, 'UTF-8');
+    $genderName = htmlspecialchars(siteText((string) ($config['genders'][$character['sex']] ?? 'Unknown')), ENT_QUOTES, 'UTF-8');
     $outfitUrl = ZealotMarket::snapshotOutfitUrl($snapshot) ?? getVocationImage($character['vocation']);
     $detailUrl = getLinkWithQuery($subtopic, ['details' => (int) $auction['id']]);
     $currentBid = max((int) $auction['price'], (int) ($auction['bid_price'] ?? 0));
@@ -29,7 +29,10 @@ foreach ($auctions as $auction) {
     $daysLeft = intdiv($secondsLeft, 86400);
     $hoursLeft = intdiv($secondsLeft % 86400, 3600);
     $minutesLeft = intdiv($secondsLeft % 3600, 60);
-    $timeLeft = $daysLeft > 0 ? $daysLeft . 'd ' . $hoursLeft . 'h left' : $hoursLeft . 'h ' . $minutesLeft . 'm left';
+    $timeLeft = t('market.time_remaining_short', '{days}d {hours}h left', ['days' => $daysLeft, 'hours' => $hoursLeft]);
+    if ($daysLeft === 0) {
+        $timeLeft = t('market.time_remaining_minutes_short', '{hours}h {minutes}m left', ['hours' => $hoursLeft, 'minutes' => $minutesLeft]);
+    }
 
     $equipment = ZealotMarket::snapshotEquipment($snapshot);
     $equipmentFallbacks = [
@@ -61,23 +64,23 @@ foreach ($auctions as $auction) {
                 <span class="zealot-market-card__eyebrow">Live listing</span>
                 <h2><a href="<?= $detailUrl; ?>"><?= $characterName; ?></a></h2>
             </div>
-            <span class="zealot-market-card__timer" title="Ends <?= htmlspecialchars(date('M j, Y H:i', $endsAt), ENT_QUOTES, 'UTF-8'); ?>"><?= $timeLeft; ?></span>
+            <span class="zealot-market-card__timer" title="<?= htmlspecialchars(t('market.ends_at', 'Ends {date}', ['date' => siteDate('M j, Y H:i', $endsAt)]), ENT_QUOTES, 'UTF-8'); ?>"><?= htmlspecialchars($timeLeft, ENT_QUOTES, 'UTF-8'); ?></span>
         </header>
 
         <div class="zealot-market-card__body">
             <div class="zealot-market-card__outfit">
                 <img src="<?= htmlspecialchars($outfitUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?= $vocationName; ?> outfit">
-                <strong>Level <?= number_format((int) $character['level']); ?></strong>
+                <strong><?= htmlspecialchars(siteText('Level'), ENT_QUOTES, 'UTF-8'); ?> <?= number_format((int) $character['level']); ?></strong>
             </div>
 
             <dl class="zealot-market-card__details">
                 <div><dt>Vocation</dt><dd><?= $vocationName; ?></dd></div>
                 <div><dt>Gender</dt><dd><?= $genderName; ?></dd></div>
                 <div><dt>Capacity</dt><dd><?= number_format((int) $character['cap']); ?></dd></div>
-                <div><dt>Listed</dt><dd><?= htmlspecialchars(date('M j, Y', (int) ($auction['date_start_unix'] ?? strtotime($auction['date_start']))), ENT_QUOTES, 'UTF-8'); ?></dd></div>
+                <div><dt>Listed</dt><dd><?= htmlspecialchars(siteDate('M j, Y', (int) ($auction['date_start_unix'] ?? strtotime($auction['date_start']))), ENT_QUOTES, 'UTF-8'); ?></dd></div>
             </dl>
 
-            <div class="zealot-market-card__equipment" aria-label="Visible equipment">
+            <div class="zealot-market-card__equipment" aria-label="<?= htmlspecialchars(siteText('Visible equipment'), ENT_QUOTES, 'UTF-8'); ?>">
                 <?php foreach (range(1, 10) as $slot) {
                     if (isset($equipment[$slot])) { ?>
                         <span><?= getItemImage((int) (is_array($equipment[$slot]) ? $equipment[$slot]['itemtype'] : $equipment[$slot]), (int) (is_array($equipment[$slot]) ? $equipment[$slot]['count'] : 1), $equipmentFallbacks[$slot]); ?></span>
@@ -91,7 +94,7 @@ foreach ($auctions as $auction) {
         <footer class="zealot-market-card__footer">
             <div>
                 <span>Current bid</span>
-                <strong><?= number_format($currentBid); ?> <img src="<?= $template_path; ?>/images/account/icon-tibiacointrusted.png" alt="Zealot Coins"></strong>
+                <strong><?= number_format($currentBid); ?> <img src="<?= $template_path; ?>/images/account/icon-tibiacointrusted.png" alt="<?= htmlspecialchars(siteText('Zealot Coins'), ENT_QUOTES, 'UTF-8'); ?>"></strong>
             </div>
             <a href="<?= $detailUrl; ?>">View character <span aria-hidden="true">→</span></a>
         </footer>

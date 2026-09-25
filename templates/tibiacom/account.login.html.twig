@@ -10,7 +10,7 @@
 					<span class="CaptionEdgeRightTop" style="background-image:url({{ template_path }}/images/global/content/box-frame-edge.gif);" /></span>
 					<span class="CaptionBorderTop" style="background-image:url({{ template_path }}/images/global/content/table-headline-border.gif);" ></span>
 					<span class="CaptionVerticalLeft" style="background-image:url({{ template_path }}/images/global/content/box-frame-vertical.gif);" /></span>
-					<div class="Text" >Account Login</div>
+					<div class="Text" >{{ t('account.login.title', 'Account Login') }}</div>
 					<span class="CaptionVerticalRight" style="background-image:url({{ template_path }}/images/global/content/box-frame-vertical.gif);" /></span>
 					<span class="CaptionBorderBottom" style="background-image:url({{ template_path }}/images/global/content/table-headline-border.gif);" ></span>
 					<span class="CaptionEdgeLeftBottom" style="background-image:url({{ template_path }}/images/global/content/box-frame-edge.gif);" /></span>
@@ -37,13 +37,13 @@
 																<td><input style="width: 100%;" type="text" name="account_login" size="35" maxlength="30" autofocus /></td>
 															</tr>
 															<tr>
-																<td class="LabelV" ><span{% if error is not null %} class="red"{% endif %}>Tibia Password:</span></td>
+																	<td class="LabelV" ><span{% if error is not null %} class="red"{% endif %}>{{ t('account.password', 'Tibia Password:') }}</span></td>
 																<td><input style="width: 100%;" type="password" name="password_login" size="35" maxlength="29" /></td>
 															</tr>
 															<tr>
 																<td class="LabelV" ></td>
 																<td><input type="checkbox" id="remember_me" name="remember_me" value="true" />
-																	<label for="remember_me"> Remember me</label></td>
+																	<label for="remember_me"> {{ t('account.remember_me', 'Remember me') }}</label></td>
 															</tr>
 														</table>
 													</td>
@@ -78,7 +78,7 @@
 <br/>
 
 <div style="text-align:center">
-	<h1>New to {{ config.lua.serverName }}?</h1>
+	<h1>{{ t('account.new_to', 'New to {server}?', {server: config.lua.serverName}) }}</h1>
 </div>
 <div class="TableContainer">
 <div class="CaptionContainer">
@@ -87,7 +87,7 @@
 <span class="CaptionEdgeRightTop" style="background-image:url({{ template_path }}/images/global/content/box-frame-edge.gif);"></span>
 <span class="CaptionBorderTop" style="background-image:url({{ template_path }}/images/global/content/table-headline-border.gif);"></span>
 <span class="CaptionVerticalLeft" style="background-image:url({{ template_path }}/images/global/content/box-frame-vertical.gif);"></span>
-<div class="Text">New Player</div>
+<div class="Text">{{ t('account.new_player', 'New Player') }}</div>
 <span class="CaptionVerticalRight" style="background-image:url({{ template_path }}/images/global/content/box-frame-vertical.gif);"></span>
 <span class="CaptionBorderBottom" style="background-image:url({{ template_path }}/images/global/content/table-headline-border.gif);"></span>
 <span class="CaptionEdgeLeftBottom" style="background-image:url({{ template_path }}/images/global/content/box-frame-edge.gif);"></span>
@@ -111,15 +111,15 @@
 											<div style="float: right; margin-top: 20px;">
 											{% spaceless %}
 												<form class="MediumButtonForm" action="{{ getLink('account/create') }}" method="post" >
-											<div class="MediumButtonBackground zealot-medium-button--account" style="background-image:url({{ template_path }}/images/global/buttons/mediumbutton.gif)" onMouseOver="MouseOverBigButton(this);" onMouseOut="MouseOutBigButton(this);">
+															<div class="MediumButtonBackground zealot-medium-button--account" data-zealot-label="{{ t('account.create', 'Create Account') }}" style="background-image:url({{ template_path }}/images/global/buttons/mediumbutton.gif)" onMouseOver="MouseOverBigButton(this);" onMouseOut="MouseOutBigButton(this);">
 														<div class="MediumButtonOver" style="background-image:url({{ template_path }}/images/global/buttons/mediumbutton-over.gif)" onMouseOver="MouseOverBigButton(this);" onMouseOut="MouseOutBigButton(this);"></div>
-														<input class="MediumButtonText" type="image" name="Create Account" alt="Create Account" src="{{ template_path }}/images/global/buttons/mediumbutton_createaccount.png" />
+														<input class="MediumButtonText" type="image" name="Create Account" alt="{{ t('account.create', 'Create Account') }}" src="{{ template_path }}/images/global/buttons/mediumbutton_createaccount.png" />
 													</div>
 												</form>
 											{% endspaceless %}
 											</div>
 										<div id="LoginCreateAccountBox"><p><b>{{ config.lua.serverName }}...</b></p>
-										<div style="margin-left: 10px;"><p>... where hardcore gaming meets fantasy.</p><p>... where friendships last a lifetime.</p><p>... unites adventurers since 2026!</p>
+										<div style="margin-left: 10px;"><p>{{ t('account.login.tagline_fantasy', '... where hardcore gaming meets fantasy.') }}</p><p>{{ t('account.login.tagline_friendships', '... where friendships last a lifetime.') }}</p><p>{{ t('account.login.tagline_adventurers', '... unites adventurers since 2026!') }}</p>
 										</div>
 										</div>
 										</td>

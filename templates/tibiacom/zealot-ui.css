@@ -1256,13 +1256,19 @@ body {
   background-image: none !important;
   color: var(--zealot-gold-light);
   font-family: Verdana, Arial, sans-serif;
-  font-size: 11px;
+  min-width: 0;
+  padding: 0 10px;
+  font-size: 12px;
   font-weight: bold;
   text-shadow: 1px 1px 1px #000;
 }
 
 #Loginbox #LoginButton #ButtonText::after {
-  content: 'Account';
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  content: attr(data-zealot-label);
 }
 
 .zealot-medium-button--download::after,
@@ -1275,22 +1281,52 @@ body {
   pointer-events: none;
   color: var(--zealot-gold-light);
   font-family: Verdana, Arial, sans-serif;
-  font-size: 11px;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0 10px;
+  font-size: 12px;
   font-weight: bold;
   text-shadow: 1px 1px 1px #000;
 }
 
 .zealot-medium-button--download::after {
-  content: 'Download client';
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  content: attr(data-zealot-label);
 }
 
 .zealot-medium-button--account::after {
-  content: 'Create account';
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  content: attr(data-zealot-label);
 }
 
 .MediumButtonText {
   opacity: 0;
   cursor: pointer;
+}
+
+/* Page controls can be longer in Spanish and Portuguese. Keep their label
+ * inside the original illustrated hit area instead of letting it cross the
+ * gold frame. */
+.BigButton,
+.MediumButtonBackground {
+  overflow: hidden;
+}
+
+.BigButton .BigButtonText {
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: 0 9px;
+  font-size: clamp(10px, 0.8vw, 13px);
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* The quick-action strip is a component rather than a news headline, so it
@@ -1392,6 +1428,44 @@ body {
   align-items: center;
   justify-content: center;
   gap: 24px;
+}
+
+.zealot-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 2px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(231, 196, 125, 0.32);
+}
+
+.Content .zealot-status-shell .zealot-language-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 24px;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: #d5c3af !important;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 7pt !important;
+  font-weight: bold;
+  line-height: 1;
+  text-decoration: none !important;
+}
+
+.Content .zealot-status-shell .zealot-language-option:hover,
+.Content .zealot-status-shell .zealot-language-option:focus-visible,
+.Content .zealot-status-shell .zealot-language-option.is-active {
+  border-color: rgba(231, 196, 125, 0.68);
+  background: rgba(40, 90, 69, 0.78);
+  color: #fff1c8 !important;
+}
+
+.zealot-language-option > span:first-child {
+  font-size: 13px;
+  line-height: 1;
 }
 
 .Content .zealot-status-shell .zealot-quick-action {
@@ -2073,16 +2147,19 @@ body {
   left: 42px;
   width: 116px;
   height: 32px;
-  padding: 0 8px 0 0;
+  min-width: 0;
+  padding: 0 9px 0 2px;
   background: none !important;
   color: #fff1c8;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: bold;
   letter-spacing: 0.01em;
   line-height: 1;
   text-align: center;
   text-shadow: 1px 2px 1px #09140f, 0 0 3px rgba(0, 0, 0, .8);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -2139,12 +2216,20 @@ body {
 }
 
 #MenuColumn #Menu .SubmenuitemLabel {
+  box-sizing: border-box;
+  display: block;
+  min-width: 0;
+  padding-right: 8px;
   color: #eadbbd !important;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: bold;
   letter-spacing: 0.01em;
+  line-height: 18px;
+  overflow: hidden;
   text-shadow: 1px 1px 1px #09140f;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Sidebar calls-to-action share one green/gold treatment regardless of which
@@ -2297,6 +2382,61 @@ body {
   text-shadow: 1px 1px 1px #000;
 }
 
+/* Localized Server Save labels are naturally longer than the English ones.
+ * Keep each element in its own flow row: the legacy grid placed the label and
+ * timer in the same implicit cell, which caused the overlap in PT/ES. */
+#Themeboxes .serversave {
+  height: auto;
+  min-height: 0;
+}
+
+#Themeboxes .serversave_header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  min-height: 56px;
+  padding: 5px 10px;
+  font-size: 17px;
+  line-height: 1.08 !important;
+  overflow: hidden;
+  text-align: center;
+  text-wrap: balance;
+}
+
+#Themeboxes .serversave_content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  height: auto;
+  min-height: 94px;
+  padding: 9px 10px 10px;
+  gap: 8px;
+}
+
+#Themeboxes .serversave_text {
+  flex: 0 0 auto;
+  font-size: 11px !important;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+#Themeboxes .serversave_text small {
+  display: block;
+  font-size: inherit;
+}
+
+#Themeboxes .serversave_countdown {
+  flex: 0 0 auto;
+  min-height: 38px;
+  box-sizing: border-box;
+  padding: 5px 2px;
+  font-size: 21px !important;
+  line-height: 26px;
+  white-space: nowrap;
+}
+
 /* Compact account and download calls-to-action keep their labels, but lose the
  * chain/stone wrapper so they belong to the same navigation system. */
 #Loginbox,
@@ -2380,12 +2520,18 @@ body {
   color: var(--zealot-gold-light);
   cursor: pointer;
   font-family: Verdana, Arial, sans-serif;
-  font-size: 8pt;
+  min-width: 0;
+  padding: 0 8px;
+  font-size: 10px;
   font-weight: bold;
   text-shadow: 1px 1px 1px #000;
 }
 
 #Loginbox #LoginstatusText_2::after {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   content: attr(data-zealot-label);
 }
 
@@ -2622,6 +2768,26 @@ body {
 }
 
 @media (max-width: 720px) {
+  .Content .zealot-status-shell .InfoBar {
+    height: auto;
+    min-height: 34px;
+    padding: 4px 36px 4px 6px;
+  }
+
+  .zealot-quick-actions {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .zealot-language-switcher {
+    margin-left: 0;
+    padding-left: 6px;
+  }
+
+  .zealot-language-option__label {
+    display: none;
+  }
+
   #ArtworkHelper {
     background-position: top center !important;
   }

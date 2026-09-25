@@ -11,7 +11,7 @@ global $config, $logged, $db, $hooks, $template_path, $twig;
  * @link      https://github.com/opentibiabr/myaac
  */
 defined('MYAAC') or die('Direct access not allowed!');
-$title = 'Create Account';
+$title = t('account.create', 'Create Account');
 
 if ($config['account_country'])
     require SYSTEM . 'countries.conf.php';
@@ -29,7 +29,7 @@ if ($logged) {
                       style="background-image:url(<?= $template_path; ?>/images/global/content/table-headline-border.gif);"></span>
                 <span class="CaptionVerticalLeft"
                       style="background-image:url(<?= $template_path; ?>/images/global/content/box-frame-vertical.gif);"></span>
-                <div class="Text">Please logout before attempting to create a new account.</div>
+                <div class="Text"><?= t('account.create.logged_in', 'Please logout before attempting to create a new account.') ?></div>
                 <span class="CaptionVerticalRight"
                       style="background-image:url(<?= $template_path; ?>/images/global/content/box-frame-vertical.gif);"></span>
                 <span class="CaptionBorderBottom"
@@ -53,7 +53,7 @@ if ($logged) {
                                         <table class="TableContent" width="100%" style="border:1px solid #faf0d7;">
                                             <tbody>
                                             <tr bgcolor="#F1E0C6">
-                                                <td>Please logout before attempting to create a new account.</td>
+                                                <td><?= t('account.create.logged_in', 'Please logout before attempting to create a new account.') ?></td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -76,7 +76,7 @@ if ($logged) {
                 <div onmouseover="MouseOverBigButton(this);" onmouseout="MouseOutBigButton(this);">
                     <div class="BigButtonOver"
                          style="background-image: url(<?= $template_path; ?>/images/global/buttons/sbutton_over.gif); visibility: hidden;"></div>
-                    <input class="BigButtonText" type="button" value="Login"></div>
+                    <input class="BigButtonText" type="button" value="<?= t('account.login', 'Login') ?>"></div>
             </a></div>
     </div>
     <?php

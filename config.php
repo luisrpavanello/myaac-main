@@ -57,8 +57,8 @@ $config = array(
 	// footer
 	'footer' => ''/*'<br/>Your Server &copy; 2026. All rights reserved.'*/,
 
-	'language' => 'en', // default language (currently only 'en' available)
-	'language_allow_change' => false,
+	'language' => 'en', // public-site default language
+	'language_allow_change' => true,
 
 	'visitors_counter' => true,
 	'visitors_counter_ttl' => 10, // how long visitor will be marked as online (in minutes)

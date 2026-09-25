@@ -11,7 +11,7 @@ global $config, $db, $account_logged, $logged, $action, $template_path, $twig;
  * @link      https://github.com/opentibiabr/myaac
  */
 defined('MYAAC') or die('Direct access not allowed!');
-$title = 'Account Management';
+$title = t('account.management.title', 'Account Management');
 
 if ($config['account_country'])
     require SYSTEM . 'countries.conf.php';
@@ -62,7 +62,7 @@ if (isset($_REQUEST['redirect'])) {
 if ($action == '') {
     $freePremium = getBoolean(configLua('freePremium')) || $account_logged->getPremDays() == OTS_Account::GRATIS_PREMIUM_DAYS;
     $account_premdays = $account_logged->getPremDays();
-    $daysLeft = "$account_premdays " . ($account_premdays > 1 ? ' days' : ' day');
+    $daysLeft = "$account_premdays " . ($account_premdays > 1 ? t('account.days', 'days') : t('account.day', 'day'));
 
     $recovery_key = $account_logged->getCustomField('key');
     $account_coins = $account_logged->getCustomField('coins');
@@ -71,18 +71,18 @@ if ($action == '') {
 
     $tag = isVipSystemEnabled() ? 'VIP' : "Premium";
     $account_status = $account_logged->isPremium()
-        ? "<b><span style='color: green;'>{$tag} Account, {$daysLeft} left</span></b>"
+        ? "<b><span style='color: green;'>" . t('account.status.premium', '{tag} Account, {days} left', ['tag' => $tag, 'days' => $daysLeft]) . "</span></b>"
         : (!isVipSystemEnabled() && $freePremium
-            ? "<b><span style='color: green;'>Free Premium Account</span></b>"
-            : '<b><span style="color: red;">Free Account</span></b>');
+            ? "<b><span style='color: green;'>" . t('account.status.free_premium', 'Free Premium Account') . "</span></b>"
+            : '<b><span style="color: red;">' . t('account.status.free', 'Free Account') . '</span></b>');
 
     if (empty($recovery_key)) {
-        $account_registered = '<span style="color: red"><img src="' . $template_path . '/images/premiumfeatures/icon_no.png"> Not registered.</span>';
+        $account_registered = '<span style="color: red"><img src="' . $template_path . '/images/premiumfeatures/icon_no.png"> ' . t('account.not_registered', 'Not registered.') . '</span>';
     } else {
         if ($config['generate_new_reckey'] && $config['mail_enabled'])
-            $account_registered = '<b><span style="color: green">Yes ( <a href="' . getLink('account/register/new') . '"> Buy new Recovery Key </a> )</span></b>';
+            $account_registered = '<b><span style="color: green">' . t('account.yes', 'Yes') . ' ( <a href="' . getLink('account/register/new') . '"> ' . t('account.buy_recovery_key', 'Buy new Recovery Key') . ' </a> )</span></b>';
         else
-            $account_registered = '<b><span style="color: green"><img src="' . $template_path . '/images/premiumfeatures/icon_yes.png"> Registered.</span></b>';
+            $account_registered = '<b><span style="color: green"><img src="' . $template_path . '/images/premiumfeatures/icon_yes.png"> ' . t('account.registered', 'Registered.') . '</span></b>';
     }
 
     $account_created = $account_logged->getCreated();
@@ -95,17 +95,17 @@ if ($action == '') {
     $account_phone = $account_logged->getCustomField("phone");
     if ($account_logged->isBanned())
         if ($account_logged->getBanTime() > 0)
-            $welcome_message = '<span style="color: red">Your account is banished until ' . date("j F Y, G:i:s", $account_logged->getBanTime()) . '!</span>';
+            $welcome_message = '<span style="color: red">' . t('account.ban_until', 'Your account is banished until {date}!', ['date' => date("j F Y, G:i:s", $account_logged->getBanTime())]) . '</span>';
         else
-            $welcome_message = '<span style="color: red">Your account is banished FOREVER!</span>';
+            $welcome_message = '<span style="color: red">' . t('account.ban_forever', 'Your account is banished FOREVER!') . '</span>';
     else
-        $welcome_message = 'Welcome to your ' . configLua('serverName') . ' account!';
+        $welcome_message = t('account.welcome', 'Welcome to your {server} account!', ['server' => configLua('serverName')]);
 
     $verify_message = "";
     if ($config['mail_enabled'] && $config['account_mail_verify'] && $account_logged->getCustomField('email_verified') != '1') {
       $verifyLink = getLink('account/resend/verify');
       $type = ($config['account_verified_only'] ?? false) ? 'required' : 'optional';
-      $verify_message = "<span style='color: red'>Verification is {$type}! Please <b><a href='{$verifyLink}'>Verify</a></b> your Account!</span>";
+      $verify_message = "<span style='color: red'>" . t('account.verification_required', 'Verification is {type}! Please <b><a href="{link}">Verify</a></b> your Account!', ['type' => $type, 'link' => $verifyLink]) . "</span>";
     }
 
     $email_change = '';
@@ -131,8 +131,8 @@ if ($action == '') {
 
     $expiresIn = $account_logged->getExpirePremiumTime();
     $accountExpire = $expiresIn > 0 && $expiresIn > time()
-        ? ["Your VIP Time will expire in " . date("M d Y, G:i:s", $expiresIn), false]
-        : ['You do not have VIP time!', true];
+        ? [t('account.vip_expires', 'Your VIP Time will expire in {date}', ['date' => date("M d Y, G:i:s", $expiresIn)]), false]
+        : [t('account.no_vip', 'You do not have VIP time!'), true];
 
     $twig->display('account.management.html.twig', array(
         'welcome_message' => $welcome_message,

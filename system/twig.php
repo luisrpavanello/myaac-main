@@ -70,6 +70,9 @@ $twig->addFunction($function);
 $function = new TwigFunction('config', 'config');
 $twig->addFunction($function);
 
+$function = new TwigFunction('t', 't');
+$twig->addFunction($function);
+
 $function = new TwigFunction('getCustomPage', 'myaacTwigGetCustomPage');
 $twig->addFunction($function);
 

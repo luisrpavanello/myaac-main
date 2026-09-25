@@ -940,28 +940,26 @@ function template_footer()
     global $visitors;
     $amount = $visitors->getAmountVisitors();
     $ret .=
-      '<br/>Currently there ' .
-      ($amount > 1 ? 'are' : 'is') .
-      ' ' .
-      $amount .
-      ' visitor' .
-      ($amount > 1 ? 's' : '') .
-      '. • ';
+      '<br/>' . t('footer.visitors', null, [
+        'verb' => $amount > 1 ? 'are' : 'is',
+        'count' => $amount,
+        'plural' => $amount > 1 ? 's' : '',
+      ]) . ' • ';
   }
 
   if ($config['views_counter']) {
-    $ret .= 'Page has been viewed ' . $views_counter . ' times. • ';
+    $ret .= t('footer.views', null, ['count' => $views_counter]) . ' • ';
   }
 
   if (config('footer_show_load_time')) {
-    $ret .= 'Load time: ' . round(microtime(true) - START_TIME, 4) . ' seconds.';
+    $ret .= t('footer.load_time', null, ['seconds' => round(microtime(true) - START_TIME, 4)]);
   }
 
   if (isset($config['footer'][0])) {
     $ret .= '<br/>' . $config['footer'];
   }
 
-  return $ret . '<br/>Copyright by Myaac <strong>&copy; Zealot</strong>. All rights reserved.';
+  return $ret . '<br/>' . t('footer.copyright') . ' <strong>&copy; Zealot</strong>. ' . t('footer.rights');
 }
 
 function template_ga_code()
