@@ -152,9 +152,11 @@ function getDailyBoostSpriteUrl($name, $lookType = null, $lookTypeEx = null)
   // assets. The server persists this exact looktype with each daily boost, so
   // this is independent from monster names and always mirrors the client.
   if (is_numeric($lookType) && (int) $lookType > 0) {
-    $clientSpritePath = 'images/library/daily-boost/' . (int) $lookType . '.png';
-    if (file_exists(BASE . $clientSpritePath)) {
-      return $clientSpritePath;
+    foreach (['gif', 'png'] as $extension) {
+      $clientSpritePath = 'images/library/daily-boost/' . (int) $lookType . '.' . $extension;
+      if (file_exists(BASE . $clientSpritePath)) {
+        return $clientSpritePath;
+      }
     }
   }
 
@@ -162,9 +164,11 @@ function getDailyBoostSpriteUrl($name, $lookType = null, $lookTypeEx = null)
   // instead of a creature outfit. Keep that client-native path separate to
   // avoid collisions with regular outfit looktypes.
   if (is_numeric($lookTypeEx) && (int) $lookTypeEx > 0) {
-    $clientSpritePath = 'images/library/daily-boost/item-' . (int) $lookTypeEx . '.png';
-    if (file_exists(BASE . $clientSpritePath)) {
-      return $clientSpritePath;
+    foreach (['gif', 'png'] as $extension) {
+      $clientSpritePath = 'images/library/daily-boost/item-' . (int) $lookTypeEx . '.' . $extension;
+      if (file_exists(BASE . $clientSpritePath)) {
+        return $clientSpritePath;
+      }
     }
   }
 

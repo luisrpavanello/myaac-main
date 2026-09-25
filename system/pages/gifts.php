@@ -3,8 +3,6 @@ global $config, $db, $logged, $account_logged, $title, $action;
 
 defined('MYAAC') or die('Direct access not allowed!');
 
-require_once PLUGINS . 'pagseguro/config.php';
-
 function shopTableExists($table)
 {
     global $db;
@@ -13,13 +11,18 @@ function shopTableExists($table)
     return (bool)$query->fetch();
 }
 
-function shopMoney($value)
-{
-    return 'R$' . number_format((float)$value, 2, ',', '.');
-}
-
 $isHistory = $action === 'show_history' || $action === 'history';
 $title = $isHistory ? 'Shop History' : 'Shop Offer';
+
+// The legacy Shop Offer was coupled to PagSeguro, which only settles in BRL.
+// The live storefront uses the USD Payment Center instead, so never expose a
+// BRL-priced offer that could disagree with the checkout currency.
+if (!$isHistory) {
+    header('Location: ' . BASE_URL . '?subtopic=donate&type=coins', true, 302);
+    exit;
+}
+
+require_once PLUGINS . 'pagseguro/config.php';
 
 if ($isHistory) {
     if (!$logged || !$account_logged || !$account_logged->isLoaded()) {
@@ -93,48 +96,3 @@ if ($isHistory) {
     echo '</table>';
     return;
 }
-
-$donates = $config['pagSeguro']['donates'] ?? [];
-$boxes = $config['pagSeguro']['boxes'] ?? [];
-$validBoxes = array_filter($boxes, static function ($box) {
-    return isset($box['id'], $box['name']) && $box['id'] !== 'xxxxx';
-});
-
-echo '<table width="100%" border="0" cellpadding="4" cellspacing="1">';
-echo '<tr bgcolor="' . $config['vdarkborder'] . '" class="white"><td colspan="4"><b>Available Coin Packages</b></td></tr>';
-echo '<tr bgcolor="' . $config['darkborder'] . '"><td><b>Package</b></td><td><b>Reward</b></td><td><b>Price</b></td><td><b>Action</b></td></tr>';
-if (count($donates) === 0) {
-    echo '<tr bgcolor="' . $config['lightborder'] . '"><td colspan="4">No coin packages configured.</td></tr>';
-} else {
-    $i = 0;
-    foreach ($donates as $donate) {
-        $coins = (int)$donate['coins'];
-        $extra = (int)($donate['extra'] ?? 0);
-        $reward = $coins . ' Coins' . ($extra > 0 ? ' +' . $extra . ' bonus' : '');
-        echo '<tr bgcolor="' . getStyle($i++) . '">';
-        echo '<td>' . htmlspecialchars($donate['id']) . '</td>';
-        echo '<td>' . htmlspecialchars($reward) . '</td>';
-        echo '<td>' . shopMoney($donate['value']) . '</td>';
-        echo '<td>' . generateLink('?subtopic=donate&type=coins', 'Buy Coins') . '</td>';
-        echo '</tr>';
-    }
-}
-echo '</table><br />';
-
-echo '<table width="100%" border="0" cellpadding="4" cellspacing="1">';
-echo '<tr bgcolor="' . $config['vdarkborder'] . '" class="white"><td colspan="4"><b>Available Item Offers</b></td></tr>';
-echo '<tr bgcolor="' . $config['darkborder'] . '"><td><b>Item</b></td><td><b>Description</b></td><td><b>Price</b></td><td><b>Action</b></td></tr>';
-if (count($validBoxes) === 0) {
-    echo '<tr bgcolor="' . $config['lightborder'] . '"><td colspan="4">No item offers configured yet.</td></tr>';
-} else {
-    $i = 0;
-    foreach ($validBoxes as $box) {
-        echo '<tr bgcolor="' . getStyle($i++) . '">';
-        echo '<td>' . htmlspecialchars($box['name']) . '</td>';
-        echo '<td>' . htmlspecialchars($box['description'] ?? '') . '</td>';
-        echo '<td>' . shopMoney($box['value']) . '</td>';
-        echo '<td>' . generateLink(getLink('boxes'), 'Buy Box') . '</td>';
-        echo '</tr>';
-    }
-}
-echo '</table>';

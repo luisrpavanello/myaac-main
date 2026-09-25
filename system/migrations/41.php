@@ -33,7 +33,7 @@ if($db->hasTable(TABLE_PREFIX . 'faq')) {
 		],
 		[
 			'question' => 'How do points and the shop work?',
-			'answer' => 'Open <a href="?points">Buy Points</a> to see coin packages and <a href="?gifts">Shop Offer</a> to check available offers. Your purchase history is available at <a href="?gifts/history">Shop History</a>.',
+			'answer' => 'Open <a href="?subtopic=donate&type=coins">Payment Center</a> to see USD coin packages and available offers. Your purchase history is available at <a href="?gifts/history">Shop History</a>.',
 		],
 		[
 			'question' => 'Where can I see rates, stages and server information?',

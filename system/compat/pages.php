@@ -70,7 +70,8 @@ switch ($page) {
         break;
 
     case 'shopsystem':
-        $page = 'gifts';
+        $page = 'donate';
+        $_GET['type'] = 'coins';
         break;
 
     default:

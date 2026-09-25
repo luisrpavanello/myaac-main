@@ -11,32 +11,8 @@ global $config;
  * @version   2.0
  */
 defined('MYAAC') or die('Direct access not allowed!');
-$title = 'Buy Box with Pagseguro';
 
-if (!$code = $_POST['code'] ?? null) {
-    echo 'Please select item.';
-    return;
-}
-if (!isset($_POST['reference'])) {
-    echo 'Please enter reference.';
-    return;
-}
-
-require_once(PLUGINS . 'pagseguro/config.php');
-require_once(LIBS . 'PagSeguroLibrary/PagSeguroLibrary.php');
-
-$paymentRequest = new PagSeguroPaymentRequest();
-$boxSelected = $config['pagSeguro']['boxes'][$code];
-$paymentRequest->addItem($code, $boxSelected['name'], 1.00, $boxSelected['value']);
-$paymentRequest->setCurrency("BRL");
-$paymentRequest->setReference($_POST['reference']);
-$paymentRequest->setRedirectUrl(BASE_URL . $config['pagSeguro']['urlRedirect']);
-$paymentRequest->addParameter('notificationURL', "https://YOUR_SITE/payments/buybox.php");
-
-try {
-    $credentials = PagSeguroConfig::getAccountCredentials();
-    $checkoutUrl = $paymentRequest->register($credentials);
-    header('Location:' . $checkoutUrl);
-} catch (PagSeguroServiceException $e) {
-    die($e->getMessage());
-}
+// The public storefront is USD-only. PagSeguro supports BRL only, so this
+// retired endpoint must not be able to start a payment in another currency.
+header('Location: ' . BASE_URL . '?subtopic=donate&type=coins', true, 302);
+exit;

@@ -13,36 +13,8 @@ global $config;
  * @version   2.0
  */
 defined('MYAAC') or die('Direct access not allowed!');
-$title = 'Donate with Pagseguro';
 
-if (!$code = $_POST['code'] ?? null) {
-    echo 'Please select item.';
-    return;
-}
-if (!isset($_POST['reference'])) {
-    echo 'Please enter reference.';
-    return;
-}
-
-require_once(PLUGINS . 'pagseguro/config.php');
-require_once(LIBS . 'PagSeguroLibrary/PagSeguroLibrary.php');
-
-$paymentRequest = new PagSeguroPaymentRequest();
-$donateSelected = $config['pagSeguro']['donates'][$code];
-$value = $donateSelected['value'];
-$qtd = $donateSelected['coins'];
-$double = $config['pagSeguro']['doubleCoins'] && $qtd >= (int)$config['pagSeguro']['doubleCoinsStart'];
-$desc = ($double ? $qtd * 2 : $qtd) . " {$config['pagSeguro']['productName']}" . ($double ? "\r\n DOUBLE COINS" : '');
-$paymentRequest->addItem($code, $desc, $qtd, $config['pagSeguro']['value']);
-$paymentRequest->setCurrency("BRL");
-$paymentRequest->setReference($_POST['reference']);
-$paymentRequest->setRedirectUrl(BASE_URL . $config['pagSeguro']['urlRedirect']);
-$paymentRequest->addParameter('notificationURL', "https://YOUR_SITE/payments/donate.php");
-
-try {
-    $credentials = PagSeguroConfig::getAccountCredentials();
-    $checkoutUrl = $paymentRequest->register($credentials);
-    header('Location:' . $checkoutUrl);
-} catch (PagSeguroServiceException $e) {
-    die($e->getMessage());
-}
+// The public storefront is USD-only. PagSeguro supports BRL only, so this
+// retired endpoint must not be able to start a payment in another currency.
+header('Location: ' . BASE_URL . '?subtopic=donate&type=coins', true, 302);
+exit;

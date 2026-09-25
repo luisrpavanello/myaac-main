@@ -3,8 +3,9 @@
 
 The OTClient client uses an appearances.dat protobuf catalog and LZMA-compressed
 sprite sheets; it does not store one GIF per monster. This small dependency-free
-exporter reads those same assets and writes a transparent PNG suitable for the
-website. It intentionally uses the looktype, not a display name.
+exporter reads those same assets and writes a transparent PNG or animated GIF
+suitable for the website. It intentionally uses the looktype, not a display
+name, and preserves the animation phases and timing provided by the client.
 """
 
 import argparse
@@ -70,8 +71,25 @@ def unpack_varints(data):
     return values
 
 
+def parse_animation(data):
+    phases = []
+    for field, wire, value in protobuf_fields(data):
+        if field != 6 or wire != 2:
+            continue
+        minimum = maximum = 250
+        for phase_field, phase_wire, phase_value in protobuf_fields(value):
+            if phase_field == 1 and phase_wire == 0:
+                minimum = phase_value
+            elif phase_field == 2 and phase_wire == 0:
+                maximum = phase_value
+        # A few legacy appearances contain zero-duration frames. OTClient
+        # treats them as a short valid interval; do the same for web GIFs.
+        phases.append(max(20, int((minimum + maximum) / 2) or 250))
+    return phases
+
+
 def parse_sprite_info(data):
-    parsed = {'width': 1, 'height': 1, 'depth': 1, 'layers': 1, 'sprites': []}
+    parsed = {'width': 1, 'height': 1, 'depth': 1, 'layers': 1, 'sprites': [], 'durations': []}
     for field, wire, value in protobuf_fields(data):
         if field == 1:
             parsed['width'] = value
@@ -83,10 +101,12 @@ def parse_sprite_info(data):
             parsed['layers'] = value
         elif field == 5:
             parsed['sprites'].extend(unpack_varints(value) if wire == 2 else [value])
+        elif field == 6 and wire == 2:
+            parsed['durations'] = parse_animation(value)
     return parsed
 
 
-def find_initial_sprite_info(appearances, looktype, category):
+def find_sprite_info(appearances, looktype, category, prefer_animated=False):
     category_field = 2 if category == 'outfit' else 1
     for field, wire, appearance in protobuf_fields(appearances):
         if field != category_field or wire != 2:
@@ -107,6 +127,13 @@ def find_initial_sprite_info(appearances, looktype, category):
                 if sprite_info is not None:
                     groups.append((fixed_group, sprite_info))
         if appearance_id == looktype:
+            if prefer_animated:
+                # Outfit appearances usually provide an idle group followed by
+                # a moving group. The latter is what makes the sprite alive in
+                # the client, so use the group with the most official phases.
+                animated_groups = [group for group in groups if len(group[1]['durations']) > 1]
+                if animated_groups:
+                    return max(animated_groups, key=lambda group: len(group[1]['durations']))[1]
             # Fixed frame group 0 is the client's initial/static pose.
             for fixed_group, sprite_info in groups:
                 if fixed_group == 0:
@@ -244,8 +271,132 @@ def write_png(path, width, height, rgba):
     path.write_bytes(payload)
 
 
+def make_palette(frames):
+    """Build a GIF-safe palette while retaining exact pixel-art colours."""
+    counts = {}
+    for frame in frames:
+        for offset in range(0, len(frame), 4):
+            if frame[offset + 3] < 128:
+                continue
+            colour = tuple(frame[offset:offset + 3])
+            counts[colour] = counts.get(colour, 0) + 1
+
+    colours = list(counts)
+    if len(colours) <= 255:
+        return sorted(colours, key=lambda colour: counts[colour], reverse=True)
+
+    # Median-cut is intentionally small and dependency-free. It only applies
+    # to unusually colourful sprites; ordinary OTClient pixel art keeps its
+    # original colours unchanged in the branch above.
+    boxes = [colours]
+    while len(boxes) < 255:
+        candidates = [box for box in boxes if len(box) > 1]
+        if not candidates:
+            break
+        box = max(candidates, key=lambda values: max(max(colour[channel] for colour in values) - min(colour[channel] for colour in values) for channel in range(3)) * sum(counts[colour] for colour in values))
+        ranges = [max(colour[channel] for colour in box) - min(colour[channel] for colour in box) for channel in range(3)]
+        channel = max(range(3), key=lambda index: ranges[index])
+        ordered = sorted(box, key=lambda colour: colour[channel])
+        midpoint = sum(counts[colour] for colour in ordered) / 2
+        total = 0
+        split = 1
+        for index, colour in enumerate(ordered):
+            total += counts[colour]
+            if total >= midpoint:
+                split = max(1, index + 1)
+                break
+        boxes.remove(box)
+        boxes.extend((ordered[:split], ordered[split:]))
+
+    palette = []
+    for box in boxes:
+        total = max(1, sum(counts[colour] for colour in box))
+        palette.append(tuple(sum(colour[channel] * counts[colour] for colour in box) // total for channel in range(3)))
+    return palette
+
+
+def palette_indexes(frames, palette):
+    exact = {colour: index + 1 for index, colour in enumerate(palette)}
+    nearest = {}
+    indexed = []
+    for frame in frames:
+        pixels = bytearray()
+        for offset in range(0, len(frame), 4):
+            if frame[offset + 3] < 128:
+                pixels.append(0)
+                continue
+            colour = tuple(frame[offset:offset + 3])
+            index = exact.get(colour)
+            if index is None:
+                index = nearest.get(colour)
+                if index is None:
+                    index = min(range(len(palette)), key=lambda candidate: sum((colour[channel] - palette[candidate][channel]) ** 2 for channel in range(3))) + 1
+                    nearest[colour] = index
+            pixels.append(index)
+        indexed.append(pixels)
+    return indexed
+
+
+def gif_lzw(data):
+    """Encode indexed pixels with a portable GIF LZW stream.
+
+    The sprites are tiny (at most 64px here), so emitting literal palette
+    indexes is deliberately preferable to a stateful dictionary encoder. It
+    avoids browser-specific edge cases around GIF code-width changes while
+    keeping each eight-frame Daily Boost animation well below 40 KB.
+    """
+    minimum_code_size = 8
+    clear_code = 1 << minimum_code_size
+    end_code = clear_code + 1
+    code_size = minimum_code_size + 1
+    buffer = 0
+    bits = 0
+    output = bytearray()
+
+    def emit(code, width):
+        nonlocal buffer, bits
+        buffer |= code << bits
+        bits += width
+        while bits >= 8:
+            output.append(buffer & 0xff)
+            buffer >>= 8
+            bits -= 8
+
+    emit(clear_code, code_size)
+    for index, pixel in enumerate(data):
+        # GIF decoders grow their dictionary after each literal. Reset before
+        # it reaches the 9-bit boundary, so all emitted literals remain valid
+        # 9-bit codes without relying on implementation-specific width timing.
+        if index and index % 200 == 0:
+            emit(clear_code, code_size)
+        emit(pixel, code_size)
+    emit(end_code, code_size)
+    if bits:
+        output.append(buffer & 0xff)
+    return bytes((minimum_code_size,)) + b''.join(bytes((len(output[index:index + 255]),)) + output[index:index + 255] for index in range(0, len(output), 255)) + b'\x00'
+
+
+def write_gif(path, width, height, frames, durations):
+    palette = make_palette(frames)
+    indexed_frames = palette_indexes(frames, palette)
+    colour_table = [(0, 0, 0)] + palette[:255]
+    colour_table.extend([(0, 0, 0)] * (256 - len(colour_table)))
+    payload = bytearray(b'GIF89a')
+    payload.extend(struct.pack('<HHBBB', width, height, 0xf7, 0, 0))
+    payload.extend(channel for colour in colour_table for channel in colour)
+    payload.extend(b'!\xff\x0bNETSCAPE2.0\x03\x01\x00\x00\x00')
+    for frame, duration in zip(indexed_frames, durations):
+        delay = min(65535, max(2, int(round(duration / 10))))
+        payload.extend(b'!\xf9\x04\x05' + struct.pack('<H', delay) + b'\x00\x00')
+        payload.extend(b',' + struct.pack('<HHHHB', 0, 0, width, height, 0))
+        payload.extend(gif_lzw(frame))
+    payload.extend(b';')
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+
+
 def main():
-    parser = argparse.ArgumentParser(description='Export an official OTClient outfit sprite to PNG.')
+    parser = argparse.ArgumentParser(description='Export an official OTClient outfit sprite to PNG or animated GIF.')
     parser.add_argument('--assets', required=True, type=Path, help='OTClient data/things/<version> directory')
     parser.add_argument('--looktype', required=True, type=int)
     parser.add_argument('--output', required=True, type=Path)
@@ -256,6 +407,7 @@ def main():
     parser.add_argument('--legs', type=int, default=0)
     parser.add_argument('--feet', type=int, default=0)
     parser.add_argument('--addons', type=int, default=0)
+    parser.add_argument('--animated', action='store_true', help='Export every official animation frame as a looping GIF')
     args = parser.parse_args()
 
     catalog_file = args.assets / 'catalog-content.json'
@@ -266,7 +418,12 @@ def main():
     if appearances_entry is None:
         raise ValueError('catalog-content.json has no appearances entry')
     sprite_descriptors = [entry for entry in catalog if entry.get('type') == 'sprite']
-    sprite_info = find_initial_sprite_info((args.assets / appearances_entry['file']).read_bytes(), args.looktype, args.category)
+    sprite_info = find_sprite_info(
+        (args.assets / appearances_entry['file']).read_bytes(),
+        args.looktype,
+        args.category,
+        args.animated,
+    )
     width, height, depth, layers = (sprite_info[key] for key in ('width', 'height', 'depth', 'layers'))
     if args.direction >= width:
         raise ValueError('Looktype {} has only {} directions'.format(args.looktype, width))
@@ -280,34 +437,53 @@ def main():
         sheet = sheet_cache.setdefault(descriptor['file'], decode_sheet(args.assets / descriptor['file']))
         return crop_sprite(sheet, descriptor, sprite_id)
 
-    def index_for(layer, y_pattern):
-        return ((y_pattern * width + args.direction) * layers) + layer
+    animation_phases = max(1, len(sprite_info['durations']))
 
-    output = None
-    active_addon_patterns = [0] + [pattern for pattern in range(1, height) if args.addons & (1 << (pattern - 1))]
-    for y_pattern in active_addon_patterns:
-        base_index = index_for(0, y_pattern)
-        if base_index >= len(sprite_info['sprites']):
-            continue
-        image_width, image_height, base = image_for(sprite_info['sprites'][base_index])
+    def render_phase(animation_phase):
+        output = None
+        image_width = image_height = None
+        active_addon_patterns = [0] + [pattern for pattern in range(1, height) if args.addons & (1 << (pattern - 1))]
+        for y_pattern in active_addon_patterns:
+            def index_for(layer):
+                return (((animation_phase * depth) * height + y_pattern) * width + args.direction) * layers + layer
+
+            base_index = index_for(0)
+            if base_index >= len(sprite_info['sprites']):
+                continue
+            image_width, image_height, base = image_for(sprite_info['sprites'][base_index])
+            if output is None:
+                output = bytearray(base)
+            else:
+                alpha_over(output, base)
+            if args.category == 'outfit' and layers > 1:
+                mask_index = index_for(1)
+                if mask_index < len(sprite_info['sprites']):
+                    mask_width, mask_height, mask = image_for(sprite_info['sprites'][mask_index])
+                    if (mask_width, mask_height) != (image_width, image_height):
+                        raise ValueError('Mask dimensions do not match the base sprite')
+                    multiply_mask(output, mask, (255, 255, 0), outfit_color(args.head))
+                    multiply_mask(output, mask, (255, 0, 0), outfit_color(args.body))
+                    multiply_mask(output, mask, (0, 255, 0), outfit_color(args.legs))
+                    multiply_mask(output, mask, (0, 0, 255), outfit_color(args.feet))
+        return output, image_width, image_height
+
+    frames = []
+    for animation_phase in range(animation_phases if args.animated else 1):
+        output, image_width, image_height = render_phase(animation_phase)
         if output is None:
-            output = bytearray(base)
-        else:
-            alpha_over(output, base)
-        if args.category == 'outfit' and layers > 1:
-            mask_index = index_for(1, y_pattern)
-            if mask_index < len(sprite_info['sprites']):
-                mask_width, mask_height, mask = image_for(sprite_info['sprites'][mask_index])
-                if (mask_width, mask_height) != (image_width, image_height):
-                    raise ValueError('Mask dimensions do not match the base sprite')
-                multiply_mask(output, mask, (255, 255, 0), outfit_color(args.head))
-                multiply_mask(output, mask, (255, 0, 0), outfit_color(args.body))
-                multiply_mask(output, mask, (0, 255, 0), outfit_color(args.legs))
-                multiply_mask(output, mask, (0, 0, 255), outfit_color(args.feet))
-    if output is None:
+            continue
+        frames.append(output)
+    if not frames:
         raise ValueError('Looktype {} contains no renderable initial sprite'.format(args.looktype))
-    write_png(args.output, image_width, image_height, output)
-    print('{} -> {} ({}x{}, looktype {})'.format(args.assets, args.output, image_width, image_height, args.looktype))
+    if args.animated:
+        if args.output.suffix.lower() != '.gif':
+            raise ValueError('Animated exports must use a .gif output path')
+        durations = sprite_info['durations'] or [250]
+        write_gif(args.output, image_width, image_height, frames, durations[:len(frames)])
+        print('{} -> {} ({}x{}, {} official frames, looktype {})'.format(args.assets, args.output, image_width, image_height, len(frames), args.looktype))
+    else:
+        write_png(args.output, image_width, image_height, frames[0])
+        print('{} -> {} ({}x{}, looktype {})'.format(args.assets, args.output, image_width, image_height, args.looktype))
 
 
 if __name__ == '__main__':

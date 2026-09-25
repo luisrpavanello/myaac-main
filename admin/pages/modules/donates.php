@@ -12,15 +12,15 @@ global $db, $twig;
  */
 
 $result = [];
-if ($db->hasTable('pagseguro_transactions')) {
-    $query = $db->query("SELECT `account_id`, SUM(`code`) as total, payment_status FROM `pagseguro_transactions` WHERE `payment_status` = 'AVAILABLE' GROUP BY account_id ORDER BY total DESC LIMIT 10;")->fetchAll();
+if ($db->hasTable('myaac_stripe_transactions')) {
+    $query = $db->query("SELECT `account_id`, SUM(`amount_total`) AS `total_cents` FROM `myaac_stripe_transactions` WHERE `status` = 'paid' GROUP BY `account_id` ORDER BY `total_cents` DESC LIMIT 10;")->fetchAll();
     foreach ($query as $item) {
-        if ($acc = $db->query("SELECT `id`, `name`, `email` FROM `accounts` WHERE `id` = {$item['account_id']}")->fetch()) {
+        if ($acc = $db->query('SELECT `id`, `name`, `email` FROM `accounts` WHERE `id` = ' . (int) $item['account_id'])->fetch()) {
             $result[$acc['id']] = [
                 'name'    => $acc['name'],
                 'email'   => $acc['email'],
                 'players' => getPlayerByAccountId($acc['id']),
-                'value'   => "R$ " . number_format((float)$item['total'], 2, ',', '.')
+                'value'   => 'USD ' . number_format((float) $item['total_cents'] / 100, 2, '.', ',')
             ];
         }
     }

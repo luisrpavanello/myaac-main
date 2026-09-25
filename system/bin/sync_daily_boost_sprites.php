@@ -72,7 +72,10 @@ foreach ($sources as $label => $table) {
         continue;
     }
 
-    $outputFile = $outputDirectory . '/' . ($category === 'object' ? 'item-' : '') . $lookType . '.png';
+    // Daily Boosts intentionally use the client animation, not a screenshot of
+    // its first frame. Keeping the files keyed by looktype makes a new daily
+    // creature/boss deterministic and independent from its display name.
+    $outputFile = $outputDirectory . '/' . ($category === 'object' ? 'item-' : '') . $lookType . '.gif';
     $arguments = [
         'python3',
         $exporter,
@@ -80,6 +83,7 @@ foreach ($sources as $label => $table) {
         '--looktype', (string) $lookType,
         '--category', $category,
         '--output', $outputFile,
+        '--animated',
         '--direction', $category === 'outfit' ? '2' : '0',
         '--head', (string) ((int) ($boost['lookhead'] ?? 0)),
         '--body', (string) ((int) ($boost['lookbody'] ?? 0)),

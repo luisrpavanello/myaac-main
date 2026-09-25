@@ -136,6 +136,10 @@ foreach ($links as $link) {
   $template['link_' . $link] = getLink($link);
 }
 
+// Shop offers are handled by the unified USD Payment Center. Keep the legacy
+// template variable working while avoiding the retired BRL PagSeguro offer.
+$template['link_gifts'] = BASE_URL . '?subtopic=donate&type=coins';
+
 $template['link_screenshots'] = getLink('gallery');
 $template['link_movies'] = getLink('videos');
 

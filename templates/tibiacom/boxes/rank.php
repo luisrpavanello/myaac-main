@@ -121,7 +121,7 @@ unset($player);
         </div>
         <?php } ?>
         <a href="<?php echo BASE_URL ?>?highscores">
-            <button type="button" class="rank_button">Ver Highscores</button>
+            <button type="button" class="rank_button">View Highscores</button>
         </a>
     </div>
     <div class="rank_bottom"></div>

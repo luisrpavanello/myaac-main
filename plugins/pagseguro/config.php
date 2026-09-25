@@ -25,7 +25,7 @@ $config['pagSeguro'] = [
     'doubleCoins'       => false, // should coins be doubled? for example: for 5 coins donated you become 10.
     'doubleCoinsStart'  => 300, // if doubleCoins is activated, what is min value to activate double coins
     'donationType'      => 'coins_transferable', // what should be added to player account? coins/coins_transferable
-    'donates'           => [ // value = value in reais / coins = amount of coins / extra = bonus
+    'donates'           => [ // value = value in USD / coins = amount of coins / extra = bonus
         '10'   => ['id' => '10',   'value'   => 10,   'coins' => 100,   'extra' => 0],
         '20'   => ['id' => '20',   'value'   => 20,   'coins' => 200,   'extra' => 0],
         '30'   => ['id' => '30',   'value'   => 30,   'coins' => 300,   'extra' => 30],
@@ -39,7 +39,7 @@ $config['pagSeguro'] = [
             'value'       => 1.00, // value
             'image'       => 'box_basic.png', // your image
             'border'      => '#1fc939', // border color
-            'description' => 'Com essa box, você economiza R$ xx,00', // some description
+            'description' => 'This box saves you $xx.xx.', // some description
         ],
     ]
 ];
