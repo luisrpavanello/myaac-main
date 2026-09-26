@@ -271,6 +271,43 @@ def write_png(path, width, height, rgba):
     path.write_bytes(payload)
 
 
+def crop_frames_to_visible_bounds(frames, width, height, padding=2):
+    """Crop one shared transparent border around every animation frame.
+
+    OTClient anchors some outfits at the lower-right of their full tile canvas.
+    Keeping that empty canvas makes an otherwise centered ``img`` look offset
+    on the web. A union of all opaque pixels preserves every animation phase
+    while making the real creature/boss content center correctly in the card.
+    """
+    left, top, right, bottom = width, height, -1, -1
+    for frame in frames:
+        for y in range(height):
+            for x in range(width):
+                if frame[(y * width + x) * 4 + 3] < 128:
+                    continue
+                left = min(left, x)
+                top = min(top, y)
+                right = max(right, x)
+                bottom = max(bottom, y)
+
+    if right < left or bottom < top:
+        return frames, width, height
+
+    left = max(0, left - padding)
+    top = max(0, top - padding)
+    right = min(width - 1, right + padding)
+    bottom = min(height - 1, bottom + padding)
+    cropped_width, cropped_height = right - left + 1, bottom - top + 1
+
+    def crop(frame):
+        return b''.join(
+            frame[(y * width + left) * 4:(y * width + right + 1) * 4]
+            for y in range(top, bottom + 1)
+        )
+
+    return [crop(frame) for frame in frames], cropped_width, cropped_height
+
+
 def make_palette(frames):
     """Build a GIF-safe palette while retaining exact pixel-art colours."""
     counts = {}
@@ -384,10 +421,17 @@ def write_gif(path, width, height, frames, durations):
     payload = bytearray(b'GIF89a')
     payload.extend(struct.pack('<HHBBB', width, height, 0xf7, 0, 0))
     payload.extend(channel for colour in colour_table for channel in colour)
+    # Mark the exported format so the website synchronizer can replace GIFs
+    # generated before the disposal fix when that looktype appears again.
+    marker = b'DAILYBOOSTv3'
+    payload.extend(b'!\xfe' + bytes((len(marker),)) + marker + b'\x00')
     payload.extend(b'!\xff\x0bNETSCAPE2.0\x03\x01\x00\x00\x00')
     for frame, duration in zip(indexed_frames, durations):
         delay = min(65535, max(2, int(round(duration / 10))))
-        payload.extend(b'!\xf9\x04\x05' + struct.pack('<H', delay) + b'\x00\x00')
+        # Disposal method 2 (restore to background) clears transparent pixels
+        # left by the previous full-canvas frame. Method 1/"none" accumulates
+        # the frames and produces ghosting in browsers.
+        payload.extend(b'!\xf9\x04\x09' + struct.pack('<H', delay) + b'\x00\x00')
         payload.extend(b',' + struct.pack('<HHHHB', 0, 0, width, height, 0))
         payload.extend(gif_lzw(frame))
     payload.extend(b';')
@@ -475,6 +519,7 @@ def main():
         frames.append(output)
     if not frames:
         raise ValueError('Looktype {} contains no renderable initial sprite'.format(args.looktype))
+    frames, image_width, image_height = crop_frames_to_visible_bounds(frames, image_width, image_height)
     if args.animated:
         if args.output.suffix.lower() != '.gif':
             raise ValueError('Animated exports must use a .gif output path')

@@ -27,7 +27,7 @@
 
 html {
   min-height: 100%;
-  background: var(--zealot-night);
+  background: #06100d url(images/header/zealot-site-background.jpg) center top / cover fixed no-repeat;
 }
 
 /* index.php previously applied a repeating theme-box image directly on body.
@@ -35,10 +35,11 @@ html {
 body {
   min-height: 100vh;
   height: auto !important;
-  background-color: var(--zealot-night) !important;
-  background-image: linear-gradient(180deg, #101a15 0, var(--zealot-night) 520px) !important;
+  background-color: #06100d !important;
+  background-image: url(images/header/zealot-site-background.jpg) !important;
   background-repeat: no-repeat !important;
-  background-size: 100% 100% !important;
+  background-position: center top !important;
+  background-size: cover !important;
   background-attachment: fixed !important;
 }
 
@@ -46,7 +47,8 @@ body {
  * surrounding page from falling back to a disconnected flat black surface. */
 #ArtworkHelper {
   min-height: 100vh;
-  background-color: var(--zealot-night);
+  height: auto;
+  background-color: transparent;
 }
 
 /* The header mark is an alpha PNG, so the artwork belongs directly to the
@@ -1463,7 +1465,13 @@ body {
   color: #fff1c8 !important;
 }
 
-.zealot-language-option > span:first-child {
+.zealot-language-option__flags {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.zealot-language-option__flags > span {
   font-size: 13px;
   line-height: 1;
 }
@@ -2437,6 +2445,57 @@ body {
   white-space: nowrap;
 }
 
+/* The translated payment and character-search titles are wider than their
+ * English counterparts. These two boxes used an inherited one-line header,
+ * which put the second line on top of the panel below. Let their header grow
+ * independently and keep the form/artwork in a separate content flow. */
+#Themeboxes .donate,
+#Themeboxes .searchchar {
+  height: auto !important;
+  min-height: 0;
+}
+
+#Themeboxes .donate_header,
+#Themeboxes .searchchar_header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  height: auto !important;
+  padding: 7px 10px;
+  font-size: 17px;
+  line-height: 1.08 !important;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+}
+
+#Themeboxes .donate_content {
+  min-height: 125px;
+}
+
+#Themeboxes .searchchar_content {
+  display: flex;
+  min-height: 80px;
+  height: auto !important;
+  padding: 9px 10px 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#Themeboxes .searchchar_input {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+}
+
+#Themeboxes .searchchar_button {
+  flex: 0 0 30px;
+  margin-top: 0;
+}
+
 /* Compact account and download calls-to-action keep their labels, but lose the
  * chain/stone wrapper so they belong to the same navigation system. */
 #Loginbox,
@@ -2552,7 +2611,7 @@ body {
 /* Daily Boost sits above the dynamic modules. Reserve its real rendered
  * height plus a visual gap so longer boost labels cannot overlap Highscores. */
 #Themeboxes {
-  margin-top: 54px;
+  margin-top: 72px;
 }
 
 .DailyHighlightsTitle {

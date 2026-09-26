@@ -15,7 +15,9 @@ function siteLanguages()
     return [
         'en' => ['label' => 'English', 'flag' => '🇺🇸'],
         'es' => ['label' => 'Español', 'flag' => '🇪🇸'],
-        'pt' => ['label' => 'Português', 'flag' => '🇧🇷'],
+        // Portuguese is shared by Brazilian and Portuguese players, so keep
+        // both flags visible while they use the same translated interface.
+        'pt' => ['label' => 'Português', 'flag' => '🇧🇷', 'secondary_flag' => '🇵🇹'],
     ];
 }
 

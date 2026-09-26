@@ -165,7 +165,7 @@ if ($save) {
     }
 
     if (!isset($_POST['accept_rules']) || $_POST['accept_rules'] !== 'true')
-        $errors['accept_rules'] = 'You have to agree to the ' . $config['lua']['serverName'] . ' Rules in order to create an account!';
+        $errors['accept_rules'] = t('account.create.accept_rules_error', 'You must agree to the {server} Rules to create an account.', ['server' => $config['lua']['serverName']]);
 
     $params = array(
         'account' => $account_db,

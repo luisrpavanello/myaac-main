@@ -4,6 +4,21 @@ if (PHP_SAPI !== 'cli') {
     exit("This script can be run only from the command line.\n");
 }
 
+$onlyMissing = false;
+foreach (array_slice($argv, 1) as $argument) {
+    if ($argument === '--if-missing') {
+        $onlyMissing = true;
+        continue;
+    }
+    if ($argument === '--help' || $argument === '-h') {
+        echo "Usage: php system/bin/sync_daily_boost_sprites.php [--if-missing]\n";
+        echo "  --if-missing  Export only the sprites that are not already cached.\n";
+        exit(0);
+    }
+    fwrite(STDERR, "Unknown option: {$argument}\n");
+    exit(64);
+}
+
 require_once __DIR__ . '/../../common.php';
 require_once SYSTEM . 'functions.php';
 require_once SYSTEM . 'init.php';
@@ -47,6 +62,19 @@ $sources = [
 ];
 $failed = 0;
 
+function isCurrentDailyBoostSprite(string $file): bool
+{
+    if (!is_file($file) || filesize($file) <= 0) {
+        return false;
+    }
+
+    // The exporter stamps v3 into the GIF. This makes --if-missing also heal
+    // caches created before a rendering fix without continuously re-exporting
+    // current-format sprites every five minutes.
+    $header = file_get_contents($file, false, null, 0, 1024);
+    return is_string($header) && strpos($header, 'DAILYBOOSTv3') !== false;
+}
+
 foreach ($sources as $label => $table) {
     if (!$db->hasTable($table)) {
         fwrite(STDERR, "SKIPPED  {$label}: table {$table} does not exist\n");
@@ -76,6 +104,10 @@ foreach ($sources as $label => $table) {
     // its first frame. Keeping the files keyed by looktype makes a new daily
     // creature/boss deterministic and independent from its display name.
     $outputFile = $outputDirectory . '/' . ($category === 'object' ? 'item-' : '') . $lookType . '.gif';
+    if ($onlyMissing && isCurrentDailyBoostSprite($outputFile)) {
+        echo strtoupper($label) . "  SKIPPED {$outputFile} already exists\n";
+        continue;
+    }
     $arguments = [
         'python3',
         $exporter,

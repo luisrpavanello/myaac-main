@@ -1,29 +1,39 @@
 <style>
     .donate{
         width: 180px;
-        height: 190px;
+        height: auto;
     }
     .donate_header{
-        height: 45px;
+        min-height: 72px;
+        height: auto;
         width: 180px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 10px;
         background-image: url('templates/tibiacom/images/themeboxes/box_top.png');
         font-family: Verdana;
         font-weight: bold;
         color: #d5c3af;
-        line-height: 65px;
-        font-size: 18px;
+        line-height: 1.08;
+        font-size: 17px;
+        overflow-wrap: anywhere;
+        text-align: center;
+        text-wrap: balance;
     }
     .donate_bottom{
         height: 30px;
         width: 180px;
-        margin-top: -20px;
+        margin-top: 0;
         background-image: url('templates/tibiacom/images/themeboxes/box_bottom.png');
     }
     .donate_content{
         box-sizing: border-box;
         padding: 0px 10px;
         width: 160px;
-        height: 125px;
+        min-height: 125px;
+        height: auto;
         background-image: url('templates/tibiacom/images/themeboxes/box_bg.png');
         display: flex;
         flex-direction: column;

@@ -1,27 +1,18 @@
-<h2>Welcome to the Lost Account Interface!</h2>
+<h2>{{ t('lost.title', 'Account Recovery') }}</h2>
 
-<p>If you have lost access to your account, this interface can help you. Of course, you need to prove that your claim to
-  the account is justified. Enter the requested data and follow the instructions carefully. Please understand there is
-  no way to get access to your lost account if the interface cannot help you. Further options to change account data are
-  available if you have a registered account.</p>
+<p>{{ t('lost.intro', 'If you no longer have access to your account, this page can help you recover it. You will need to confirm that the account belongs to you.') }}</p>
 
-<p>By using the Lost Account Interface you can</p>
+<p>{{ t('lost.can', 'With account recovery, you can:') }}</p>
 
 <ul class="CustomBulletPointList"
     style="list-style-image: url(https://static.tibia.com/images/global/content/bullet.gif);">
-  <li>get a new password if you have lost the current password,</li>
-  <li>get your account back if it has been hacked,</li>
-  <li>change the email address of your account instantly (only possible with a valid recovery key or a valid recovery
-    TAN),
-  </li>
-  <li>request a new recovery key/recovery TAN (only available to registered accounts),</li>
-  <li>remove an authenticator app from your account (only possible with a valid recovery key or a valid recovery TAN),
-  </li>
-  <li>disable email code authentication for your account (only available to accounts with a valid recovery key).</li>
+  <li>{{ t('lost.benefit_password', 'request a new password when you have lost the current one;') }}</li>
+  <li>{{ t('lost.benefit_hacked', 'recover an account that has been compromised;') }}</li>
+  <li>{{ t('lost.benefit_email', 'change the account email using a valid recovery key;') }}</li>
+  <li>{{ t('lost.benefit_key', 'request a new recovery key for a registered account.') }}</li>
 </ul>
 
-<p>As a first step to use the Lost Account Interface, please enter the name of a character or the email address of your
-  account and click on "Submit".</p>
+<p>{{ t('lost.first_step', 'Start by entering a character name or the email address associated with the account, then choose what you need.') }}</p>
 
 <br/>
 
@@ -36,7 +27,7 @@
             style="background-image:url({{ template_path }}/images/global/content/table-headline-border.gif);"></span>
       <span class="CaptionVerticalLeft"
             style="background-image:url({{ template_path }}/images/global/content/box-frame-vertical.gif);"></span>
-      <div class="Text">Lost account</div>
+      <div class="Text">{{ t('lost.form_title', 'Account Recovery') }}</div>
       <span class="CaptionVerticalRight"
             style="background-image:url({{ template_path }}/images/global/content/box-frame-vertical.gif);"></span>
       <span class="CaptionBorderBottom"
@@ -61,7 +52,7 @@
                     <input type="hidden" name="character" value="">
                     <table cellspacing="1" cellpadding="4" border="0" width="100%">
                       <tr>
-                        <td bgcolor="{{ config.darkborder }}"><b>Please enter your character name</b></td>
+                        <td bgcolor="{{ config.darkborder }}"><b>{{ t('lost.character_label', 'Character name') }}</b></td>
                       </tr>
                       <tr>
                         <td bgcolor="{{ config.darkborder }}">
@@ -69,7 +60,7 @@
                         </td>
                       </tr>
                       <tr>
-                        <td bgcolor="{{ config.darkborder }}"><b>Or enter your e-mail</b></td>
+                        <td bgcolor="{{ config.darkborder }}"><b>{{ t('lost.or_email', 'Or enter your email address') }}</b></td>
                       </tr>
                       <tr>
                         <td bgcolor="{{ config.darkborder }}">
@@ -79,19 +70,16 @@
                     </table>
                     <table cellspacing="1" cellpadding="4" border="0" width="100%">
                       <tr>
-                        <td bgcolor="{{ config.darkborder }}"><b>What do you want?</b></td>
+                        <td bgcolor="{{ config.darkborder }}"><b>{{ t('lost.what_do_you_need', 'What do you need?') }}</b></td>
                       </tr>
                       <tr>
                         <td bgcolor="{{ config.darkborder }}">
                           <input type="radio" name="action_type" id="action_type_email" value="email">
-                          <label for="action_type_email"> Send me new password and my account name to account e-mail
-                            adress.</label><br/>
+                          <label for="action_type_email"> {{ t('lost.option_email', 'Send my account name and a new password to the account email.') }}</label><br/>
                           <input type=radio name="action_type" id="action_type_key" value="reckey">
-                          <label for="action_type_key"> I got <b>recovery key</b> and want set new password and e-mail
-                            adress to my account.</label><br/>
+                          <label for="action_type_key"> {{ t('lost.option_key', 'I have a recovery key and want to set a new password and email address.') }}</label><br/>
                           <input type="radio" name="action_type" id="action_type_no_char" value="no_char">
-                          <label for="action_type_no_char"> I don't have character created and want to recovery my
-                            account.</label><br/>
+                          <label for="action_type_no_char"> {{ t('lost.option_no_character', 'I do not have a character and want to recover my account by email.') }}</label><br/>
                         </td>
                       </tr>
                     </table>
@@ -115,6 +103,5 @@
     </tbody>
   </table>
 </div>
-
 
 

@@ -1,3 +1,6 @@
-To play on {{ config.lua.serverName }} you need an account.
-All you have to do to create your new account is to enter an account {% if constant('USE_ACCOUNT_NAME') %}name{% else %}number{% endif %}, password{% if config.recaptcha_enabled %}, confirm reCAPTCHA{% endif %}{% if config.account_country %}, country{% endif %} and your email address.
-Also you have to agree to the terms presented below. If you have done so, your account {% if constant('USE_ACCOUNT_NAME') %}name{% else %}number{% endif %} will be shown on the following page and your account password will be sent to your email address along with further instructions. If you do not receive the email with your password, please check your spam filter.<br/><br/>
+{% set account_type = constant('USE_ACCOUNT_NAME') ? t('account.create.account_name', 'name') : t('account.create.account_number', 'number') %}
+{% set recaptcha = config.recaptcha_enabled ? t('account.create.hint_recaptcha', ', confirm reCAPTCHA') : '' %}
+{% set country = config.account_country ? t('account.create.hint_country', ', and select your country') : '' %}
+{{ t('account.create.hint_intro', 'To play on {server}, you need an account.', {'server': config.lua.serverName}) }}
+{{ t('account.create.hint_setup', 'To create your account, enter an account {account_type}, a password{recaptcha}{country}, and your email address.', {'account_type': account_type, 'recaptcha': recaptcha, 'country': country}) }}
+{{ t('account.create.hint_finish', 'You must also accept the terms below. Once finished, your account {account_type} will be shown on the next page and your password will be sent to your email address with further instructions. If you do not receive the email, please check your spam folder.', {'account_type': account_type}) }}<br/><br/>

@@ -1,7 +1,7 @@
 body {
   margin: 0px;
   padding: 0px;
-  background-color: #051122;
+  background: #06100d url(images/header/zealot-site-background.jpg) center top / cover fixed no-repeat;
 }
 
 img {
@@ -367,22 +367,24 @@ img {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  height: 64px;
-  margin-bottom: 2px;
+  height: 80px;
+  margin: 0 auto 3px;
   background-image: url(images/header/pedestal1.gif);
   background-position: center bottom;
   background-repeat: no-repeat;
-  background-size: 80px 65px;
+  background-size: 88px 72px;
 }
 
 .DailyBoostSprite img {
   position: relative;
   z-index: 1;
-  width: var(--daily-boost-sprite-size, 54px);
-  height: var(--daily-boost-sprite-size, 54px);
+  /* The exported image retains the exact client canvas, so scale the canvas
+     here rather than changing/cropping individual creature GIFs. */
+  width: min(68px, calc(var(--daily-boost-sprite-size, 54px) * 1.3));
+  height: min(68px, calc(var(--daily-boost-sprite-size, 54px) * 1.3));
   object-fit: contain;
   object-position: center bottom;
-  margin-bottom: 7px;
+  margin: 0 0 8px;
   image-rendering: pixelated;
 }
 

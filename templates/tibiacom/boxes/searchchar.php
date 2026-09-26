@@ -1,28 +1,45 @@
 <style>
     .searchchar{
         width: 180px;
-        height: 145px;
+        height: auto;
     }
     .searchchar_header{
-        height: 45px;
+        min-height: 72px;
+        height: auto;
         width: 180px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 10px;
         background-image: url('templates/tibiacom/images/themeboxes/box_top.png');
         font-family: Verdana;
         font-weight: bold;
         color: #d5c3af;
-        line-height: 65px;
+        line-height: 1.08;
+        font-size: 17px;
+        overflow-wrap: anywhere;
+        text-align: center;
+        text-wrap: balance;
     }
     .searchchar_bottom{
         height: 30px;
         width: 180px;
-        margin-top: -20px;
+        margin-top: 0;
         background-image: url('templates/tibiacom/images/themeboxes/box_bottom.png');
     }
     .searchchar_content{
-        padding: 0px 10px;
+        box-sizing: border-box;
+        padding: 9px 10px 10px;
         width: 160px;
-        height: 80px;
+        min-height: 80px;
+        height: auto;
         background-image: url('templates/tibiacom/images/themeboxes/box_bg.png');
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
     }
     .searchchar_text{
         margin-left: 45px;
@@ -40,7 +57,7 @@
         color: #d5c3af;
         font-size: 12px;
         cursor: pointer;
-        margin-top: 5px;
+        margin-top: 0;
     }
     .searchchar_button:hover{
         background: url('templates/tibiacom/images/themeboxes/button_over.png');
@@ -48,6 +65,7 @@
     }
     .searchchar_input{
         display: block;
+        box-sizing: border-box;
         width: 100%;
         padding: 0.375rem 0.75rem;
         border-radius: 0.25rem;

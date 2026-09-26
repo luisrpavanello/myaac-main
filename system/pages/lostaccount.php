@@ -11,11 +11,11 @@ global $db, $config, $action, $twig, $template_path;
  * @link      https://github.com/opentibiabr/myaac
  */
 defined('MYAAC') or die('Direct access not allowed!');
-$title = 'Lost Account Interface';
+$title = t('lost.title', 'Account Recovery');
 $baseUrl = BASE_URL;
 
 if (!$config['mail_enabled']) {
-    echo '<b>Account maker is not configured to send e-mails, you can\'t use Lost Account Interface. Contact with admin to get help.</b>';
+    echo '<b>' . htmlspecialchars(t('lost.mail_unavailable', 'Account recovery by email is temporarily unavailable. Please contact the administrator for assistance.'), ENT_QUOTES, 'UTF-8') . '</b>';
     return;
 }
 

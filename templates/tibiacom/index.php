@@ -519,7 +519,9 @@ if (isset($config['boxes']))
                                                    hreflang="<?= htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>"
                                                    lang="<?= htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>"
                                                    title="<?= htmlspecialchars(t('language.' . $languageCode), ENT_QUOTES, 'UTF-8'); ?>">
-                                                    <span aria-hidden="true"><?= $language['flag']; ?></span>
+                                                    <span class="zealot-language-option__flags" aria-hidden="true">
+                                                        <span><?= $language['flag']; ?></span><?php if (!empty($language['secondary_flag'])): ?><span><?= $language['secondary_flag']; ?></span><?php endif; ?>
+                                                    </span>
                                                     <span class="zealot-language-option__label"><?= htmlspecialchars(t('language.' . $languageCode), ENT_QUOTES, 'UTF-8'); ?></span>
                                                 </a>
                                             <?php endforeach; ?>

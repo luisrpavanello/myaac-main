@@ -290,7 +290,7 @@
 												</tr>
 												<tr>
 													<td colspan="2" >
-														<span><input type="checkbox" id="accept_rules" name="accept_rules" value="true"{% if accept_rules %}checked{% endif %}/> <label for="accept_rules">I agree to the <a href="?subtopic=rules" target="_blank">{{ config.lua.serverName }} Rules</a>.</label></span>
+														<span><input type="checkbox" id="accept_rules" name="accept_rules" value="true"{% if accept_rules %}checked{% endif %}/> <label for="accept_rules">{{ t('account.create.accept_rules', 'I agree to the') }} <a href="?subtopic=rules" target="_blank">{{ t('account.create.rules_link', '{server} Rules', {'server': config.lua.serverName}) }}</a>.</label></span>
 													</td>
 												</tr>
                                                 {% if errors.accept_rules is defined %}
